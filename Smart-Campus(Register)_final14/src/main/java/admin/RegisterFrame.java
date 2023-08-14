@@ -73,6 +73,33 @@ public class RegisterFrame extends JFrame {
             }
         });
 
+        JPanel passwordPanel = new JPanel(new BorderLayout());
+        passwordPanel.add(txtPassword, BorderLayout.CENTER);
+        JButton btnTogglePassword = new JButton("👁️");
+        passwordPanel.add(btnTogglePassword, BorderLayout.EAST);
+        btnTogglePassword.addActionListener(new ActionListener() {
+            private boolean passwordVisible = false;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                passwordVisible = !passwordVisible;
+                txtPassword.setEchoChar(passwordVisible ? '\0' : (char) 0x2022);
+            }
+        });
+
+        JPanel confirmPasswordPanel = new JPanel(new BorderLayout());
+        confirmPasswordPanel.add(txtConfirmPassword, BorderLayout.CENTER);
+        JButton btnToggleConfirmPassword = new JButton("👁️");
+        confirmPasswordPanel.add(btnToggleConfirmPassword, BorderLayout.EAST);
+        btnToggleConfirmPassword.addActionListener(new ActionListener() {
+            private boolean confirmPasswordVisible = false;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                confirmPasswordVisible = !confirmPasswordVisible;
+                txtConfirmPassword.setEchoChar(confirmPasswordVisible ? '\0' : (char) 0x2022);
+            }
+        });
         btnRegister = new JButton("확인");
         btnRegister.addActionListener(new ActionListener() {
             @Override
@@ -148,13 +175,13 @@ public class RegisterFrame extends JFrame {
 
         panel.add(lblUsername);
         panel.add(txtUsername);
-        panel.add(btnCheckDuplicate);
+        panel.add(btnCheckDuplicate); 
         panel.add(lblPassword);
-        panel.add(txtPassword);
-        panel.add(new JLabel());
+        panel.add(passwordPanel);
+        panel.add(lblConfirmPasswordStatus); 
         panel.add(lblConfirmPassword);
-        panel.add(txtConfirmPassword);
-        panel.add(lblConfirmPasswordStatus);
+        panel.add(confirmPasswordPanel);
+        panel.add(new JLabel()); 
         panel.add(lblMajor);
         panel.add(comboMajor);
         panel.add(new JLabel());
