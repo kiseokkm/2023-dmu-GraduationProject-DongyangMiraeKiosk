@@ -116,6 +116,24 @@ public class LoginFrame extends javax.swing.JFrame {
 
         pack();
         setLocationRelativeTo(null);
+        
+        btnFindId = new javax.swing.JButton("아이디 찾기");
+        btnFindId.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FindIdFrame findIdFrame = new FindIdFrame();
+                findIdFrame.setVisible(true);
+                // 현재 로그인 프레임을 닫지 않게 두려면 아래 줄을 주석 처리하거나 삭제하세요.
+                // dispose();
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        pnlContainer.add(btnFindId, gridBagConstraints);
+
     }
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {
@@ -178,6 +196,12 @@ public class LoginFrame extends javax.swing.JFrame {
             return true;
         }
     }
+    private void btnFindIdActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO: 아이디 찾기 로직 추가
+        JOptionPane.showMessageDialog(this, "아이디 찾기 기능 구현 필요!");
+    }
+
+    
 
     /**
      * @param args the command line arguments
@@ -201,5 +225,7 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JPanel pnlContainer;
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtUsername;
+    private javax.swing.JButton btnFindId;
+
     // End of variables declaration
 }
