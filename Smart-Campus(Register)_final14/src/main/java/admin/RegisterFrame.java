@@ -1,0 +1,256 @@
+package admin;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import models.User1;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class RegisterFrame extends JFrame {
+    private JTextField txtUsername;
+    private JButton btnCheckDuplicate;
+    private JPasswordField txtPassword;
+    private JPasswordField txtConfirmPassword;
+    private JTextField txtStudentId;
+    private JTextField txtname;
+    private JTextField txtPhoneNumber;
+    private JButton btnRegister;
+    private JButton btnCancel;
+    private JLabel lblConfirmPasswordStatus;
+    private JComboBox<String> comboMajor;
+
+    public RegisterFrame() {
+        initComponents();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("회원가입");
+        setSize(500, 500);
+        setLocationRelativeTo(null);
+        btnRegister.setEnabled(false);
+    }
+
+    private void initComponents() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(8, 3, 5, 5));
+
+        JLabel lblUsername = new JLabel("아이디:(ID 중복확인 필수!)");
+        JLabel lblPassword = new JLabel("비밀번호:");
+        JLabel lblConfirmPassword = new JLabel("비밀번호 확인:");
+        JLabel lblMajor = new JLabel("학과:");
+        JLabel lblStudentId = new JLabel("학번:");
+        JLabel lblname = new JLabel("이름:");
+        JLabel lblPhoneNumber = new JLabel("전화번호:");
+
+        txtUsername = new JTextField(20);
+        txtPassword = new JPasswordField(20);
+        txtConfirmPassword = new JPasswordField(20);
+        txtStudentId = new JTextField(20);
+        txtname = new JTextField(20);
+        txtPhoneNumber = new JTextField(20);
+
+        btnCheckDuplicate = new JButton("중복확인");
+        btnCheckDuplicate.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = txtUsername.getText();
+                boolean isDuplicate = checkDuplicate(username);
+
+                if (isDuplicate) {
+                    JOptionPane.showMessageDialog(RegisterFrame.this, "중복된 아이디입니다.", "중복확인", JOptionPane.WARNING_MESSAGE);
+                    btnRegister.setEnabled(false);
+                } else {
+                    JOptionPane.showMessageDialog(RegisterFrame.this, "사용 가능한 아이디입니다.", "중복확인", JOptionPane.INFORMATION_MESSAGE);
+                    btnRegister.setEnabled(true);
+                }
+            }
+        });
+
+        btnRegister = new JButton("확인");
+        btnRegister.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = txtUsername.getText();
+                String password = new String(txtPassword.getPassword());
+                String confirmPassword = new String(txtConfirmPassword.getPassword());
+                String studentId = txtStudentId.getText();
+                String name = txtname.getText();
+                String phoneNumber = txtPhoneNumber.getText();
+                String major = (String) comboMajor.getSelectedItem();
+
+                if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || studentId.isEmpty()
+                        || name.isEmpty() || phoneNumber.isEmpty()) {
+                    JOptionPane.showMessageDialog(RegisterFrame.this, "모든 정보를 입력해주세요!", "오류", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (!password.equals(confirmPassword)) {
+                    JOptionPane.showMessageDialog(RegisterFrame.this, "비밀번호가 일치하지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                User1 user1 = new User1(username, password, major, studentId, name, phoneNumber);
+                boolean isSaved = saveUser1ToDatabase(user1);
+
+                if (isSaved) {
+                    dispose();
+                    LoginFrame loginFrame = new LoginFrame();
+                    loginFrame.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(RegisterFrame.this, "회원가입에 실패하였습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+
+        btnCancel = new JButton("취소");
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+
+        lblConfirmPasswordStatus = new JLabel();
+        lblConfirmPasswordStatus.setForeground(Color.RED);
+
+        comboMajor = new JComboBox<String>();
+        comboMajor.addItem("기계공학과");
+        comboMajor.addItem("기계설계공학과");
+        comboMajor.addItem("로봇공학과");
+        comboMajor.addItem("자동화공학과");
+        comboMajor.addItem("전기공학과");
+        comboMajor.addItem("정보전자공학과");
+        comboMajor.addItem("반도체전자공학과");
+        comboMajor.addItem("정보통신공학과");
+        comboMajor.addItem("소방안전관리과");
+        comboMajor.addItem("컴퓨터소프트웨어공학과");
+        comboMajor.addItem("컴퓨터정보공학과");
+        comboMajor.addItem("인공지능소프트웨어공학과");
+        comboMajor.addItem("생명화학공학과");
+        comboMajor.addItem("바이오융합공학과");
+        comboMajor.addItem("건축과");
+        comboMajor.addItem("실내건축디자인과");
+        comboMajor.addItem("시각디자인과");
+        comboMajor.addItem("경영학과");
+        comboMajor.addItem("세무회계학과");
+        comboMajor.addItem("유통마케팅학과");
+        comboMajor.addItem("호텔관광학과");
+        comboMajor.addItem("경영정보학과");
+        comboMajor.addItem("빅데이터경영과");
+
+        panel.add(lblUsername);
+        panel.add(txtUsername);
+        panel.add(btnCheckDuplicate);
+        panel.add(lblPassword);
+        panel.add(txtPassword);
+        panel.add(new JLabel());
+        panel.add(lblConfirmPassword);
+        panel.add(txtConfirmPassword);
+        panel.add(lblConfirmPasswordStatus);
+        panel.add(lblMajor);
+        panel.add(comboMajor);
+        panel.add(new JLabel());
+        panel.add(lblStudentId);
+        panel.add(txtStudentId);
+        panel.add(new JLabel());
+        panel.add(lblname);
+        panel.add(txtname);
+        panel.add(new JLabel());
+        panel.add(lblPhoneNumber);
+        panel.add(txtPhoneNumber);
+        panel.add(new JLabel());
+        panel.add(new JLabel());
+        panel.add(btnRegister);
+        panel.add(btnCancel);
+
+        add(panel);
+        
+        DocumentListener passwordCheckListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                checkPasswordMatch();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                checkPasswordMatch();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                checkPasswordMatch();
+            }
+
+            private void checkPasswordMatch() {
+                String password = new String(txtPassword.getPassword());
+                String confirmPassword = new String(txtConfirmPassword.getPassword());
+
+                if (!password.equals(confirmPassword)) {
+                    lblConfirmPasswordStatus.setText("비밀번호가 다릅니다.");
+                } else {
+                    lblConfirmPasswordStatus.setText("");
+                }
+            }
+        };
+
+        txtPassword.getDocument().addDocumentListener(passwordCheckListener);
+        txtConfirmPassword.getDocument().addDocumentListener(passwordCheckListener);
+
+    }
+
+    private boolean checkDuplicate(String username) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql = "SELECT * FROM user1 WHERE username = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, username);
+            ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean saveUser1ToDatabase(User1 user1) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql = "INSERT INTO user1 (username, password, major, studentId, name, phoneNumber) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, user1.getUsername());
+            statement.setString(2, user1.getPassword());
+            statement.setString(3, user1.getMajor());
+            statement.setString(4, user1.getStudentId());
+            statement.setString(5, user1.getname());
+            statement.setString(6, user1.getPhoneNumber());
+            int rowsInserted = statement.executeUpdate();
+
+            if (rowsInserted > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static void main(String[] args) {
+        RegisterFrame registerFrame = new RegisterFrame();
+        registerFrame.setVisible(true);
+    }
+}
