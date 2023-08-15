@@ -47,8 +47,8 @@ public class LoginFrame extends javax.swing.JFrame {
 
         pnlContainer.setPreferredSize(new java.awt.Dimension(400, 200));
         java.awt.GridBagLayout pnlFormLayout = new java.awt.GridBagLayout();
-        pnlFormLayout.columnWidths = new int[]{100, 250};
-        pnlFormLayout.rowHeights = new int[]{60, 0, 60, 40};
+        pnlFormLayout.columnWidths = new int[]{100, 150};
+        pnlFormLayout.rowHeights = new int[]{50, 0, 60, 40};
         pnlContainer.setLayout(pnlFormLayout);
 
         lblTitle.setFont(lblTitle.getFont().deriveFont(lblTitle.getFont().getSize() + 10f));
@@ -117,24 +117,39 @@ public class LoginFrame extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
         
+        //아이디 찾기 버튼 ~
         btnFindId = new javax.swing.JButton("아이디 찾기");
         btnFindId.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FindIdFrame findIdFrame = new FindIdFrame();
                 findIdFrame.setVisible(true);
-                // 현재 로그인 프레임을 닫지 않게 두려면 아래 줄을 주석 처리하거나 삭제하세요.
-                // dispose();
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         pnlContainer.add(btnFindId, gridBagConstraints);
 
+        //비밀번호 찾기 버튼 ~
+        btnFindPassword = new javax.swing.JButton("비밀번호 찾기");
+        btnFindPassword.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FindPasswordFrame findPasswordFrame = new FindPasswordFrame();
+                findPasswordFrame.setVisible(true);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        pnlContainer.add(btnFindPassword, gridBagConstraints);
     }
+    
+    
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {
         if (getValidFields()) {
@@ -198,7 +213,7 @@ public class LoginFrame extends javax.swing.JFrame {
     }
     private void btnFindIdActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO: 아이디 찾기 로직 추가
-        JOptionPane.showMessageDialog(this, "아이디 찾기 기능 구현 필요!");
+        JOptionPane.showMessageDialog(this, "아이디 찾기 기능 구현!");
     }
 
     
@@ -226,6 +241,7 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtUsername;
     private javax.swing.JButton btnFindId;
+    private javax.swing.JButton btnFindPassword;
 
     // End of variables declaration
 }
