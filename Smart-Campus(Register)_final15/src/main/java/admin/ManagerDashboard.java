@@ -7,12 +7,18 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ManagerDashboard extends JFrame {
     private JButton addNoticeButton;
     private JButton editNoticeButton;
     private JButton deleteNoticeButton;
+    private JTable noticeTable; 
+    private DefaultTableModel noticeTableModel;
 
     public ManagerDashboard() {
         setTitle("Manager Dashboard");
@@ -30,9 +36,13 @@ public class ManagerDashboard extends JFrame {
         addNoticeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String newNotice = JOptionPane.showInputDialog("Enter new notice:");
-                if (newNotice != null && !newNotice.isEmpty()) {
-                    addNotice(newNotice);
+                String title = JOptionPane.showInputDialog("Enter notice title:");
+                if (title != null && !title.isEmpty()) {
+                    String content = JOptionPane.showInputDialog("Enter notice content:");
+                    String author = JOptionPane.showInputDialog("Enter author:");
+                    if (content != null && author != null && !content.isEmpty() && !author.isEmpty()) {
+                        addNotice(title, content, author);
+                    }
                 }
             }
         });
@@ -41,23 +51,7 @@ public class ManagerDashboard extends JFrame {
         editNoticeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ArrayList<String> notices = fetchAllNotices();
-                String selectedNotice = (String) JOptionPane.showInputDialog(
-                        null,
-                        "Select notice to edit:",
-                        "Edit Notice",
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        notices.toArray(),
-                        notices.get(0)
-                );
-
-                if (selectedNotice != null) {
-                    String updatedNotice = JOptionPane.showInputDialog("Update notice:", selectedNotice);
-                    if (updatedNotice != null && !updatedNotice.isEmpty()) {
-                        updateNotice(selectedNotice, updatedNotice);
-                    }
-                }
+                // The logic for editing a notice can be implemented here
             }
         });
 
@@ -68,7 +62,7 @@ public class ManagerDashboard extends JFrame {
                 ArrayList<String> notices = fetchAllNotices();
                 String selectedNotice = (String) JOptionPane.showInputDialog(
                         null,
-                        "Select notice to delete:",
+                        "Select notice title to delete:",
                         "Delete Notice",
                         JOptionPane.QUESTION_MESSAGE,
                         null,
@@ -85,39 +79,45 @@ public class ManagerDashboard extends JFrame {
         add(addNoticeButton);
         add(editNoticeButton);
         add(deleteNoticeButton);
-    }
+    
+    
+    String[] columnNames = {"Title"};
+    noticeTableModel = new DefaultTableModel(columnNames, 0);
+    noticeTable = new JTable(noticeTableModel);
+    noticeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    noticeTable.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                int rowIndex = noticeTable.getSelectedRow();
+                String title = (String) noticeTableModel.getValueAt(rowIndex, 0);
+                showNoticeDetails(title);
+            }
+        }
+    });
+    JScrollPane scrollPane = new JScrollPane(noticeTable);
+    add(scrollPane);
 
-    // 데이터베이스에서 모든 공지사항을 가져오는 함수
+    // 공지사항 데이터 로드
+    loadNoticesIntoTable();
+}
+
+    // 데이터베이스에서 모든 공지사항의 제목을 가져오는 함수
     private ArrayList<String> fetchAllNotices() {
         ArrayList<String> notices = new ArrayList<>();
-        
         // 데이터베이스 연결 및 조회 로직 구현
-        
         return notices;
     }
 
     // 데이터베이스에 새로운 공지사항을 추가하는 함수
-    private void addNotice(String notice) {
+    private void addNotice(String title, String content, String author) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-            String sql = "INSERT INTO notices (content) VALUES (?)";
+            String sql = "INSERT INTO notices (title, content, author, date) VALUES (?, ?, ?, CURDATE())";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, notice);
-            statement.executeUpdate();
-            connection.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    // 데이터베이스의 기존 공지사항을 수정하는 함수
-    private void updateNotice(String oldNotice, String newNotice) {
-        try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-            String sql = "UPDATE notices SET content = ? WHERE content = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, newNotice);
-            statement.setString(2, oldNotice);
+            statement.setString(1, title);
+            statement.setString(2, content);
+            statement.setString(3, author);
             statement.executeUpdate();
             connection.close();
         } catch (Exception ex) {
@@ -126,12 +126,12 @@ public class ManagerDashboard extends JFrame {
     }
 
     // 데이터베이스의 공지사항을 삭제하는 함수
-    private void deleteNotice(String notice) {
+    private void deleteNotice(String title) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-            String sql = "DELETE FROM notices WHERE content = ?";
+            String sql = "DELETE FROM notices WHERE title = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, notice);
+            statement.setString(1, title);
             statement.executeUpdate();
             connection.close();
         } catch (Exception ex) {
@@ -144,5 +144,38 @@ public class ManagerDashboard extends JFrame {
             ManagerDashboard managerDashboard = new ManagerDashboard();
             managerDashboard.setVisible(true);
         });
+    }
+    
+    private void loadNoticesIntoTable() {
+        ArrayList<String> notices = fetchAllNotices();
+        for (String title : notices) {
+            noticeTableModel.addRow(new Object[]{title});
+        }
+    }
+    
+ // 공지사항의 상세 내용을 팝업 창에서 보여주는 메서드
+    private void showNoticeDetails(String title) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql = "SELECT content FROM notices WHERE title = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, title);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                String content = rs.getString("content");
+                JTextArea textArea = new JTextArea(10, 40);
+                textArea.setText(content);
+                textArea.setWrapStyleWord(true);
+                textArea.setLineWrap(true);
+                textArea.setCaretPosition(0);
+                textArea.setEditable(false);
+                JOptionPane.showMessageDialog(null, new JScrollPane(textArea), "Notice Details", JOptionPane.INFORMATION_MESSAGE);
+            }
+            rs.close();
+            statement.close();
+            connection.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

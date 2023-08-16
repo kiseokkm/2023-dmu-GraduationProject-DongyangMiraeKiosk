@@ -3,12 +3,20 @@
  */
 package kiosk;
 
+import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.ListModel;
 
 public class MenuFrame extends javax.swing.JFrame implements StateObserver {
@@ -24,16 +32,21 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
    * Creates new form MenuFrame
    */
   public MenuFrame() {
-    app.Global.setAppIcon(this);
+	  try {
+	        app.Global.setAppIcon(this);
 
-    /**
-     * Initialize
-     */
-    initModels();
-    initComponents();
-    initCustomComponents();
-    initState();
-  }
+	        /**
+	         * Initialize
+	         */
+	        initModels();
+	        initComponents();
+	        initCustomComponents();
+	        initState();
+	    } catch (Exception e) {
+	        e.printStackTrace(); // 여기서 오류 메시지를 출력합니다.
+	        JOptionPane.showMessageDialog(this, "An error occurred while initializing the frame: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
 
   /**
    * This method is called from within the constructor to initialize the form.
@@ -200,7 +213,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   }// </editor-fold>//GEN-END:initComponents
   
   
-
+  private javax.swing.JTable noticeTable;
+  private javax.swing.table.DefaultTableModel noticeTableModel;
   
   
   
@@ -293,18 +307,92 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	        String sql = "SELECT * FROM notices ORDER BY id DESC";
 	        Statement statement = connection.createStatement();
 	        ResultSet resultSet = statement.executeQuery(sql);
+	        
+	        noticeTableModel = new javax.swing.table.DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
+	        noticeTable = new javax.swing.JTable(noticeTableModel); // 이 부분이 noticeTable 초기화 부분입니다. 
+	        
 	        while (resultSet.next()) {
-	            // 이 부분에서 공지사항 데이터를 사용하여 화면을 업데이트합니다.
-	            javax.swing.JLabel noticeLabel = new javax.swing.JLabel(resultSet.getString("content"));
-	            pnlMealCombos.add(noticeLabel);
+	            Object[] row = {
+	                resultSet.getInt("id"),
+	                resultSet.getString("title"),
+	                resultSet.getString("author"),
+	                resultSet.getString("date"),
+	                resultSet.getInt("viewCount")
+	            };
+	            noticeTableModel.addRow(row);
 	        }
-	        resultSet.close();
+	        
+	    
+	    
+        noticeTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int rowIndex = noticeTable.getSelectedRow();
+                    String title = (String) noticeTableModel.getValueAt(rowIndex, 1);
+                    showNoticeDetails(title);
+                }
+            }
+        });
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+	    
+	    
+	    pnlMealCombos.removeAll(); // 기존에 pnlMealCombos에 추가된 컴포넌트들을 모두 제거합니다.
+	    pnlMealCombos.setLayout(new BorderLayout()); // 레이아웃을 BorderLayout으로 설정합니다.
+	    pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER); // noticeTable을 JScrollPane에 넣어 pnlMealCombos에 추가합니다.
+	    pnlMealCombos.revalidate(); // pnlMealCombos 패널을 다시 그립니다.
+	    pnlMealCombos.repaint(); // pnlMealCombos 패널을 다시 그립니다.
+
+}
+	    
+	    
+	    
+	    
+	    
+	    
+  private void showNoticeDetails(String title) {
+	  System.out.println("showNoticeDetails called with title: " + title);
+
+	    try {
+	        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+	        String sql = "SELECT content FROM notices WHERE title = ?";
+	        PreparedStatement statement = connection.prepareStatement(sql);
+	        statement.setString(1, title);
+	        ResultSet rs = statement.executeQuery();
+	        if (rs.next()) {
+	            String content = rs.getString("content");
+	            JTextArea textArea = new JTextArea(10, 40);
+	            textArea.setText(content);
+	            textArea.setWrapStyleWord(true);
+	            textArea.setLineWrap(true);
+	            textArea.setCaretPosition(0);
+	            textArea.setEditable(false);
+
+	            JDialog dialog = new JDialog();
+	            dialog.setTitle("Notice Details");
+	            dialog.setSize(400, 300);
+	            dialog.add(new JScrollPane(textArea));
+	            dialog.setLocationRelativeTo(null);  // center on screen
+	            dialog.setVisible(true);
+
+	        }
+	        rs.close();
 	        statement.close();
 	        connection.close();
-	    } catch (SQLException e) {
-	        e.printStackTrace();
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
 	    }
 	}
+	
+	    
+	    
+	    
+	    
+	    
+	   
+
 
   
   

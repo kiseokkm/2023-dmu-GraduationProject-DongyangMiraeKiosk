@@ -3,6 +3,8 @@
  */
 package kiosk;
 
+import javax.swing.JOptionPane;
+
 public class StartFrame extends javax.swing.JFrame {
 
   /**
@@ -73,11 +75,16 @@ public class StartFrame extends javax.swing.JFrame {
     setLocationRelativeTo(null);
   }// </editor-fold>//GEN-END:initComponents
 
-  private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
-    StateManager.reset();
-    new MenuFrame().setVisible(true);
-    dispose();
-  }//GEN-LAST:event_btnStartActionPerformed
+  private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {
+	    try {
+	        StateManager.reset();
+	        new MenuFrame().setVisible(true);
+	        dispose();
+	    } catch (Exception e) {
+	        e.printStackTrace(); // 여기서 오류 메시지를 출력합니다.
+	        JOptionPane.showMessageDialog(this, "An error occurred: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
 
   /**
    * @param args the command line arguments
