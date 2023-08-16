@@ -231,37 +231,43 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   }//GEN-LAST:event_tblOrderMouseClicked
 
   private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbedPaneStateChanged
-    int tabIndex = tabbedPane.getSelectedIndex();
+	    int tabIndex = tabbedPane.getSelectedIndex();
 
-    if (tabIndex == 1 && itemsSides == null) {
-      itemsSides = itemService.getAllByCategory(2);
-      itemsSides.forEach((item) -> {
-        BtnItem btnItem = new BtnItem(item);
-        btnItem.addActionListener((java.awt.event.ActionEvent e) -> itemActionPeformed(item));
-        pnlSides.add(btnItem);
-      });
-    }
+	    // When 공지사항 tab is selected
+	    if (tabIndex == 0 && pnlMealCombos.getComponentCount() == 0) {
+	        NoticeBoard noticeBoard = new NoticeBoard();
+	        pnlMealCombos.add(noticeBoard);
+	    }
 
-    if (tabIndex == 2 && itemsDesserts == null) {
-      itemsDesserts = itemService.getAllByCategory(3);
-      itemsDesserts.forEach((item) -> {
-        BtnItem btnItem = new BtnItem(item);
-        btnItem.addActionListener((java.awt.event.ActionEvent e) -> itemActionPeformed(item));
-        pnlDesserts.add(btnItem);
-      });
-    }
+	    if (tabIndex == 1 && itemsSides == null) {
+	      itemsSides = itemService.getAllByCategory(2);
+	      itemsSides.forEach((item) -> {
+	        BtnItem btnItem = new BtnItem(item);
+	        btnItem.addActionListener((java.awt.event.ActionEvent e) -> itemActionPeformed(item));
+	        pnlSides.add(btnItem);
+	      });
+	    }
 
-    if (tabIndex == 3 && itemsBeverages == null) {
-      // Connect with campus map
-      java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-      try {
-        java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
-        desktop.browse(uri);
-      } catch (java.net.URISyntaxException | java.io.IOException ex) {
-        ex.printStackTrace();
-      }
-    }
-  }//GEN-LAST:event_tabbedPaneStateChanged
+	    if (tabIndex == 2 && itemsDesserts == null) {
+	      itemsDesserts = itemService.getAllByCategory(3);
+	      itemsDesserts.forEach((item) -> {
+	        BtnItem btnItem = new BtnItem(item);
+	        btnItem.addActionListener((java.awt.event.ActionEvent e) -> itemActionPeformed(item));
+	        pnlDesserts.add(btnItem);
+	      });
+	    }
+
+	    if (tabIndex == 3 && itemsBeverages == null) {
+	      // Connect with campus map
+	      java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+	      try {
+	        java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
+	        desktop.browse(uri);
+	      } catch (java.net.URISyntaxException | java.io.IOException ex) {
+	        ex.printStackTrace();
+	      }
+	    }
+	}//GEN-LAST:event_tabbedPaneStateChanged
 
   private void itemActionPeformed(models.Item item) {
     CustomizeDialog customizeDialog = new CustomizeDialog(item);
