@@ -19,6 +19,9 @@ import java.sql.Statement;
 
 
 public class LoginFrame extends javax.swing.JFrame {
+	
+    private static final String MANAGER_USERNAME = "manager";
+    private static final String MANAGER_PASSWORD = "password123";
 
     private services.AuthService authService;
 
@@ -160,7 +163,15 @@ public class LoginFrame extends javax.swing.JFrame {
             String username = txtUsername.getText();
             String password = new String(txtPassword.getPassword());
 
-            // 사용자 인증 확인
+            // Check if the credentials match the manager's credentials
+            if (MANAGER_USERNAME.equals(username) && MANAGER_PASSWORD.equals(password)) {
+                // Open manager's dashboard or screen
+                new ManagerDashboard().setVisible(true);  // Assuming you have a ManagerDashboard class for the manager
+                dispose();
+                return;
+            }
+
+            // 기존 사용자 인증 확인 코드
             if (authenticateUser(username, password)) {
                 new AdminFrame().setVisible(true);
                 dispose();

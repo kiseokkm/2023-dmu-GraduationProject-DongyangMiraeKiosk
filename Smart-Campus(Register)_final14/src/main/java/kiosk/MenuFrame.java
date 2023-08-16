@@ -3,6 +3,14 @@
  */
 package kiosk;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.ListModel;
+
 public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 
   services.ItemService itemService;
@@ -187,7 +195,17 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 
     pack();
     setLocationRelativeTo(null);
+    
+    
   }// </editor-fold>//GEN-END:initComponents
+  
+  
+
+  
+  
+  
+  
+  
 
   private void initModels() {
     itemService = new services.ItemService();
@@ -234,9 +252,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	    int tabIndex = tabbedPane.getSelectedIndex();
 
 	    // When 공지사항 tab is selected
-	    if (tabIndex == 0 && pnlMealCombos.getComponentCount() == 0) {
-	        NoticeBoard noticeBoard = new NoticeBoard();
-	        pnlMealCombos.add(noticeBoard);
+	    if (tabIndex == 0) {
+	        loadNotices();
 	    }
 
 	    if (tabIndex == 1 && itemsSides == null) {
@@ -268,6 +285,29 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	      }
 	    }
 	}//GEN-LAST:event_tabbedPaneStateChanged
+  
+  
+  private void loadNotices() {
+	    try {
+	        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+	        String sql = "SELECT * FROM notices ORDER BY id DESC";
+	        Statement statement = connection.createStatement();
+	        ResultSet resultSet = statement.executeQuery(sql);
+	        while (resultSet.next()) {
+	            javax.swing.JLabel noticeLabel = new javax.swing.JLabel(resultSet.getString("content"));
+	            pnlMealCombos.add(noticeLabel);
+	        }
+	        resultSet.close();
+	        statement.close();
+	        connection.close();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+  
+  
+  
 
   private void itemActionPeformed(models.Item item) {
     CustomizeDialog customizeDialog = new CustomizeDialog(item);
