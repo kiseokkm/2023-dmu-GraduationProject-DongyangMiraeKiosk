@@ -39,7 +39,7 @@ public class RegisterFrame extends JFrame {
 
     private void initComponents() {
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(8, 3, 5, 5));
+        panel.setLayout(new GridLayout(10, 3, 5, 5));
 
         JLabel lblUsername = new JLabel("아이디:(ID 중복확인 필수!)");
         JLabel lblPassword = new JLabel("비밀번호:");
@@ -48,6 +48,7 @@ public class RegisterFrame extends JFrame {
         JLabel lblStudentId = new JLabel("학번:");
         JLabel lblname = new JLabel("이름:");
         JLabel lblPhoneNumber = new JLabel("전화번호:");
+        JLabel lblMostPreciousThing = new JLabel("당신의 가장 소중한것은:");
 
         txtUsername = new JTextField(20);
         txtPassword = new JPasswordField(20);
@@ -55,6 +56,7 @@ public class RegisterFrame extends JFrame {
         txtStudentId = new JTextField(20);
         txtname = new JTextField(20);
         txtPhoneNumber = new JTextField(20);
+        JTextField txtMostPreciousThing = new JTextField(20);
 
         btnCheckDuplicate = new JButton("중복확인");
         btnCheckDuplicate.addActionListener(new ActionListener() {
@@ -111,6 +113,7 @@ public class RegisterFrame extends JFrame {
                 String name = txtname.getText();
                 String phoneNumber = txtPhoneNumber.getText();
                 String major = (String) comboMajor.getSelectedItem();
+                String mostPreciousThing = txtMostPreciousThing.getText();
 
                 if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || studentId.isEmpty()
                         || name.isEmpty() || phoneNumber.isEmpty()) {
@@ -123,7 +126,7 @@ public class RegisterFrame extends JFrame {
                     return;
                 }
 
-                User1 user1 = new User1(username, password, major, studentId, name, phoneNumber);
+                User1 user1 = new User1(username, password, major, studentId, name, phoneNumber, mostPreciousThing);
                 boolean isSaved = saveUser1ToDatabase(user1);
 
                 if (isSaved) {
@@ -194,6 +197,9 @@ public class RegisterFrame extends JFrame {
         panel.add(lblPhoneNumber);
         panel.add(txtPhoneNumber);
         panel.add(new JLabel());
+        panel.add(lblMostPreciousThing);
+        panel.add(txtMostPreciousThing);
+        panel.add(new JLabel());
         panel.add(new JLabel());
         panel.add(btnRegister);
         panel.add(btnCancel);
@@ -255,7 +261,7 @@ public class RegisterFrame extends JFrame {
     private boolean saveUser1ToDatabase(User1 user1) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-            String sql = "INSERT INTO user1 (username, password, major, studentId, name, phoneNumber) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO user1 (username, password, major, studentId, name, phoneNumber,mostPreciousThing) VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, user1.getUsername());
             statement.setString(2, user1.getPassword());
@@ -263,6 +269,7 @@ public class RegisterFrame extends JFrame {
             statement.setString(4, user1.getStudentId());
             statement.setString(5, user1.getname());
             statement.setString(6, user1.getPhoneNumber());
+            statement.setString(7, user1.getMostPreciousThing());
             int rowsInserted = statement.executeUpdate();
 
             if (rowsInserted > 0) {
@@ -280,4 +287,13 @@ public class RegisterFrame extends JFrame {
         RegisterFrame registerFrame = new RegisterFrame();
         registerFrame.setVisible(true);
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

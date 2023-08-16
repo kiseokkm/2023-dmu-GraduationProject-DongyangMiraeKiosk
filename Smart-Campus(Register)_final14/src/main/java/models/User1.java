@@ -8,6 +8,7 @@ public class User1 {
   private String studentId;
   private String name;
   private String phoneNumber;
+  private String mostPreciousThing;
 
   public int getUser_id() {
     return user_id;
@@ -64,6 +65,14 @@ public class User1 {
   public void setPhoneNumber(String phoneNumber) {
     this.phoneNumber = phoneNumber;
   }
+  
+  public String getMostPreciousThing() {
+      return mostPreciousThing;
+  }
+
+  public void setMostPreciousThing(String mostPreciousThing) {
+      this.mostPreciousThing = mostPreciousThing;
+  }
 
   @Override
   public String toString() {
@@ -71,17 +80,15 @@ public class User1 {
         + ", studentId=" + studentId + ", name=" + name + ", phoneNumber=" + phoneNumber + "]";
   }
 
-  public User1() {
-    // 기본 생성자
-  }
+  public User1() { }
 
-  public User1(String username, String password, String major, String studentId, String name,
-      String phoneNumber) {
-    this.username = username;
-    this.password = password;
-    this.major = major;
-    this.studentId = studentId;
-    this.name = name;
-    this.phoneNumber = phoneNumber;
+  public User1(String username, String password, String major, String studentId, String name, String phoneNumber, String mostPreciousThing) {
+      this.username = username;
+      this.password = password;
+      this.major = major;
+      this.studentId = studentId;
+      this.name = name;
+      this.phoneNumber = phoneNumber;
+      this.mostPreciousThing = mostPreciousThing;  // 추가된 파라미터 초기화
   }
 }
