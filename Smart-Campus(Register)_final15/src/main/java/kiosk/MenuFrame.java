@@ -32,21 +32,21 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
    * Creates new form MenuFrame
    */
   public MenuFrame() {
-	  try {
-	        app.Global.setAppIcon(this);
+     try {
+           app.Global.setAppIcon(this);
 
-	        /**
-	         * Initialize
-	         */
-	        initModels();
-	        initComponents();
-	        initCustomComponents();
-	        initState();
-	    } catch (Exception e) {
-	        e.printStackTrace(); // 여기서 오류 메시지를 출력합니다.
-	        JOptionPane.showMessageDialog(this, "An error occurred while initializing the frame: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-	    }
-	}
+           /**
+            * Initialize
+            */
+           initModels();
+           initComponents();
+           initCustomComponents();
+           initState();
+       } catch (Exception e) {
+           e.printStackTrace(); // 여기서 오류 메시지를 출력합니다.
+           JOptionPane.showMessageDialog(this, "An error occurred while initializing the frame: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+       }
+   }
 
   /**
    * This method is called from within the constructor to initialize the form.
@@ -263,67 +263,67 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   }//GEN-LAST:event_tblOrderMouseClicked
 
   private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbedPaneStateChanged
-	    int tabIndex = tabbedPane.getSelectedIndex();
+       int tabIndex = tabbedPane.getSelectedIndex();
 
-	    // When 공지사항 tab is selected
-	    if (tabIndex == 0) {
-	        loadNotices();
-	    }
+       // When 공지사항 tab is selected
+       if (tabIndex == 0) {
+           new NoticeFrame().setVisible(true);
+       }
 
-	    if (tabIndex == 1 && itemsSides == null) {
-	      itemsSides = itemService.getAllByCategory(2);
-	      itemsSides.forEach((item) -> {
-	        BtnItem btnItem = new BtnItem(item);
-	        btnItem.addActionListener((java.awt.event.ActionEvent e) -> itemActionPeformed(item));
-	        pnlSides.add(btnItem);
-	      });
-	    }
+       if (tabIndex == 1 && itemsSides == null) {
+         itemsSides = itemService.getAllByCategory(2);
+         itemsSides.forEach((item) -> {
+           BtnItem btnItem = new BtnItem(item);
+           btnItem.addActionListener((java.awt.event.ActionEvent e) -> itemActionPeformed(item));
+           pnlSides.add(btnItem);
+         });
+       }
 
-	    if (tabIndex == 2 && itemsDesserts == null) {
-	      itemsDesserts = itemService.getAllByCategory(3);
-	      itemsDesserts.forEach((item) -> {
-	        BtnItem btnItem = new BtnItem(item);
-	        btnItem.addActionListener((java.awt.event.ActionEvent e) -> itemActionPeformed(item));
-	        pnlDesserts.add(btnItem);
-	      });
-	    }
+       if (tabIndex == 2 && itemsDesserts == null) {
+         itemsDesserts = itemService.getAllByCategory(3);
+         itemsDesserts.forEach((item) -> {
+           BtnItem btnItem = new BtnItem(item);
+           btnItem.addActionListener((java.awt.event.ActionEvent e) -> itemActionPeformed(item));
+           pnlDesserts.add(btnItem);
+         });
+       }
 
-	    if (tabIndex == 3 && itemsBeverages == null) {
-	      // Connect with campus map
-	      java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-	      try {
-	        java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
-	        desktop.browse(uri);
-	      } catch (java.net.URISyntaxException | java.io.IOException ex) {
-	        ex.printStackTrace();
-	      }
-	    }
-	}//GEN-LAST:event_tabbedPaneStateChanged
+       if (tabIndex == 3 && itemsBeverages == null) {
+         // Connect with campus map
+         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+         try {
+           java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
+           desktop.browse(uri);
+         } catch (java.net.URISyntaxException | java.io.IOException ex) {
+           ex.printStackTrace();
+         }
+       }
+   }//GEN-LAST:event_tabbedPaneStateChanged
   
   
   private void loadNotices() {
-	    try {
-	        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-	        String sql = "SELECT * FROM notices ORDER BY id DESC";
-	        Statement statement = connection.createStatement();
-	        ResultSet resultSet = statement.executeQuery(sql);
-	        
-	        noticeTableModel = new javax.swing.table.DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
-	        noticeTable = new javax.swing.JTable(noticeTableModel); // 이 부분이 noticeTable 초기화 부분입니다. 
-	        
-	        while (resultSet.next()) {
-	            Object[] row = {
-	                resultSet.getInt("id"),
-	                resultSet.getString("title"),
-	                resultSet.getString("author"),
-	                resultSet.getString("date"),
-	                resultSet.getInt("viewCount")
-	            };
-	            noticeTableModel.addRow(row);
-	        }
-	        
-	    
-	    
+       try {
+           Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+           String sql = "SELECT * FROM notices ORDER BY id DESC";
+           Statement statement = connection.createStatement();
+           ResultSet resultSet = statement.executeQuery(sql);
+           
+           noticeTableModel = new javax.swing.table.DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
+           noticeTable = new javax.swing.JTable(noticeTableModel); // 이 부분이 noticeTable 초기화 부분입니다. 
+           
+           while (resultSet.next()) {
+               Object[] row = {
+                   resultSet.getInt("id"),
+                   resultSet.getString("title"),
+                   resultSet.getString("author"),
+                   resultSet.getString("date"),
+                   resultSet.getInt("viewCount")
+               };
+               noticeTableModel.addRow(row);
+           }
+           
+       
+       
         noticeTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -337,61 +337,61 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     } catch (SQLException e) {
         e.printStackTrace();
     }
-	    
-	    
-	    pnlMealCombos.removeAll(); // 기존에 pnlMealCombos에 추가된 컴포넌트들을 모두 제거합니다.
-	    pnlMealCombos.setLayout(new BorderLayout()); // 레이아웃을 BorderLayout으로 설정합니다.
-	    pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER); // noticeTable을 JScrollPane에 넣어 pnlMealCombos에 추가합니다.
-	    pnlMealCombos.revalidate(); // pnlMealCombos 패널을 다시 그립니다.
-	    pnlMealCombos.repaint(); // pnlMealCombos 패널을 다시 그립니다.
+       
+       
+       pnlMealCombos.removeAll(); // 기존에 pnlMealCombos에 추가된 컴포넌트들을 모두 제거합니다.
+       pnlMealCombos.setLayout(new BorderLayout()); // 레이아웃을 BorderLayout으로 설정합니다.
+       pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER); // noticeTable을 JScrollPane에 넣어 pnlMealCombos에 추가합니다.
+       pnlMealCombos.revalidate(); // pnlMealCombos 패널을 다시 그립니다.
+       pnlMealCombos.repaint(); // pnlMealCombos 패널을 다시 그립니다.
 
 }
-	    
-	    
-	    
-	    
-	    
-	    
+       
+       
+       
+       
+       
+       
   private void showNoticeDetails(String title) {
-	  System.out.println("showNoticeDetails called with title: " + title);
+     System.out.println("showNoticeDetails called with title: " + title);
 
-	    try {
-	        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-	        String sql = "SELECT content FROM notices WHERE title = ?";
-	        PreparedStatement statement = connection.prepareStatement(sql);
-	        statement.setString(1, title);
-	        ResultSet rs = statement.executeQuery();
-	        if (rs.next()) {
-	            String content = rs.getString("content");
-	            JTextArea textArea = new JTextArea(10, 40);
-	            textArea.setText(content);
-	            textArea.setWrapStyleWord(true);
-	            textArea.setLineWrap(true);
-	            textArea.setCaretPosition(0);
-	            textArea.setEditable(false);
+       try {
+           Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+           String sql = "SELECT content FROM notices WHERE title = ?";
+           PreparedStatement statement = connection.prepareStatement(sql);
+           statement.setString(1, title);
+           ResultSet rs = statement.executeQuery();
+           if (rs.next()) {
+               String content = rs.getString("content");
+               JTextArea textArea = new JTextArea(10, 40);
+               textArea.setText(content);
+               textArea.setWrapStyleWord(true);
+               textArea.setLineWrap(true);
+               textArea.setCaretPosition(0);
+               textArea.setEditable(false);
 
-	            JDialog dialog = new JDialog();
-	            dialog.setTitle("Notice Details");
-	            dialog.setSize(400, 300);
-	            dialog.add(new JScrollPane(textArea));
-	            dialog.setLocationRelativeTo(null);  // center on screen
-	            dialog.setVisible(true);
+               JDialog dialog = new JDialog();
+               dialog.setTitle("Notice Details");
+               dialog.setSize(400, 300);
+               dialog.add(new JScrollPane(textArea));
+               dialog.setLocationRelativeTo(null);  // center on screen
+               dialog.setVisible(true);
 
-	        }
-	        rs.close();
-	        statement.close();
-	        connection.close();
-	    } catch (Exception ex) {
-	        ex.printStackTrace();
-	    }
-	}
-	
-	    
-	    
-	    
-	    
-	    
-	   
+           }
+           rs.close();
+           statement.close();
+           connection.close();
+       } catch (Exception ex) {
+           ex.printStackTrace();
+       }
+   }
+   
+       
+       
+       
+       
+       
+      
 
 
   
