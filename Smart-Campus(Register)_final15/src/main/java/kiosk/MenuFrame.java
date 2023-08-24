@@ -4,6 +4,8 @@
 package kiosk;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -13,9 +15,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
 
@@ -125,43 +130,9 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     jPanel1Layout.columnWidths = new int[] {140, 0};
     pnlOrder.setLayout(jPanel1Layout);
 
-    lblOrder.setFont(lblOrder.getFont().deriveFont(lblOrder.getFont().getStyle() | java.awt.Font.BOLD));
-    lblOrder.setText("키오스크 메뉴");
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-    gridBagConstraints.insets = new java.awt.Insets(20, 0, 10, 0);
-    pnlOrder.add(lblOrder, gridBagConstraints);
 
-    scpOrder.setPreferredSize(new java.awt.Dimension(452, 500));
 
-    tblOrder.setModel(tbmOrder);
-    tblOrder.addMouseListener(new java.awt.event.MouseAdapter() {
-      public void mouseClicked(java.awt.event.MouseEvent evt) {
-        tblOrderMouseClicked(evt);
-      }
-    });
-    scpOrder.setViewportView(tblOrder);
 
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 20);
-    pnlOrder.add(scpOrder, gridBagConstraints);
-
-    pnlTotal.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.TRAILING, 20, 0));
-
-    lblTotal.setFont(lblTotal.getFont().deriveFont(lblTotal.getFont().getStyle() | java.awt.Font.BOLD));
-    lblTotal.setText("Total:");
-    pnlTotal.add(lblTotal);
-
-    lblTotalValue.setFont(lblTotalValue.getFont().deriveFont(lblTotalValue.getFont().getStyle() | java.awt.Font.BOLD));
-    lblTotalValue.setText("0개");
-    pnlTotal.add(lblTotalValue);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
@@ -262,13 +233,59 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     customizeDialog.setVisible(true);
   }//GEN-LAST:event_tblOrderMouseClicked
 
-  private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tabbedPaneStateChanged
-       int tabIndex = tabbedPane.getSelectedIndex();
+  private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {
+	   int tabIndex = tabbedPane.getSelectedIndex();
 
-       // When 공지사항 tab is selected
-       if (tabIndex == 0) {
-           new NoticeFrame().setVisible(true);
-       }
+	   // When 공지사항 tab is selected
+	   if (tabIndex == 0) {
+	       JTable noticeTable = NoticeFrame.getNoticeTable();
+	       
+	       noticeTable.addMouseListener(new MouseAdapter() {
+	           @Override
+	           public void mouseClicked(MouseEvent e) {
+	               int rowIndex = noticeTable.getSelectedRow();
+	               String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
+	               
+	               System.out.println("Incrementing view count for title: " + title); // 로깅 추가
+	               NoticeFrame.incrementViewCount(title);  // 조회수 증가 메서드 호출
+	               System.out.println("Incremented view count for title: " + title);  // 로깅 추가
+	               
+	               JTextArea noticeContent = NoticeFrame.getNoticeDetails(title);
+	               JScrollPane scrollPane = new JScrollPane(noticeContent);
+
+	               JButton backButton = new JButton("뒤로 가기");
+	               backButton.addActionListener(new ActionListener() {
+	                   @Override
+	                   public void actionPerformed(ActionEvent event) {
+	                       // 공지사항 목록을 다시 표시합니다.
+	                       pnlMealCombos.removeAll();
+	                       pnlMealCombos.setLayout(new BorderLayout());
+	                       pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+	                       pnlMealCombos.revalidate();
+	                       pnlMealCombos.repaint();
+	                   }
+	               });
+
+	               JPanel contentPanel = new JPanel(new BorderLayout());
+	               contentPanel.add(scrollPane, BorderLayout.CENTER);
+	               contentPanel.add(backButton, BorderLayout.SOUTH); // 뒤로 가기 버튼을 아래쪽에 추가
+
+	               pnlMealCombos.removeAll();
+	               pnlMealCombos.setLayout(new BorderLayout());
+	               pnlMealCombos.add(contentPanel, BorderLayout.CENTER);
+	               pnlMealCombos.revalidate();
+	               pnlMealCombos.repaint();
+	           }
+	       });
+	       
+	       pnlMealCombos.removeAll();
+	       pnlMealCombos.setLayout(new BorderLayout());
+	       pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+	       pnlMealCombos.revalidate();
+	       pnlMealCombos.repaint();
+	   }
+
+
 
        if (tabIndex == 1 && itemsSides == null) {
          itemsSides = itemService.getAllByCategory(2);
@@ -324,27 +341,30 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
            
        
        
-        noticeTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int rowIndex = noticeTable.getSelectedRow();
-                    String title = (String) noticeTableModel.getValueAt(rowIndex, 1);
-                    showNoticeDetails(title);
-                }
-            }
-        });
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
+           noticeTable.addMouseListener(new MouseAdapter() {
+        	    @Override
+        	    public void mouseClicked(MouseEvent e) {
+        	        int rowIndex = noticeTable.getSelectedRow();
+        	        String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
+        	        
+        	        System.out.println("Incrementing view count for title: " + title); // 로깅 추가
+        	        NoticeFrame.incrementViewCount(title);  // 조회수 증가 메서드 호출
+        	        JTextArea noticeContent = NoticeFrame.getNoticeDetails(title);
+        	        // ... 기존 코드 ...
+        	    }
+        	});
        
-       
+           
        pnlMealCombos.removeAll(); // 기존에 pnlMealCombos에 추가된 컴포넌트들을 모두 제거합니다.
        pnlMealCombos.setLayout(new BorderLayout()); // 레이아웃을 BorderLayout으로 설정합니다.
        pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER); // noticeTable을 JScrollPane에 넣어 pnlMealCombos에 추가합니다.
        pnlMealCombos.revalidate(); // pnlMealCombos 패널을 다시 그립니다.
        pnlMealCombos.repaint(); // pnlMealCombos 패널을 다시 그립니다.
 
+       } catch (SQLException e) {
+           e.printStackTrace();
+           JOptionPane.showMessageDialog(null, "데이터베이스 연결 또는 쿼리 중 오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+       }
 }
        
        
