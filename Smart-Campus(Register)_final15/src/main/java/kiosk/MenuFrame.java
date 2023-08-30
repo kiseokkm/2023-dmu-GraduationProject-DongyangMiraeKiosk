@@ -4,6 +4,7 @@
 package kiosk;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -15,14 +16,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
+import java.awt.FlowLayout;
+
 
 public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 
@@ -226,64 +231,84 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     }
   }//GEN-LAST:event_btnContinueActionPerformed
 
-  private void tblOrderMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblOrderMouseClicked
-    int rowIndex = tblOrder.getSelectedRow();
-    CustomizeDialog customizeDialog = new CustomizeDialog(StateManager.getOrderedItem(rowIndex), rowIndex);
-    customizeDialog.addObserver(this);
-    customizeDialog.setVisible(true);
-  }//GEN-LAST:event_tblOrderMouseClicked
-
   private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {
-	   int tabIndex = tabbedPane.getSelectedIndex();
+	    int tabIndex = tabbedPane.getSelectedIndex();
 
-	   // When 공지사항 tab is selected
-	   if (tabIndex == 0) {
-	       JTable noticeTable = NoticeFrame.getNoticeTable();
-	       
-	       noticeTable.addMouseListener(new MouseAdapter() {
-	           @Override
-	           public void mouseClicked(MouseEvent e) {
-	               int rowIndex = noticeTable.getSelectedRow();
-	               String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
-	               
-	               System.out.println("Incrementing view count for title: " + title); // 로깅 추가
-	               NoticeFrame.incrementViewCount(title);  // 조회수 증가 메서드 호출
-	               System.out.println("Incremented view count for title: " + title);  // 로깅 추가
-	               
-	               JTextArea noticeContent = NoticeFrame.getNoticeDetails(title);
-	               JScrollPane scrollPane = new JScrollPane(noticeContent);
+	    // When 공지사항 tab is selected
+	    if (tabIndex == 0) {
+	        JTable noticeTable = NoticeFrame.getNoticeTable();
+	        
+	        noticeTable.addMouseListener(new MouseAdapter() {
+	            @Override
+	            public void mouseClicked(MouseEvent e) {
+	                int rowIndex = noticeTable.getSelectedRow();
+	                String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
 
-	               JButton backButton = new JButton("뒤로 가기");
-	               backButton.addActionListener(new ActionListener() {
-	                   @Override
-	                   public void actionPerformed(ActionEvent event) {
-	                       // 공지사항 목록을 다시 표시합니다.
-	                       pnlMealCombos.removeAll();
-	                       pnlMealCombos.setLayout(new BorderLayout());
-	                       pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
-	                       pnlMealCombos.revalidate();
-	                       pnlMealCombos.repaint();
-	                   }
-	               });
+		               System.out.println("Incrementing view count for title: " + title); // 로깅 추가
+		               NoticeFrame.incrementViewCount(title);  // 조회수 증가 메서드 호출
+		               System.out.println("Incremented view count for title: " + title);  // 로깅 추가
 
-	               JPanel contentPanel = new JPanel(new BorderLayout());
-	               contentPanel.add(scrollPane, BorderLayout.CENTER);
-	               contentPanel.add(backButton, BorderLayout.SOUTH); // 뒤로 가기 버튼을 아래쪽에 추가
+	                JTextArea noticeContent = NoticeFrame.getNoticeDetails(title);
+	                JScrollPane scrollPane = new JScrollPane(noticeContent);
 
-	               pnlMealCombos.removeAll();
-	               pnlMealCombos.setLayout(new BorderLayout());
-	               pnlMealCombos.add(contentPanel, BorderLayout.CENTER);
-	               pnlMealCombos.revalidate();
-	               pnlMealCombos.repaint();
-	           }
-	       });
-	       
-	       pnlMealCombos.removeAll();
-	       pnlMealCombos.setLayout(new BorderLayout());
-	       pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
-	       pnlMealCombos.revalidate();
-	       pnlMealCombos.repaint();
-	   }
+	                // 데이터베이스에서 추가 정보를 가져오는 코드
+	                try {
+	                    Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+	                    String sql = "SELECT * FROM notices WHERE title = ?";
+	                    PreparedStatement statement = connection.prepareStatement(sql);
+	                    statement.setString(1, title);
+	                    ResultSet rs = statement.executeQuery();
+	                    if (rs.next()) {
+	                        // 상단에 표시할 레이블을 생성합니다.
+	                        String additionalInfo = String.format("번호: %d | 제목: %s | 작성자: %s | 작성일: %s | 조회수: %d",
+	                            rs.getInt("id"), rs.getString("title"), rs.getString("author"), rs.getString("date"), rs.getInt("viewCount"));
+	                        JLabel additionalLabel = new JLabel(additionalInfo);
+
+	                        // 뒤로 가기 버튼 생성
+	                        JButton backButton = new JButton("뒤로 가기");
+	                        backButton.addActionListener(new ActionListener() {
+	                            @Override
+	                            public void actionPerformed(ActionEvent event) {
+	                                pnlMealCombos.removeAll();
+	                                pnlMealCombos.setLayout(new BorderLayout());
+	                                pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+	                                pnlMealCombos.revalidate();
+	                                pnlMealCombos.repaint();
+	                            }
+	                        });
+
+	                        // 레이아웃에 컴포넌트를 추가합니다.
+	                        JPanel contentPanel = new JPanel(new BorderLayout());
+	                        contentPanel.add(additionalLabel, BorderLayout.NORTH);
+	                        contentPanel.add(scrollPane, BorderLayout.CENTER);
+	                        contentPanel.add(backButton, BorderLayout.SOUTH);
+
+	                        pnlMealCombos.removeAll();
+	                        pnlMealCombos.setLayout(new BorderLayout());
+	                        pnlMealCombos.add(contentPanel, BorderLayout.CENTER);
+	                        pnlMealCombos.revalidate();
+	                        pnlMealCombos.repaint();
+	                    }
+	                    rs.close();
+	                    statement.close();
+	                    connection.close();
+	                } catch (Exception ex) {
+	                    ex.printStackTrace();
+	                }
+	            }
+	        });
+	        
+	        pnlMealCombos.removeAll();
+	        pnlMealCombos.setLayout(new BorderLayout());
+	        pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+	        pnlMealCombos.revalidate();
+	        pnlMealCombos.repaint();
+	    }
+
+	    // ... (기존의 코드: 다른 탭들에 대한 처리)
+
+
+
 
 
 
@@ -318,55 +343,49 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
    }//GEN-LAST:event_tabbedPaneStateChanged
   
   
-  private void loadNotices() {
-       try {
-           Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-           String sql = "SELECT * FROM notices ORDER BY id DESC";
-           Statement statement = connection.createStatement();
-           ResultSet resultSet = statement.executeQuery(sql);
-           
-           noticeTableModel = new javax.swing.table.DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
-           noticeTable = new javax.swing.JTable(noticeTableModel); // 이 부분이 noticeTable 초기화 부분입니다. 
-           
-           while (resultSet.next()) {
-               Object[] row = {
-                   resultSet.getInt("id"),
-                   resultSet.getString("title"),
-                   resultSet.getString("author"),
-                   resultSet.getString("date"),
-                   resultSet.getInt("viewCount")
-               };
-               noticeTableModel.addRow(row);
-           }
-           
-       
-       
-           noticeTable.addMouseListener(new MouseAdapter() {
-        	    @Override
-        	    public void mouseClicked(MouseEvent e) {
-        	        int rowIndex = noticeTable.getSelectedRow();
-        	        String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
-        	        
-        	        System.out.println("Incrementing view count for title: " + title); // 로깅 추가
-        	        NoticeFrame.incrementViewCount(title);  // 조회수 증가 메서드 호출
-        	        JTextArea noticeContent = NoticeFrame.getNoticeDetails(title);
-        	        // ... 기존 코드 ...
-        	    }
-        	});
-       
-           
-       pnlMealCombos.removeAll(); // 기존에 pnlMealCombos에 추가된 컴포넌트들을 모두 제거합니다.
-       pnlMealCombos.setLayout(new BorderLayout()); // 레이아웃을 BorderLayout으로 설정합니다.
-       pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER); // noticeTable을 JScrollPane에 넣어 pnlMealCombos에 추가합니다.
-       pnlMealCombos.revalidate(); // pnlMealCombos 패널을 다시 그립니다.
-       pnlMealCombos.repaint(); // pnlMealCombos 패널을 다시 그립니다.
+ 
+	    
+	  private void loadNotices() {
+		    try {
+		        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+		        String sql = "SELECT * FROM notices ORDER BY id DESC";
+		        Statement statement = connection.createStatement();
+		        ResultSet resultSet = statement.executeQuery(sql);
+		        
+		        noticeTableModel = new javax.swing.table.DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
+		        noticeTable = new javax.swing.JTable(noticeTableModel); 
+		        
+		        while (resultSet.next()) {
+		            Object[] row = {
+		                resultSet.getInt("id"),
+		                resultSet.getString("title"),
+		                resultSet.getString("author"),
+		                resultSet.getString("date"),
+		                resultSet.getInt("viewCount")
+		            };
+		            noticeTableModel.addRow(row);
+		        }
 
-       } catch (SQLException e) {
-           e.printStackTrace();
-           JOptionPane.showMessageDialog(null, "데이터베이스 연결 또는 쿼리 중 오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
-       }
-}
-       
+		        int noticeCount = NoticeFrame.getNoticeCount();
+		        JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
+
+		        pnlMealCombos.removeAll(); 
+		        pnlMealCombos.setLayout(new BorderLayout()); 
+		        pnlMealCombos.add(lblNoticeCount, BorderLayout.NORTH); 
+		        pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+		        
+		        pnlMealCombos.revalidate();
+		        pnlMealCombos.repaint();
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		        JOptionPane.showMessageDialog(null, "데이터베이스 연결 또는 쿼리 중 오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+		    }
+		}
+
+
+
+
+
        
        
        

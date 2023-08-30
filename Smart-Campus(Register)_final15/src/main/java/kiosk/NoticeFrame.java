@@ -1,11 +1,15 @@
 package kiosk;
 
+import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import javax.swing.BorderFactory;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -89,6 +93,42 @@ public class NoticeFrame {
         }
     }
 
+    public static int getNoticeCount() { //게시물 증가 n개 , count
+        int count = 0;
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql = "SELECT COUNT(*) FROM notices";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet rs = statement.executeQuery();
+            
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+            
+            rs.close();
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
     
 
+    public static JPanel getNoticesPanel() {
+        JPanel noticePanel = new JPanel(new BorderLayout(10, 10));  // 여백 추가
+        noticePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));  // 패딩 추가
+
+        int noticeCount = getNoticeCount();
+        JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
+        noticePanel.add(lblNoticeCount, BorderLayout.NORTH);
+
+        JTable noticeTable = getNoticeTable();
+        noticePanel.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+
+        return noticePanel;
+    }
 }
+
+
+
