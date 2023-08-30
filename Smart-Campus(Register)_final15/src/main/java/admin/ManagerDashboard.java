@@ -51,7 +51,19 @@ public class ManagerDashboard extends JFrame {
         editNoticeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // The logic for editing a notice can be implemented here
+                int rowIndex = noticeTable.getSelectedRow();
+                if (rowIndex == -1) {
+                    JOptionPane.showMessageDialog(null, "Please select a notice to edit.", "No Selection", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                String oldTitle = (String) noticeTableModel.getValueAt(rowIndex, 0);
+                String newTitle = JOptionPane.showInputDialog("Enter new title:", oldTitle);
+                if (newTitle != null && !newTitle.isEmpty()) {
+                    String newContent = JOptionPane.showInputDialog("Enter new content:");
+                    if (newContent != null && !newContent.isEmpty()) {
+                        editNotice(oldTitle, newTitle, newContent);
+                    }
+                }
             }
         });
 
@@ -59,19 +71,17 @@ public class ManagerDashboard extends JFrame {
         deleteNoticeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ArrayList<String> notices = fetchAllNotices();
-                String selectedNotice = (String) JOptionPane.showInputDialog(
-                        null,
-                        "Select notice title to delete:",
-                        "Delete Notice",
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        notices.toArray(),
-                        notices.get(0)
-                );
-
-                if (selectedNotice != null) {
-                    deleteNotice(selectedNotice);
+                int rowIndex = noticeTable.getSelectedRow();
+                if (rowIndex == -1) {
+                    JOptionPane.showMessageDialog(null, "Please select a notice to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                String title = (String) noticeTableModel.getValueAt(rowIndex, 0);
+                int dialogButton = JOptionPane.YES_NO_OPTION;
+                int dialogResult = JOptionPane.showConfirmDialog(null, "Would you like to delete this notice?", "Delete Confirmation", dialogButton);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    deleteNotice(title);
+                    loadNoticesIntoTable();
                 }
             }
         });
@@ -124,8 +134,22 @@ public class ManagerDashboard extends JFrame {
             ex.printStackTrace();
         }
     }
+    private void editNotice(String oldTitle, String newTitle, String newContent) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql = "UPDATE notices SET title = ?, content = ? WHERE title = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, newTitle);
+            statement.setString(2, newContent);
+            statement.setString(3, oldTitle);
+            statement.executeUpdate();
+            connection.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        loadNoticesIntoTable();  // 데이터를 수정한 후 테이블을 다시 로드
+    }
 
-    // 데이터베이스의 공지사항을 삭제하는 함수
     private void deleteNotice(String title) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
@@ -137,6 +161,7 @@ public class ManagerDashboard extends JFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        loadNoticesIntoTable();  // 데이터를 삭제한 후 테이블을 다시 로드
     }
 
     public static void main(String[] args) {
@@ -147,9 +172,21 @@ public class ManagerDashboard extends JFrame {
     }
     
     private void loadNoticesIntoTable() {
-        ArrayList<String> notices = fetchAllNotices();
-        for (String title : notices) {
-            noticeTableModel.addRow(new Object[]{title});
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql = "SELECT title FROM notices";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet rs = statement.executeQuery();
+            noticeTableModel.setRowCount(0);  // 테이블 초기화
+            while (rs.next()) {
+                String title = rs.getString("title");
+                noticeTableModel.addRow(new Object[]{title});
+            }
+            rs.close();
+            statement.close();
+            connection.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
     
