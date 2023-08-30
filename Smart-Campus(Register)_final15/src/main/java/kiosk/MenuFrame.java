@@ -272,13 +272,17 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	                            rs.getInt("id"), rs.getString("title"), rs.getString("author"), rs.getString("date"), rs.getInt("viewCount"));
 	                        JLabel additionalLabel = new JLabel(additionalInfo);
 
-	                        // 뒤로 가기 버튼 생성
+	                     // 뒤로 가기 버튼 생성
 	                        JButton backButton = new JButton("뒤로 가기");
 	                        backButton.addActionListener(new ActionListener() {
 	                            @Override
 	                            public void actionPerformed(ActionEvent event) {
+	                                int noticeCount = NoticeFrame.getNoticeCount();  // 게시물의 총 개수를 가져옵니다.
+	                                JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");  // 레이블 생성
+
 	                                pnlMealCombos.removeAll();
 	                                pnlMealCombos.setLayout(new BorderLayout());
+	                                pnlMealCombos.add(lblNoticeCount, BorderLayout.NORTH);  // 레이블을 상단에 추가
 	                                pnlMealCombos.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
 	                                pnlMealCombos.revalidate();
 	                                pnlMealCombos.repaint();
@@ -347,6 +351,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
          }
        }
    }//GEN-LAST:event_tabbedPaneStateChanged
+  
+  
   
   
  
