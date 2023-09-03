@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 
 public class ManagerHome extends JFrame {
     private JButton noteButton;
+    private JButton showMembersButton;
 
     public ManagerHome() {
         setTitle("Manager Home");
@@ -26,8 +27,19 @@ public class ManagerHome extends JFrame {
             }
         });
 
+        showMembersButton = new JButton("회원 목록 보기");
+        showMembersButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // 여기서 회원 목록을 보여주는 새로운 창을 띄울 수 있습니다.
+                MemberList memberList = new MemberList();
+                memberList.setVisible(true);
+            }
+        });
+
         setLayout(new FlowLayout());
         add(noteButton);
+        add(showMembersButton);
     }
 
     public static void main(String[] args) {
