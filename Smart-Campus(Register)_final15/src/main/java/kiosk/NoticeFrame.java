@@ -93,6 +93,7 @@ public class NoticeFrame {
         }
     }
 
+    
     public static int getNoticeCount() { //게시물 증가 n개 , count
         int count = 0;
         try {

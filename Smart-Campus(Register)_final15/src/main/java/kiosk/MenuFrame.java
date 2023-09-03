@@ -331,14 +331,16 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
          });
        }
 
-       if (tabIndex == 2 && itemsDesserts == null) {
-         itemsDesserts = itemService.getAllByCategory(3);
-         itemsDesserts.forEach((item) -> {
-           BtnItem btnItem = new BtnItem(item);
-           btnItem.addActionListener((java.awt.event.ActionEvent e) -> itemActionPeformed(item));
-           pnlDesserts.add(btnItem);
-         });
-       }
+       if (tabIndex == 2 && itemsDesserts == null) { // Assuming 학식 정보 is at index 2
+    	   JPanel mealInfoPanel = CafeTeria.getMealInfoPanel();
+    	   
+    	   pnlDesserts.removeAll(); // Assuming pnlDesserts is the panel for 학식 정보
+    	   pnlDesserts.setLayout(new BorderLayout());
+    	   pnlDesserts.add(mealInfoPanel, BorderLayout.CENTER);
+    	   pnlDesserts.revalidate();
+    	   pnlDesserts.repaint();
+    	 }
+
 
        if (tabIndex == 3 && itemsBeverages == null) {
          // Connect with campus map
@@ -356,7 +358,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   
   
  
-	    
+	   /* 
   private void loadNotices() {
 	    try {
 	        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
@@ -396,17 +398,14 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	        JOptionPane.showMessageDialog(null, "데이터베이스 연결 또는 쿼리 중 오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
 	    }
 	}
-
+*/
 
 
 
 
 
        
-       
-       
-       
-       
+     /*
   private void showNoticeDetails(String title) {
      System.out.println("showNoticeDetails called with title: " + title);
 
@@ -440,7 +439,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
            ex.printStackTrace();
        }
    }
-   
+   */
        
        
        
