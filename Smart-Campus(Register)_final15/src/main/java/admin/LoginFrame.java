@@ -2,6 +2,8 @@ package admin;
 
 import javax.swing.*;
 
+import manager.ManagerDashboard;
+import manager.ManagerHome;
 import models.User1;
 
 import java.awt.*;
@@ -161,8 +163,8 @@ public class LoginFrame extends javax.swing.JFrame {
 
             // Check if the credentials match the manager's credentials
             if (MANAGER_USERNAME.equals(username) && MANAGER_PASSWORD.equals(password)) {
-                // Open manager's dashboard or screen
-                new ManagerDashboard().setVisible(true);  // Assuming you have a ManagerDashboard class for the manager
+                // Open manager's Home or screen
+                new ManagerHome().setVisible(true);  // Assuming you have a ManagerDashboard class for the manager
                 dispose();
                 return;
             }

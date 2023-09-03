@@ -1,4 +1,4 @@
-package admin;
+package manager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +22,7 @@ public class ManagerDashboard extends JFrame {
 
     public ManagerDashboard() {
         setTitle("Manager Dashboard");
-        setSize(400, 300);
+        setSize(500, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         
