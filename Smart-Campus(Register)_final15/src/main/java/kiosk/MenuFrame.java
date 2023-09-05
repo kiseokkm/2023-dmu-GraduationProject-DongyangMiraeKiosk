@@ -345,18 +345,31 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     	   pnlDesserts.revalidate();
     	   pnlDesserts.repaint();
     	 }
-
-
+       
        if (tabIndex == 3 && itemsBeverages == null) {
-         // Connect with campus map
-         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-         try {
-           java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
-           desktop.browse(uri);
-         } catch (java.net.URISyntaxException | java.io.IOException ex) {
-           ex.printStackTrace();
+           // Connect with campus map
+           java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+           try {
+             java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
+             desktop.browse(uri);
+           } catch (java.net.URISyntaxException | java.io.IOException ex) {
+             ex.printStackTrace();
+           }
          }
-       }
+       
+       if (tabIndex == 4) {
+    	    // "학사 일정" 탭이 선택되었을 때
+    	    AcademicScheduleFrame academicScheduleFrame = new AcademicScheduleFrame();
+
+    	    // 기존 컴포넌트 제거 및 새로운 컴포넌트 추가
+    	    pnlAcademicSchedule.removeAll(); // pnlAcademicSchedule가 "학사 일정" 탭에 대응되는 것으로 가정
+    	    pnlAcademicSchedule.setLayout(new BorderLayout());
+    	    pnlAcademicSchedule.add(academicScheduleFrame, BorderLayout.CENTER);
+    	    pnlAcademicSchedule.revalidate();
+    	    pnlAcademicSchedule.repaint();
+    	}
+
+
    } //GEN-LAST:event_tabbedPaneStateChanged
   
   
