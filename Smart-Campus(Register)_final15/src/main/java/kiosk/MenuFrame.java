@@ -121,6 +121,11 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlBeverages.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlBeverages.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("캠퍼스 지도", pnlBeverages);
+    
+    pnlAcademicSchedule = new javax.swing.JPanel();
+    pnlAcademicSchedule.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
+    pnlAcademicSchedule.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
+    tabbedPane.addTab("학사 일정", pnlAcademicSchedule);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -352,7 +357,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
            ex.printStackTrace();
          }
        }
-   }//GEN-LAST:event_tabbedPaneStateChanged
+   } //GEN-LAST:event_tabbedPaneStateChanged
   
   
   
@@ -503,6 +508,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   private javax.swing.JScrollPane scpOrder;
   private javax.swing.JTabbedPane tabbedPane;
   private javax.swing.JTable tblOrder;
+  private javax.swing.JPanel pnlAcademicSchedule;
   // End of variables declaration//GEN-END:variables
 }
 
