@@ -94,8 +94,13 @@ public class AcademicScheduleFrame extends JPanel {
             week = new Object[7]; // Reset the week array
             firstDayOfMonth = 0; // Reset the first day of the week
         }
+        CustomTableCellRenderer renderer = new CustomTableCellRenderer();
+        for (int i = 0; i < calendarTable.getColumnCount(); i++) {
+            calendarTable.getColumnModel().getColumn(i).setCellRenderer(renderer);
+        }
 
         // TODO: Fetch academic events from the database and update the JTable
         // For example, if there is an event on the 5th day of the month, update model's cell at (row, 5) to include the event
     }
+    
 }
