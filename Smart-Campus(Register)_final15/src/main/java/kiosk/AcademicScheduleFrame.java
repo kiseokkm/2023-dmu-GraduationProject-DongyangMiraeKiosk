@@ -6,7 +6,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Calendar;
@@ -17,6 +19,7 @@ public class AcademicScheduleFrame extends JPanel {
     private int currentYear;
     private JLabel lblMonthYear;
     private JTable calendarTable;
+    private JTable academicEventsTable; // 학사 일정을 나타낼 새로운 JTable
 
     public AcademicScheduleFrame() {
         setLayout(new BorderLayout());
@@ -27,6 +30,10 @@ public class AcademicScheduleFrame extends JPanel {
         String[] columnNames = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
         DefaultTableModel model = new DefaultTableModel(null, columnNames);
         calendarTable = new JTable(model);
+        
+        // 학사 일정을 나타낼 JTable 생성
+        DefaultTableModel academicEventsModel = new DefaultTableModel(new Object[]{"Date", "Event"}, 0);
+        academicEventsTable = new JTable(academicEventsModel);
 
         // Create a panel for the month/year and navigation buttons
         JPanel calendarPanel = new JPanel();
@@ -36,7 +43,16 @@ public class AcademicScheduleFrame extends JPanel {
 
         // Add everything to the main panel
         add(calendarPanel, BorderLayout.NORTH);
+        
+        // 달력 테이블 크기 조절
+        calendarTable.setPreferredScrollableViewportSize(new Dimension(500, 200)); 
         add(new JScrollPane(calendarTable), BorderLayout.CENTER);
+
+        // 학사 일정 테이블 크기 및 열 너비 조절
+        academicEventsTable.setPreferredScrollableViewportSize(new Dimension(500, 100));
+        academicEventsTable.getColumnModel().getColumn(0).setPreferredWidth(100); // Date 열 너비 조정
+        academicEventsTable.getColumnModel().getColumn(1).setPreferredWidth(400); // Event 열 너비 조정
+        add(new JScrollPane(academicEventsTable), BorderLayout.SOUTH);
 
         calendarPanel.add(prevMonth);
         calendarPanel.add(lblMonthYear);
@@ -67,10 +83,11 @@ public class AcademicScheduleFrame extends JPanel {
         updateCalendar();
     }
 
+
     private void updateCalendar() {
         // Update the month label and clear the existing table
         String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        lblMonthYear.setText(months[currentMonth] + " " + currentYear);
+        lblMonthYear.setText(currentYear + "." + (currentMonth + 1));
         
         // Clear existing table
         DefaultTableModel model = (DefaultTableModel) calendarTable.getModel();
@@ -98,9 +115,40 @@ public class AcademicScheduleFrame extends JPanel {
         for (int i = 0; i < calendarTable.getColumnCount(); i++) {
             calendarTable.getColumnModel().getColumn(i).setCellRenderer(renderer);
         }
+        
+        // 학사 일정 테이블 초기화
+        DefaultTableModel academicModel = (DefaultTableModel) academicEventsTable.getModel();
+        academicModel.setRowCount(0);
+        
+        try {
+            // 데이터베이스 연결
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
 
-        // TODO: Fetch academic events from the database and update the JTable
-        // For example, if there is an event on the 5th day of the month, update model's cell at (row, 5) to include the event
+            // 해당 월의 학사 일정 정보만 가져옵니다.
+            String sql = "SELECT * FROM academic_schedule WHERE MONTH(date) = ? AND YEAR(date) = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, currentMonth + 1);  // DB는 1부터 시작
+            preparedStatement.setInt(2, currentYear);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Date eventDate = resultSet.getDate("date");
+                String event = resultSet.getString("event");
+
+                academicModel.addRow(new Object[]{eventDate, event}); // 학사 일정 테이블에 일정 추가
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "데이터베이스 연결 또는 쿼리 중 오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        
+        
     }
     
 }
