@@ -12,6 +12,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Calendar;
+import java.util.HashSet;
+
+
+
 
 public class AcademicScheduleFrame extends JPanel {
 
@@ -20,6 +24,7 @@ public class AcademicScheduleFrame extends JPanel {
     private JLabel lblMonthYear;
     private JTable calendarTable;
     private JTable academicEventsTable; // 학사 일정을 나타낼 새로운 JTable
+    private HashSet<String> eventDays = new HashSet<>();
 
     public AcademicScheduleFrame() {
         setLayout(new BorderLayout());
@@ -85,6 +90,7 @@ public class AcademicScheduleFrame extends JPanel {
 
 
     private void updateCalendar() {
+    	eventDays.clear();
         // Update the month label and clear the existing table
         String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
         lblMonthYear.setText(currentYear + "." + (currentMonth + 1));
@@ -111,7 +117,7 @@ public class AcademicScheduleFrame extends JPanel {
             week = new Object[7]; // Reset the week array
             firstDayOfMonth = 0; // Reset the first day of the week
         }
-        CustomTableCellRenderer renderer = new CustomTableCellRenderer();
+        CustomTableCellRenderer renderer = new CustomTableCellRenderer(eventDays);
         for (int i = 0; i < calendarTable.getColumnCount(); i++) {
             calendarTable.getColumnModel().getColumn(i).setCellRenderer(renderer);
         }
@@ -135,6 +141,7 @@ public class AcademicScheduleFrame extends JPanel {
                 Date eventDate = resultSet.getDate("date");
                 String event = resultSet.getString("event");
 
+                eventDays.add(String.valueOf(eventDate.getDate()));  // 이벤트가 있는 날짜를 HashSet에 추가
                 academicModel.addRow(new Object[]{eventDate, event}); // 학사 일정 테이블에 일정 추가
             }
 
