@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,6 +20,8 @@ public class ManagerDashboard extends JFrame {
     private JButton deleteNoticeButton;
     private JTable noticeTable; 
     private DefaultTableModel noticeTableModel;
+    private JCheckBox pinNoticeCheckbox = new JCheckBox("Pin Notice");
+
 
     public ManagerDashboard() {
         setTitle("Manager Dashboard");
@@ -40,8 +43,9 @@ public class ManagerDashboard extends JFrame {
                 if (title != null && !title.isEmpty()) {
                     String content = JOptionPane.showInputDialog("Enter notice content:");
                     String author = JOptionPane.showInputDialog("Enter author:");
+                    boolean pinned = pinNoticeCheckbox.isSelected();  // 체크박스의 상태를 가져옵니다.
                     if (content != null && author != null && !content.isEmpty() && !author.isEmpty()) {
-                        addNotice(title, content, author);
+                        addNotice(title, content, author, pinned);  // 핀 상태를 메서드에 전달합니다.
                     }
                 }
             }
@@ -85,10 +89,24 @@ public class ManagerDashboard extends JFrame {
                 }
             }
         });
+        
+        // 체크박스 상태 변경 리스너
+        pinNoticeCheckbox.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED || e.getStateChange() == ItemEvent.DESELECTED) {
+                int rowIndex = noticeTable.getSelectedRow();
+                if (rowIndex != -1) {
+                    String title = (String) noticeTableModel.getValueAt(rowIndex, 0);
+                    updatePinStatus(title, e.getStateChange() == ItemEvent.SELECTED);
+                    loadNoticesIntoTable();  // 핀 상태가 변경된 후 테이블 다시 로드
+                }
+            }
+        });
+
 
         add(addNoticeButton);
         add(editNoticeButton);
         add(deleteNoticeButton);
+        add(pinNoticeCheckbox);
     
     
     String[] columnNames = {"Title"};
@@ -101,6 +119,8 @@ public class ManagerDashboard extends JFrame {
             if (e.getClickCount() == 2) {
                 int rowIndex = noticeTable.getSelectedRow();
                 String title = (String) noticeTableModel.getValueAt(rowIndex, 0);
+                boolean pinned = (boolean) noticeTableModel.getValueAt(rowIndex, 1); // 핀 상태 가져오기
+                pinNoticeCheckbox.setSelected(pinned); // 체크박스 상태 설정
                 showNoticeDetails(title);
             }
         }
@@ -119,15 +139,16 @@ public class ManagerDashboard extends JFrame {
         return notices;
     }
 
-    // 데이터베이스에 새로운 공지사항을 추가하는 함수
-    private void addNotice(String title, String content, String author) {
+ // 핀 상태를 데이터베이스에 저장
+    private void addNotice(String title, String content, String author, boolean pinned) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-            String sql = "INSERT INTO notices (title, content, author, date) VALUES (?, ?, ?, CURDATE())";
+            String sql = "INSERT INTO notices (title, content, author, date, pinned) VALUES (?, ?, ?, CURDATE(), ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, title);
             statement.setString(2, content);
             statement.setString(3, author);
+            statement.setInt(4, pinned ? 1 : 0);  // 핀 상태 저장
             statement.executeUpdate();
             connection.close();
         } catch (Exception ex) {
@@ -174,13 +195,14 @@ public class ManagerDashboard extends JFrame {
     private void loadNoticesIntoTable() {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-            String sql = "SELECT title FROM notices";
+            String sql = "SELECT title, pinned FROM notices ORDER BY pinned DESC, date DESC";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
-            noticeTableModel.setRowCount(0);  // 테이블 초기화
+            noticeTableModel.setRowCount(0);
             while (rs.next()) {
                 String title = rs.getString("title");
-                noticeTableModel.addRow(new Object[]{title});
+                boolean pinned = rs.getBoolean("pinned");
+                noticeTableModel.addRow(new Object[]{title, pinned});
             }
             rs.close();
             statement.close();
@@ -189,6 +211,22 @@ public class ManagerDashboard extends JFrame {
             ex.printStackTrace();
         }
     }
+    
+    private void updatePinStatus(String title, boolean pinned) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql = "UPDATE notices SET pinned = ? WHERE title = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, pinned ? 1 : 0);
+            statement.setString(2, title);
+            statement.executeUpdate();
+            connection.close();
+            loadNoticesIntoTable();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     
  // 공지사항의 상세 내용을 팝업 창에서 보여주는 메서드
     private void showNoticeDetails(String title) {
