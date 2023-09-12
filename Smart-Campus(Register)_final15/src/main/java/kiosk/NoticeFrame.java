@@ -28,10 +28,10 @@ public class NoticeFrame {
 	        ResultSet rs = statement.executeQuery();
 	        
 	        while (rs.next()) {
-	            Object identifier; // 번호 또는 특별한 문자
+	            Object identifier; 
 	            boolean isPinned = rs.getBoolean("pinned");
 	            if (isPinned) {
-	            	identifier = "★"; // 이 부분을 원하는 문자나 아이콘으로 변경할 수 있습니다.
+	                identifier = "★"; 
 	            } else {
 	                identifier = rs.getInt("id");
 	            }
