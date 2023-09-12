@@ -14,7 +14,7 @@ import java.sql.Statement;
 import java.util.Calendar;
 import java.util.HashSet;
 
-
+//학사일정
 
 
 public class AcademicScheduleFrame extends JPanel {

@@ -10,20 +10,27 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 
     // 생성자를 통해 이벤트가 있는 날짜의 HashSet을 받아옵니다.
     public CustomTableCellRenderer(HashSet<String> eventDays) {
-        this.eventDays = eventDays;
+        this.eventDays = eventDays != null ? eventDays : new HashSet<>(); // null 체크를 추가
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+    	System.out.println("Rendering cell for day: " + value);
+    	super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         
-        // value가 eventDays HashSet에 포함되어 있으면 해당 셀의 배경색을 노란색으로 변경합니다.
-        String dayValue = String.valueOf(value);
-        if (eventDays.contains(dayValue)) {
-            setBackground(Color.YELLOW);  // 이벤트가 있는 날짜는 배경색을 노란색으로 설정
+        if (value != null) {
+            String dayValue = String.valueOf(value);
+            if (eventDays.contains(dayValue)) {
+                System.out.println("Coloring Day: " + dayValue);  // 노란색으로 색칠되는 날짜를 출력
+                setBackground(Color.YELLOW);
+            } else {
+                setBackground(Color.WHITE);
+            }
         } else {
             setBackground(Color.WHITE);
         }
+
+
         
         // 주말 색상 설정
         if (column == 6) {
