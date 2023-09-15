@@ -14,6 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JButton;
 
 public class NoticeFrame {	
 
@@ -130,11 +131,28 @@ public class NoticeFrame {
 
         int noticeCount = getNoticeCount();
         JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
-        noticePanel.add(lblNoticeCount, BorderLayout.NORTH);
 
+        // 새로고침 버튼 생성
+        JButton refreshButton = new JButton("새로고침");
         JTable noticeTable = getNoticeTable();
-        noticePanel.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(noticeTable);
+        noticePanel.add(scrollPane, BorderLayout.CENTER);
+
+        refreshButton.addActionListener(e -> {
+            JTable updatedTable = getNoticeTable();
+            scrollPane.setViewportView(updatedTable);
+            noticePanel.revalidate();
+            noticePanel.repaint();
+        });
+
+        // 우측 상단에 버튼 배치
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(lblNoticeCount, BorderLayout.WEST);
+        topPanel.add(refreshButton, BorderLayout.EAST);
+        noticePanel.add(topPanel, BorderLayout.NORTH);
 
         return noticePanel;
     }
+
+
 }
