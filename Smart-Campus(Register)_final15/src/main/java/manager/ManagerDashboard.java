@@ -16,9 +16,10 @@ public class ManagerDashboard extends JFrame {
     private JButton deleteNoticeButton;
     private JTable noticeTable; 
     private DefaultTableModel noticeTableModel;
+    private JButton refreshButton;
 
     public ManagerDashboard() {
-        setTitle("Manager Dashboard");
+        setTitle("관리자 페이지");
         setSize(500, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -28,10 +29,12 @@ public class ManagerDashboard extends JFrame {
 
     private void initComponents() {
         setLayout(new FlowLayout());
+        
+        
 
-        addNoticeButton = new JButton("Add Notice");
+        addNoticeButton = new JButton("공지 추가");
         addNoticeButton.addActionListener(e -> {
-            String title = JOptionPane.showInputDialog("Enter notice title:");
+            String title = JOptionPane.showInputDialog("공지 제목을 입력하세요:");
             if (title != null && !title.isEmpty()) {
                 String content = JOptionPane.showInputDialog("Enter notice content:");
                 String author = JOptionPane.showInputDialog("Enter author:");
@@ -43,11 +46,11 @@ public class ManagerDashboard extends JFrame {
             }
         });
 
-        editNoticeButton = new JButton("Edit Notice");
+        editNoticeButton = new JButton("공지 수정");
         editNoticeButton.addActionListener(e -> {
             int rowIndex = noticeTable.getSelectedRow();
             if (rowIndex == -1) {
-                JOptionPane.showMessageDialog(null, "Please select a notice to edit.", "No Selection", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "수정할 공지를 선택하세요.", "No Selection", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             String oldTitle = (String) noticeTableModel.getValueAt(rowIndex, 0);
@@ -60,25 +63,31 @@ public class ManagerDashboard extends JFrame {
             }
         });
 
-        deleteNoticeButton = new JButton("Delete Notice");
+        deleteNoticeButton = new JButton("공지 삭제");
         deleteNoticeButton.addActionListener(e -> {
             int rowIndex = noticeTable.getSelectedRow();
             if (rowIndex == -1) {
-                JOptionPane.showMessageDialog(null, "Please select a notice to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "삭제할 공지를 선택하세요.", "No Selection", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             String title = (String) noticeTableModel.getValueAt(rowIndex, 0);
             int dialogButton = JOptionPane.YES_NO_OPTION;
-            int dialogResult = JOptionPane.showConfirmDialog(null, "Would you like to delete this notice?", "Delete Confirmation", dialogButton);
+            int dialogResult = JOptionPane.showConfirmDialog(null, "글 삭제하시겠습니까?", "Delete Confirmation", dialogButton);
             if (dialogResult == JOptionPane.YES_OPTION) {
                 deleteNotice(title);
                 loadNoticesIntoTable();
             }
         });
+        
+        refreshButton = new JButton("새로고침");
+        refreshButton.addActionListener(e -> {
+            loadNoticesIntoTable();
+        });
 
         add(addNoticeButton);
         add(editNoticeButton);
         add(deleteNoticeButton);
+        add(refreshButton);
 
         String[] columnNames = {"Title", "Pinned"};
         noticeTableModel = new DefaultTableModel(columnNames, 0) {

@@ -11,6 +11,7 @@ import javax.swing.SwingUtilities;
 public class ManagerHome extends JFrame {
     private JButton noteButton;
     private JButton showMembersButton;
+    private JButton academicScheduleButton;
 
     public ManagerHome() {
         setTitle("Manager Home");
@@ -36,10 +37,20 @@ public class ManagerHome extends JFrame {
                 memberList.setVisible(true);
             }
         });
+        
+        academicScheduleButton = new JButton("학사일정 관리");
+        academicScheduleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AcademicScheduleManager scheduleManager = new AcademicScheduleManager();
+                scheduleManager.setVisible(true);
+            }
+        });
 
         setLayout(new FlowLayout());
         add(noteButton);
         add(showMembersButton);
+        add(academicScheduleButton);
     }
 
     public static void main(String[] args) {
