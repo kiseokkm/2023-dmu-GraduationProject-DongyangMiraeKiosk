@@ -37,9 +37,33 @@ public class AcademicScheduleFrame extends JPanel {
         calendarTable = new JTable(model);
         
         // 학사 일정을 나타낼 JTable 생성
-        DefaultTableModel academicEventsModel = new DefaultTableModel(new Object[]{"Date", "Event"}, 0);
+        DefaultTableModel academicEventsModel = new DefaultTableModel(new Object[]{"날짜", "일정"}, 0);
         academicEventsTable = new JTable(academicEventsModel);
 
+        
+        // Move to AcademicScheduleAllFrame button
+        JButton moveToAllFrame = new JButton("학사일정 전체보기");
+        moveToAllFrame.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFrame frame = new JFrame("Academic Schedule for All Months");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setSize(800, 600);
+                JScrollPane scrollPane = new JScrollPane(new AcademicScheduleAllFrame());
+                frame.add(scrollPane);
+                frame.setVisible(true);
+            }
+        });
+        
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(moveToAllFrame, BorderLayout.WEST);
+        
+        
+        
+        
+        
+        
+        
+        
         // Create a panel for the month/year and navigation buttons
         JPanel calendarPanel = new JPanel();
         JButton prevMonth = new JButton("<<");
@@ -62,6 +86,9 @@ public class AcademicScheduleFrame extends JPanel {
         calendarPanel.add(prevMonth);
         calendarPanel.add(lblMonthYear);
         calendarPanel.add(nextMonth);
+        
+        topPanel.add(calendarPanel, BorderLayout.CENTER);
+        add(topPanel, BorderLayout.NORTH); 
 
         prevMonth.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
