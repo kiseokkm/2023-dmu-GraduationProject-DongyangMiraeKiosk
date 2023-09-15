@@ -21,25 +21,18 @@ public class AcademicScheduleAllFrame extends JPanel {
     private HashSet<String>[] eventDaysArray = new HashSet[12];
 
     public AcademicScheduleAllFrame() {
-        setLayout(new GridLayout(6, 1));
-        
+        setLayout(new GridLayout(6, 2)); // 6행 2열의 그리드 레이아웃
+
         for (int i = 0; i < 12; i++) {
-            eventDaysArray[i] = new HashSet<>();  // 여기서 각 원소를 초기화합니다.
+            eventDaysArray[i] = new HashSet<>();  // 각 원소 초기화
         }
 
-        for (int i = 0; i < 12; i += 2) {
-            JPanel monthPairPanel = new JPanel(new GridLayout(1, 2));
-            monthPairPanel.add(createMonthPanel(i));
-
-            if (i + 1 < 12) { // 12월 이후에는 추가 달력이 없으므로 체크
-                monthPairPanel.add(createMonthPanel(i + 1));
-            } else {
-                monthPairPanel.add(new JPanel());  // 12월만 있을 때 빈 패널 추가
-            }
-
-            add(monthPairPanel);
+        for (int i = 0; i < 12; i++) {
+            add(createMonthPanel(i));
         }
     }
+
+
 
     private JPanel createMonthPanel(int month) {
         JPanel monthPanel = new JPanel(new BorderLayout());
@@ -55,6 +48,9 @@ public class AcademicScheduleAllFrame extends JPanel {
         calendarTables[month].setDefaultRenderer(Object.class, new CustomTableCellRenderer(eventDaysArray[month]));
         calendarTables[month].setRowHeight(100);  // 행 높이 조정
 
+        calendarTables[month].setPreferredScrollableViewportSize(new Dimension(350, 200)); // 가로 크기 조절
+        eventTables[month].setPreferredScrollableViewportSize(new Dimension(350, 200));    // 가로 크기 조절
+
         JPanel tablePanel = new JPanel(new GridLayout(1, 2));
         tablePanel.add(new JScrollPane(calendarTables[month]));
         tablePanel.add(new JScrollPane(eventTables[month]));
@@ -64,6 +60,7 @@ public class AcademicScheduleAllFrame extends JPanel {
 
         return monthPanel;
     }
+
 
 
 
@@ -107,8 +104,8 @@ public class AcademicScheduleAllFrame extends JPanel {
             // 데이터베이스 연결
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
 
-            // 해당 월의 학사 일정 정보만 가져옵니다.
-            String sql = "SELECT * FROM academic_schedule WHERE MONTH(date) = ? AND YEAR(date) = ?";
+            // 해당 월의 학사 일정 정보를 가져옵니다. 그리고 날짜 기준으로 오름차순 정렬
+            String sql = "SELECT * FROM academic_schedule WHERE MONTH(date) = ? AND YEAR(date) = ? ORDER BY date ASC"; // ORDER BY clause added here
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, month + 1);  // DB는 1부터 시작
             preparedStatement.setInt(2, CURRENT_YEAR);

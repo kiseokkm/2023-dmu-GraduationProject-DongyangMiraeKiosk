@@ -46,13 +46,20 @@ public class AcademicScheduleFrame extends JPanel {
         moveToAllFrame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFrame frame = new JFrame("Academic Schedule for All Months");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setSize(800, 600);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // 창을 닫으면 해당 창만 종료됩니다.
+                
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                frame.setSize(screenSize.width, screenSize.height - 100); // 가로는 전체 화면 크기, 세로는 조금 줄여서 설정
+                
                 JScrollPane scrollPane = new JScrollPane(new AcademicScheduleAllFrame());
+                scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);  // 가로 스크롤 제거
                 frame.add(scrollPane);
+                
                 frame.setVisible(true);
             }
         });
+
+
         
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(moveToAllFrame, BorderLayout.WEST);
@@ -157,8 +164,8 @@ public class AcademicScheduleFrame extends JPanel {
             // 데이터베이스 연결
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
 
-            // 해당 월의 학사 일정 정보만 가져옵니다.
-            String sql = "SELECT * FROM academic_schedule WHERE MONTH(date) = ? AND YEAR(date) = ?";
+            // 해당 월의 학사 일정 정보만 가져옵니다. 오름차순 정렬 추가
+            String sql = "SELECT * FROM academic_schedule WHERE MONTH(date) = ? AND YEAR(date) = ? ORDER BY date ASC"; // ORDER BY clause added here
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, currentMonth + 1);  // DB는 1부터 시작
             preparedStatement.setInt(2, currentYear);
