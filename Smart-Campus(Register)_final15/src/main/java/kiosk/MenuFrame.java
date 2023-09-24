@@ -44,16 +44,15 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
    * Creates new form MenuFrame
    */
   public MenuFrame() {
-     try {
-           app.Global.setAppIcon(this);
+      try {
+          app.Global.setAppIcon(this);
+          initModels();
+          initComponents();
 
-           /**
-            * Initialize
-            */
-           initModels();
-           initComponents();
-           initCustomComponents();
-           initState();
+          // 공지사항 초기 로드
+          NoticeFrame.showNoticeTableOnPanel(pnlMealCombos);
+
+          initState();
        } catch (Exception e) {
            e.printStackTrace(); // 여기서 오류 메시지를 출력합니다.
            JOptionPane.showMessageDialog(this, "An error occurred while initializing the frame: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -216,12 +215,12 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   }
 
   private void initCustomComponents() {
-    itemsMealCombos.forEach((item) -> {
-      BtnItem btnItem = new BtnItem(item);
-      btnItem.addActionListener((java.awt.event.ActionEvent evt) -> itemActionPeformed(item));
-      pnlMealCombos.add(btnItem);
-    });
-  }
+	    itemsMealCombos.forEach((item) -> {
+	      BtnItem btnItem = new BtnItem(item);
+	      btnItem.addActionListener((java.awt.event.ActionEvent evt) -> itemActionPeformed(item));
+	      pnlMealCombos.add(btnItem);
+	    });
+	}
 
   private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
     new StartFrame().setVisible(true);
@@ -244,6 +243,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	    int tabIndex = tabbedPane.getSelectedIndex();
 
 	    if (tabIndex == 0) {
+	        NoticeFrame.resetNoticeLoadedFlag();  // 여기에서 플래그를 초기화합니다.
 	        NoticeFrame.showNoticeTableOnPanel(pnlMealCombos);
 	    }
 

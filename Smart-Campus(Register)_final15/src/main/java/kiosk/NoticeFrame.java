@@ -1,61 +1,85 @@
 package kiosk;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class NoticeFrame {   
+	private static boolean isNoticesLoaded = false; // 공지사항이 이미 로드되었는지 확인하는 플래그
+	
+    private static final int PAGE_SIZE = 20;
+    private static int pageNumber = 1;
+    private static String searchQuery = "";
+    
 
-   public static JTable getNoticeTable() {
-       DefaultTableModel noticeTableModel = new DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
-       JTable noticeTable = new JTable(noticeTableModel);
+    public static void resetNoticeLoadedFlag() { //플래그 초기화 시킴
+        isNoticesLoaded = false;
+    }
 
-       try {
-           Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-           String sql = "SELECT * FROM notices ORDER BY pinned DESC, id DESC"; 
-           PreparedStatement statement = connection.prepareStatement(sql);
-           ResultSet rs = statement.executeQuery();
-           
-           while (rs.next()) {
-               Object identifier; 
-               boolean isPinned = rs.getBoolean("pinned");
-               if (isPinned) {
-                   identifier = "★"; 
-               } else {
-                   identifier = rs.getInt("id");
-               }
-               
-               Object[] row = {
-                   identifier,
-                   rs.getString("title"),
-                   rs.getString("author"),
-                   rs.getString("date"),
-                   rs.getInt("viewCount")
-               };
-               noticeTableModel.addRow(row);
-           }
-           
-           rs.close();
-           statement.close();
-           connection.close();
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
+    public static JTable getNoticeTable() {
+        DefaultTableModel noticeTableModel = new DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
+        JTable noticeTable = new JTable(noticeTableModel);
+        int offset = (pageNumber - 1) * PAGE_SIZE;
 
-       return noticeTable;
-   }
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql;
+            PreparedStatement statement;
+            if (searchQuery.isEmpty()) {
+                sql = "SELECT * FROM notices ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?"; 
+                statement = connection.prepareStatement(sql);
+                statement.setInt(1, PAGE_SIZE);
+                statement.setInt(2, offset);
+            } else {
+                sql = "SELECT * FROM notices WHERE title LIKE ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                statement = connection.prepareStatement(sql);
+                statement.setString(1, "%" + searchQuery + "%");
+                statement.setInt(2, PAGE_SIZE);
+                statement.setInt(3, offset);
+            }
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Object identifier; 
+                boolean isPinned = rs.getBoolean("pinned");
+                if (isPinned) {
+                    identifier = "★"; 
+                } else {
+                    identifier = rs.getInt("id");
+                }
+
+                Object[] row = {
+                    identifier,
+                    rs.getString("title"),
+                    rs.getString("author"),
+                    rs.getString("date"),
+                    rs.getInt("viewCount")
+                };
+                noticeTableModel.addRow(row);
+            }
+
+            rs.close();
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return noticeTable;
+    }
 
     
     public static JTextArea getNoticeDetails(String title) {
@@ -126,93 +150,122 @@ public class NoticeFrame {
     }
 
     public static void showNoticeTableOnPanel(JPanel panel) {
-        int tabIndex = 0;  // 공지사항 탭의 인덱스를 0으로 가정합니다.
+        if (isNoticesLoaded) return;
 
-        if (tabIndex == 0) {
-            int noticeCount = getNoticeCount();
-            JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
-            JTable noticeTable = getNoticeTable();
+        JButton nextButton = new JButton(">");
+        nextButton.addActionListener(e -> {
+            pageNumber++;
+            showNoticeTableOnPanel(panel);
+        });
 
-            // 새로고침 버튼 생성 및 액션 추가
-            JButton refreshButton = new JButton("새로고침");
-            refreshButton.addActionListener(e -> {
-                JTable updatedTable = getNoticeTable();
-                panel.removeAll();
-                panel.setLayout(new BorderLayout());
-                panel.add(lblNoticeCount, BorderLayout.NORTH);
-                panel.add(new JScrollPane(updatedTable), BorderLayout.CENTER);
-                panel.revalidate();
-                panel.repaint();
-                showNoticeTableOnPanel(panel);  // 테이블 갱신 후 다시 이벤트 리스너 추가
-            });
+        JButton prevButton = new JButton("<");
+        prevButton.addActionListener(e -> {
+            if (pageNumber > 1) {
+                pageNumber--;
+                showNoticeTableOnPanel(panel);
+            }
+        });
 
-            JPanel contentPanel = new JPanel(new BorderLayout());  // 이 부분을 외부로 이동
+        JTextField searchField = new JTextField(20);
+        JButton searchButton = new JButton("검색");
+        searchButton.addActionListener(e -> {
+            searchQuery = searchField.getText().trim();
+            pageNumber = 1;
+            showNoticeTableOnPanel(panel);
+        });
 
-            noticeTable.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    int rowIndex = noticeTable.getSelectedRow();
-                    String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
-                    incrementViewCount(title);
+        JPanel navigationPanel = new JPanel(new FlowLayout());
+        navigationPanel.add(prevButton);
+        navigationPanel.add(nextButton);
+        navigationPanel.add(searchField);
+        navigationPanel.add(searchButton);
 
-                    JTextArea noticeContent = getNoticeDetails(title);
-                    JScrollPane scrollPane = new JScrollPane(noticeContent);
+        // 패널을 초기화하고 네비게이션 패널 추가
+        panel.removeAll();
+        panel.setLayout(new BorderLayout());
+        
+        int noticeCount = getNoticeCount();
+        JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
+        JTable noticeTable = getNoticeTable();
 
-                    JPanel contentPanel = new JPanel(new BorderLayout()); // 이 부분을 여기로 이동
-
-                    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang")) {
-                        String sql = "SELECT * FROM notices WHERE title = ?";
-                        PreparedStatement statement = connection.prepareStatement(sql);
-                        statement.setString(1, title);
-                        ResultSet rs = statement.executeQuery();
-                        if (rs.next()) {
-                            String additionalInfo = String.format("번호: %d | 제목: %s | 작성자: %s | 작성일: %s | 조회수: %d",
-                                    rs.getInt("id"), rs.getString("title"), rs.getString("author"), rs.getString("date"), rs.getInt("viewCount"));
-                            JLabel additionalLabel = new JLabel(additionalInfo);
-                            contentPanel.add(additionalLabel, BorderLayout.NORTH);
-                            contentPanel.add(scrollPane, BorderLayout.CENTER);
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-
-                    JButton backButton = new JButton("뒤로 가기");
-                    backButton.addActionListener(event -> {
-                        int noticeCountInside = getNoticeCount();
-                        JLabel lblNoticeCountInside = new JLabel("총 " + noticeCountInside + " 개의 게시물이 있습니다.");
-                        panel.removeAll();
-                        panel.setLayout(new BorderLayout());
-                        
-                        // 새로고침 버튼도 다시 추가합니다.
-                        JPanel topPanel = new JPanel(new BorderLayout());
-                        topPanel.add(lblNoticeCountInside, BorderLayout.WEST);
-                        topPanel.add(refreshButton, BorderLayout.EAST);
-                        panel.add(topPanel, BorderLayout.NORTH);
-                        
-                        panel.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
-                        panel.revalidate();
-                        panel.repaint();
-                    });
-
-                    contentPanel.add(backButton, BorderLayout.SOUTH);
-                    panel.removeAll();
-                    panel.setLayout(new BorderLayout());
-                    panel.add(contentPanel, BorderLayout.CENTER); // 이 부분만 panel에 추가합니다.
-                    panel.revalidate();
-                    panel.repaint();
-                }
-            });
-
-
+        JButton refreshButton = new JButton("새로고침");
+        refreshButton.addActionListener(e -> {
+            isNoticesLoaded = false;  // 이 부분을 추가하여 새로고침 이후에도 테이블이 다시 로드될 수 있게 합니다.
+            JTable updatedTable = getNoticeTable();
             panel.removeAll();
             panel.setLayout(new BorderLayout());
             JPanel topPanel = new JPanel(new BorderLayout());
             topPanel.add(lblNoticeCount, BorderLayout.WEST);
             topPanel.add(refreshButton, BorderLayout.EAST);
             panel.add(topPanel, BorderLayout.NORTH);
-            panel.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+            panel.add(new JScrollPane(updatedTable), BorderLayout.CENTER);
+            panel.add(navigationPanel, BorderLayout.SOUTH); 
             panel.revalidate();
             panel.repaint();
-        }
+            showNoticeTableOnPanel(panel);  // 새로고침 이후에도 테이블을 다시 로드하게 합니다.
+        });
+        noticeTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int rowIndex = noticeTable.getSelectedRow();
+                String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
+                incrementViewCount(title);
+                JTextArea noticeContent = getNoticeDetails(title);
+                JScrollPane scrollPane = new JScrollPane(noticeContent);
+
+                JPanel contentPanel = new JPanel(new BorderLayout());
+                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang")) {
+                    String sql = "SELECT * FROM notices WHERE title = ?";
+                    PreparedStatement statement = connection.prepareStatement(sql);
+                    statement.setString(1, title);
+                    ResultSet rs = statement.executeQuery();
+                    if (rs.next()) {
+                        String additionalInfo = String.format("번호: %d | 제목: %s | 작성자: %s | 작성일: %s | 조회수: %d",
+                                rs.getInt("id"), rs.getString("title"), rs.getString("author"), rs.getString("date"), rs.getInt("viewCount"));
+                        JLabel additionalLabel = new JLabel(additionalInfo);
+                        contentPanel.add(additionalLabel, BorderLayout.NORTH);
+                        contentPanel.add(scrollPane, BorderLayout.CENTER);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                JButton backButton = new JButton("뒤로 가기");
+                backButton.addActionListener(event -> {
+                    int noticeCountInside = getNoticeCount();
+                    JLabel lblNoticeCountInside = new JLabel("총 " + noticeCountInside + " 개의 게시물이 있습니다.");
+                    panel.removeAll();
+                    panel.setLayout(new BorderLayout());
+                    JPanel topPanel = new JPanel(new BorderLayout());
+                    topPanel.add(lblNoticeCount, BorderLayout.WEST);
+                    topPanel.add(refreshButton, BorderLayout.EAST);
+                    panel.add(topPanel, BorderLayout.NORTH);
+                    panel.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+                    panel.add(navigationPanel, BorderLayout.SOUTH);
+                    panel.revalidate();
+                    panel.repaint();
+                    isNoticesLoaded = true;
+                });
+
+                contentPanel.add(backButton, BorderLayout.SOUTH);
+                panel.removeAll();
+                panel.setLayout(new BorderLayout());
+                panel.add(contentPanel, BorderLayout.CENTER); 
+                // 여기서는 panel.add(navigationPanel, BorderLayout.SOUTH);를 추가하지 않습니다.
+                panel.revalidate();
+                panel.repaint();
+            }
+        });
+
+
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(lblNoticeCount, BorderLayout.WEST);
+        topPanel.add(refreshButton, BorderLayout.EAST);
+        panel.add(topPanel, BorderLayout.NORTH);
+        panel.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
+        panel.add(navigationPanel, BorderLayout.SOUTH);
+        panel.revalidate();
+        panel.repaint();
+        isNoticesLoaded = true;
     }
 }
