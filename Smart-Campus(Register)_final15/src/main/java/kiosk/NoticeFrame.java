@@ -1,6 +1,7 @@
 package kiosk;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,7 +21,7 @@ import javax.swing.table.DefaultTableModel;
 public class NoticeFrame {   
 	private static boolean isNoticesLoaded = false; // 공지사항이 이미 로드되었는지 확인하는 플래그
 	
-    private static final int PAGE_SIZE = 20;
+    private static final int PAGE_SIZE = 22;
     private static int pageNumber = 1;
     private static String searchQuery = "";
     
@@ -44,12 +45,16 @@ public class NoticeFrame {
                 statement.setInt(1, PAGE_SIZE);
                 statement.setInt(2, offset);
             } else {
-                sql = "SELECT * FROM notices WHERE title LIKE ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                // 제목과 내용에서 검색어 찾기
+                sql = "SELECT * FROM notices WHERE title LIKE ? OR content LIKE ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
                 statement = connection.prepareStatement(sql);
                 statement.setString(1, "%" + searchQuery + "%");
-                statement.setInt(2, PAGE_SIZE);
-                statement.setInt(3, offset);
+                statement.setString(2, "%" + searchQuery + "%");  // 내용에서도 검색
+                statement.setInt(3, PAGE_SIZE);
+                statement.setInt(4, offset);
             }
+
+            
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
@@ -151,34 +156,70 @@ public class NoticeFrame {
 
     public static void showNoticeTableOnPanel(JPanel panel) {
         if (isNoticesLoaded) return;
+        
+        // 총 페이지 수 계산
+        int totalPages = (int) Math.ceil((double) getNoticeCount() / PAGE_SIZE);
+
+        // 페이지 정보를 표시하는 레이블 생성
+        JLabel pageInfo = new JLabel(pageNumber + " / " + totalPages);
 
         JButton nextButton = new JButton(">");
         nextButton.addActionListener(e -> {
-            pageNumber++;
-            isNoticesLoaded = false; // 테이블을 새로 로드하도록 플래그를 설정
-            showNoticeTableOnPanel(panel); // 테이블 업데이트
+            if (pageNumber < totalPages) { 
+                pageNumber++;
+                isNoticesLoaded = false;
+                showNoticeTableOnPanel(panel);
+                pageInfo.setText(pageNumber + " / " + totalPages); 
+            }
         });
 
         JButton prevButton = new JButton("<");
         prevButton.addActionListener(e -> {
             if (pageNumber > 1) {
                 pageNumber--;
-                isNoticesLoaded = false; // 테이블을 새로 로드하도록 플래그를 설정
-                showNoticeTableOnPanel(panel); // 테이블 업데이트
+                isNoticesLoaded = false;
+                showNoticeTableOnPanel(panel);
+                pageInfo.setText(pageNumber + " / " + totalPages); 
+            }
+        });
+
+        // 첫 페이지로 이동하는 버튼
+        JButton firstPageButton = new JButton("<<");
+        firstPageButton.addActionListener(e -> {
+            if (pageNumber != 1) {
+                pageNumber = 1;
+                isNoticesLoaded = false;
+                showNoticeTableOnPanel(panel);
+                pageInfo.setText(pageNumber + " / " + totalPages);
+            }
+        });
+
+        // 마지막 페이지로 이동하는 버튼
+        JButton lastPageButton = new JButton(">>");
+        lastPageButton.addActionListener(e -> {
+            if (pageNumber != totalPages) {
+                pageNumber = totalPages;
+                isNoticesLoaded = false;
+                showNoticeTableOnPanel(panel);
+                pageInfo.setText(pageNumber + " / " + totalPages);
             }
         });
 
         JTextField searchField = new JTextField(20);
         JButton searchButton = new JButton("검색");
         searchButton.addActionListener(e -> {
-            searchQuery = searchField.getText().trim();
-            pageNumber = 1;
-            showNoticeTableOnPanel(panel);
+            searchQuery = searchField.getText().trim(); // 사용자가 입력한 검색어 가져오기
+            pageNumber = 1; // 검색 결과의 첫 페이지를 보여주기 위해 pageNumber를 1로 설정
+            isNoticesLoaded = false; // 공지사항을 다시 로드하기 위한 플래그 초기화
+            showNoticeTableOnPanel(panel); // 검색 결과를 반영하여 테이블을 다시 표시
         });
 
         JPanel navigationPanel = new JPanel(new FlowLayout());
+        navigationPanel.add(firstPageButton);  // 첫 페이지로 이동하는 버튼 추가
         navigationPanel.add(prevButton);
+        navigationPanel.add(pageInfo); 
         navigationPanel.add(nextButton);
+        navigationPanel.add(lastPageButton);  // 마지막 페이지로 이동하는 버튼 추가
         navigationPanel.add(searchField);
         navigationPanel.add(searchButton);
 
@@ -189,6 +230,9 @@ public class NoticeFrame {
         int noticeCount = getNoticeCount();
         JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
         JTable noticeTable = getNoticeTable();
+        
+
+
 
         JButton refreshButton = new JButton("새로고침");
         refreshButton.addActionListener(e -> {
@@ -206,6 +250,16 @@ public class NoticeFrame {
             panel.repaint();
             showNoticeTableOnPanel(panel);  // 새로고침 이후에도 테이블을 다시 로드하게 합니다.
         });
+        
+        JButton toMainButton = new JButton("첫 화면으로");
+        toMainButton.setPreferredSize(refreshButton.getPreferredSize()); // "첫 화면으로" 버튼의 크기를 "새로고침" 버튼과 동일하게 설정
+        toMainButton.addActionListener(e -> {
+            searchQuery = ""; // 검색어 초기화
+            pageNumber = 1;   // 페이지 번호 초기화
+            isNoticesLoaded = false; // 공지사항을 다시 로드하기 위한 플래그 초기화
+            showNoticeTableOnPanel(panel); // 원래의 공지 목록을 다시 표시
+        });
+        
         noticeTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -234,14 +288,15 @@ public class NoticeFrame {
 
                 JButton backButton = new JButton("뒤로 가기");
                 backButton.addActionListener(event -> {
-                    int noticeCountInside = getNoticeCount();
-                    JLabel lblNoticeCountInside = new JLabel("총 " + noticeCountInside + " 개의 게시물이 있습니다.");
                     panel.removeAll();
                     panel.setLayout(new BorderLayout());
-                    JPanel topPanel = new JPanel(new BorderLayout());
-                    topPanel.add(lblNoticeCount, BorderLayout.WEST);
-                    topPanel.add(refreshButton, BorderLayout.EAST);
-                    panel.add(topPanel, BorderLayout.NORTH);
+
+                    JPanel topPanelBack = new JPanel(new BorderLayout());
+                    topPanelBack.add(lblNoticeCount, BorderLayout.WEST);
+                    topPanelBack.add(toMainButton, BorderLayout.CENTER); // "첫 화면으로" 버튼 다시 추가
+                    topPanelBack.add(refreshButton, BorderLayout.EAST);
+
+                    panel.add(topPanelBack, BorderLayout.NORTH);
                     panel.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
                     panel.add(navigationPanel, BorderLayout.SOUTH);
                     panel.revalidate();
@@ -252,17 +307,17 @@ public class NoticeFrame {
                 contentPanel.add(backButton, BorderLayout.SOUTH);
                 panel.removeAll();
                 panel.setLayout(new BorderLayout());
-                panel.add(contentPanel, BorderLayout.CENTER); 
-                // 여기서는 panel.add(navigationPanel, BorderLayout.SOUTH);를 추가하지 않습니다.
+                panel.add(contentPanel, BorderLayout.CENTER);
                 panel.revalidate();
                 panel.repaint();
             }
         });
 
-
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(lblNoticeCount, BorderLayout.WEST);
+        topPanel.add(toMainButton, BorderLayout.CENTER);
         topPanel.add(refreshButton, BorderLayout.EAST);
+
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
         panel.add(navigationPanel, BorderLayout.SOUTH);
