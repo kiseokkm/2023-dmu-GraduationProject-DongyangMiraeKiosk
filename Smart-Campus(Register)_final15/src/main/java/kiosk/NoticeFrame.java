@@ -155,14 +155,16 @@ public class NoticeFrame {
         JButton nextButton = new JButton(">");
         nextButton.addActionListener(e -> {
             pageNumber++;
-            showNoticeTableOnPanel(panel);
+            isNoticesLoaded = false; // 테이블을 새로 로드하도록 플래그를 설정
+            showNoticeTableOnPanel(panel); // 테이블 업데이트
         });
 
         JButton prevButton = new JButton("<");
         prevButton.addActionListener(e -> {
             if (pageNumber > 1) {
                 pageNumber--;
-                showNoticeTableOnPanel(panel);
+                isNoticesLoaded = false; // 테이블을 새로 로드하도록 플래그를 설정
+                showNoticeTableOnPanel(panel); // 테이블 업데이트
             }
         });
 
