@@ -37,7 +37,7 @@ public class AdminFrame extends javax.swing.JFrame {
 	    profileButton.addActionListener(new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent e) {
-	            ProfileManager.ShowProfile(currentLoggedInUsername); // 현재 로그인한 사용자의 username을 전달
+	            ProfileUpdateDelete.ShowProfile(currentLoggedInUsername); // 현재 로그인한 사용자의 username을 전달
 	        }
 	    });
 

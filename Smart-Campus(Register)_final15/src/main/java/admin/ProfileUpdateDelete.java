@@ -12,7 +12,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class ProfileManager {
+public class ProfileUpdateDelete {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "dongyang";
@@ -33,7 +33,28 @@ public class ProfileManager {
         JLabel lblMajor = new JLabel("Major:");
         JComboBox<String> comboMajor = new JComboBox<String>();
         comboMajor.addItem("기계공학과");
-        // ... (기타 학과 선택 항목들을 추가)
+        comboMajor.addItem("기계설계공학과");
+        comboMajor.addItem("로봇공학과");
+        comboMajor.addItem("자동화공학과");
+        comboMajor.addItem("전기공학과");
+        comboMajor.addItem("정보전자공학과");
+        comboMajor.addItem("반도체전자공학과");
+        comboMajor.addItem("정보통신공학과");
+        comboMajor.addItem("소방안전관리과");
+        comboMajor.addItem("컴퓨터소프트웨어공학과");
+        comboMajor.addItem("컴퓨터정보공학과");
+        comboMajor.addItem("인공지능소프트웨어공학과");
+        comboMajor.addItem("생명화학공학과");
+        comboMajor.addItem("바이오융합공학과");
+        comboMajor.addItem("건축과");
+        comboMajor.addItem("실내건축디자인과");
+        comboMajor.addItem("시각디자인과");
+        comboMajor.addItem("경영학과");
+        comboMajor.addItem("세무회계학과");
+        comboMajor.addItem("유통마케팅학과");
+        comboMajor.addItem("호텔관광학과");
+        comboMajor.addItem("경영정보학과");
+        comboMajor.addItem("빅데이터경영과");
 
         JLabel lblStudentId = new JLabel("Student ID:");
         JTextField txtStudentId = new JTextField();
@@ -50,7 +71,7 @@ public class ProfileManager {
         
         
 
-        JButton btnUpdate = new JButton("Update");
+        JButton btnUpdate = new JButton("수정");
         btnUpdate.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -69,7 +90,8 @@ public class ProfileManager {
             }
         });
 
-        JButton btnDelete = new JButton("Delete");
+     // Delete (탈퇴) 버튼
+        JButton btnDelete = new JButton("탈퇴");
         btnDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -80,6 +102,14 @@ public class ProfileManager {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "삭제 중 오류 발생: " + ex.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
                 }
+            }
+        });
+     // Confirm (확인) 버튼
+        JButton btnConfirm = new JButton("확인");
+        btnConfirm.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                profileFrame.dispose(); // 현재 창을 닫습니다.
             }
         });
 
@@ -94,6 +124,7 @@ public class ProfileManager {
         panel.add(lblPhoneNumber);
         panel.add(txtPhoneNumber);
         panel.add(btnUpdate);
+        panel.add(btnConfirm);
         panel.add(btnDelete);
 
         profileFrame.add(panel);
