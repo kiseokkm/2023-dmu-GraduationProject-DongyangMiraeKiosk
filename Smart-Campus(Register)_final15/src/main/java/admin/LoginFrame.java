@@ -171,13 +171,15 @@ public class LoginFrame extends javax.swing.JFrame {
 
             // 기존 사용자 인증 확인 코드
             if (authenticateUser(username, password)) {
-                new AdminFrame().setVisible(true);
+                // 로그인 성공 시, 현재 로그인한 사용자의 아이디를 AdminFrame에 전달
+                new AdminFrame(username).setVisible(true);
                 dispose();
             } else {
                 javax.swing.JOptionPane.showMessageDialog(null, "로그인 실패!!", "Login alert", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }
     }
+
 
     private boolean authenticateUser(String username, String password) {
         try {
