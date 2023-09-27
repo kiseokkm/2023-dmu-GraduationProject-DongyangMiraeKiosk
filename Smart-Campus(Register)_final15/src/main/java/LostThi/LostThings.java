@@ -17,11 +17,16 @@ public class LostThings extends JPanel {
 
         JPanel buttonsPanel = new JPanel(new GridLayout(2, 1, 10, 10));
 
-        JButton btnReport = createButtonWithImage("신고", "/LostThings/FindSearch1.jpeg");
+        JButton btnReport = createButtonWithImage("등록", "/LostThings/FindSearch1.jpeg");
         btnReport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                LostThingsReport reportFrame = new LostThingsReport();
+                JFrame reportFrame = new JFrame();
+                reportFrame.setTitle("분실물 신고");
+                reportFrame.setSize(600, 400);
+                reportFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                reportFrame.setLocationRelativeTo(null);
+                reportFrame.add(new LostThingsReport());
                 reportFrame.setVisible(true);
             }
         });
@@ -31,8 +36,10 @@ public class LostThings extends JPanel {
         btnFind.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                LostThingsFind findFrame = new LostThingsFind();
-                findFrame.setVisible(true);
+                removeAll();
+                add(new LostThingsFind());
+                revalidate();
+                repaint();
             }
         });
         buttonsPanel.add(btnFind);
