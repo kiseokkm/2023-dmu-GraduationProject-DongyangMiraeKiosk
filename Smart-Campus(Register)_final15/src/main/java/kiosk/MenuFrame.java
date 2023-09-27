@@ -26,6 +26,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
+
+import LostThi.LostThings;
+
 import java.awt.FlowLayout;
 
 import kiosk.NoticeFrame;
@@ -66,6 +69,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
    */
   @SuppressWarnings("unchecked")
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+  private javax.swing.JPanel pnlLostThings;
   private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
@@ -125,6 +129,12 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlAcademicSchedule.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlAcademicSchedule.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("학사 일정", pnlAcademicSchedule);
+    
+    pnlLostThings = new javax.swing.JPanel();
+    pnlLostThings.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
+    pnlLostThings.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
+    tabbedPane.addTab("분실물찾기", pnlLostThings);
+
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -292,7 +302,14 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
            pnlAcademicSchedule.revalidate();
            pnlAcademicSchedule.repaint();
        }
-
+       if (tabIndex == 5) { // "분실물찾기" 탭이 선택되었을 때
+           LostThings lostThingsFrame = new LostThings();
+           pnlLostThings.removeAll();
+           pnlLostThings.setLayout(new BorderLayout());
+           pnlLostThings.add(lostThingsFrame, BorderLayout.CENTER);
+           pnlLostThings.revalidate();
+           pnlLostThings.repaint();
+       }
 
    } //GEN-LAST:event_tabbedPaneStateChanged
   
