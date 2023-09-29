@@ -21,7 +21,7 @@ public class LostThingsFind extends JPanel {
     private String currentCategory = "found_items";  // 기본값 설정
 
     public LostThingsFind() {
-        mainPanel = this;  
+        mainPanel = this;
         setLayout(new BorderLayout());
 
         JPanel categoryPanel = new JPanel();
@@ -46,8 +46,13 @@ public class LostThingsFind extends JPanel {
         categoryPanel.add(searchButton);
         add(categoryPanel, BorderLayout.NORTH);
 
-        tableModel = new DefaultTableModel(new Object[]{"ID", "제목", "내용", "작성자", "작성일", "조회수"}, 0);
+        tableModel = new DefaultTableModel(new Object[]{"번호", "제목", "내용", "작성자", "작성일", "조회수"}, 0);
         table = new JTable(tableModel);
+
+        // 컬럼 너비 설정
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.getColumnModel().getColumn(4).setPreferredWidth(217); // 작성일 컬럼 너비 설정
+        table.getColumnModel().getColumn(5).setPreferredWidth(50);
 
         table.addMouseListener(new MouseAdapter() {
             @Override
@@ -72,8 +77,8 @@ public class LostThingsFind extends JPanel {
         String url = "jdbc:mysql://localhost:3306/self_order_kiosk?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
         String user = "root";
         String password = "dongyang";
-        
-        currentCategory = tableName; 
+
+        currentCategory = tableName;
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
              Statement stmt = conn.createStatement()) {
@@ -87,7 +92,11 @@ public class LostThingsFind extends JPanel {
                 String title = rs.getString("title");
                 String content = rs.getString("content");
                 String author = rs.getString("author");
-                String postDate = rs.getString("post_date");
+
+                // 작성일 포맷 변경
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String postDate = sdf.format(rs.getTimestamp("post_date"));
+
                 int views = rs.getInt("views");
 
                 tableModel.addRow(new Object[]{id, title, content, author, postDate, views});
@@ -117,6 +126,7 @@ public class LostThingsFind extends JPanel {
                e.printStackTrace();
            }
        }
+    
 
     private void showContentInPanel(String content) {
         JTextArea textArea = new JTextArea(10, 40);

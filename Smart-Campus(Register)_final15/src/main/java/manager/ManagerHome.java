@@ -12,6 +12,7 @@ public class ManagerHome extends JFrame {
     private JButton noteButton;
     private JButton showMembersButton;
     private JButton academicScheduleButton;
+    private JButton lostThingsButton;
 
     public ManagerHome() {
         setTitle("Manager Home");
@@ -46,11 +47,21 @@ public class ManagerHome extends JFrame {
                 scheduleManager.setVisible(true);
             }
         });
+        
+        lostThingsButton = new JButton("분실물찾기");
+        lostThingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LostThingsManager lostThingsManager = new LostThingsManager();
+                lostThingsManager.setVisible(true);
+            }
+        });
 
         setLayout(new FlowLayout());
         add(noteButton);
         add(showMembersButton);
         add(academicScheduleButton);
+        add(lostThingsButton);
     }
 
     public static void main(String[] args) {
