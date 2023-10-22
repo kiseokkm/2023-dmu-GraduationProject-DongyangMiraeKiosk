@@ -25,7 +25,8 @@ public class AcademicScheduleFrame extends JPanel {
     private JLabel lblMonthYear;
     private JTable calendarTable;
     private JTable academicEventsTable; // 학사 일정을 나타낼 새로운 JTable
-    private HashSet<String> eventDays = new HashSet<>();
+    private HashSet<Integer> eventDays = new HashSet<>();
+
 
     public AcademicScheduleFrame() {
         setLayout(new BorderLayout());
@@ -164,21 +165,34 @@ public class AcademicScheduleFrame extends JPanel {
         try {
             // 데이터베이스 연결
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-
-            // 해당 월의 학사 일정 정보만 가져옵니다. 오름차순 정렬 추가
-            String sql = "SELECT * FROM academic_schedule WHERE MONTH(date) = ? AND YEAR(date) = ? ORDER BY date ASC"; // ORDER BY clause added here
+            String sql = "SELECT * FROM academic_schedule WHERE (MONTH(start_date) = ? OR MONTH(end_date) = ?) AND YEAR(start_date) = ? ORDER BY start_date ASC";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, currentMonth + 1);  // DB는 1부터 시작
-            preparedStatement.setInt(2, currentYear);
+            preparedStatement.setInt(1, currentMonth + 1);
+            preparedStatement.setInt(2, currentMonth + 1);
+            preparedStatement.setInt(3, currentYear);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Date eventDate = resultSet.getDate("date");
+                Date startDate = resultSet.getDate("start_date");
+                Date endDate = resultSet.getDate("end_date");
                 String event = resultSet.getString("event");
 
-                eventDays.add(String.valueOf(eventDate.getDate()));  // 이벤트가 있는 날짜를 HashSet에 추가
-                academicModel.addRow(new Object[]{eventDate, event}); // 학사 일정 테이블에 일정 추가
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(startDate);
+                int startDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+                eventDays.add(startDayOfMonth);
+
+                if (endDate != null) {
+                    cal.setTime(endDate);
+                    int endDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+                    eventDays.add(endDayOfMonth);
+                    academicModel.addRow(new Object[]{startDate + " ~ " + endDate, event});
+                } else {
+                    academicModel.addRow(new Object[]{startDate, event});
+                }
             }
+
+
 
             resultSet.close();
             preparedStatement.close();
@@ -188,9 +202,5 @@ public class AcademicScheduleFrame extends JPanel {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "데이터베이스 연결 또는 쿼리 중 오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
         }
-        
-        
-        
     }
-    
 }

@@ -19,7 +19,8 @@ public class AcademicScheduleAllFrame extends JPanel {
     private JTable[] eventTables = new JTable[12];
     private DefaultTableModel[] calendarModels = new DefaultTableModel[12];
     private DefaultTableModel[] eventModels = new DefaultTableModel[12];
-    private HashSet<String>[] eventDaysArray = new HashSet[12];
+    private HashSet<Integer>[] eventDaysArray = new HashSet[12];
+
 
     public AcademicScheduleAllFrame() {
         setLayout(new GridLayout(6, 2)); // 6행 2열의 그리드 레이아웃
@@ -105,30 +106,33 @@ public class AcademicScheduleAllFrame extends JPanel {
             // 데이터베이스 연결
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
 
-            // 해당 월의 학사 일정 정보를 가져옵니다. 그리고 날짜 기준으로 오름차순 정렬
-            String sql = "SELECT * FROM academic_schedule WHERE MONTH(date) = ? AND YEAR(date) = ? ORDER BY date ASC"; // ORDER BY clause added here
+            // 변경된 테이블 구조에 맞게 SQL 쿼리 수정
+            String sql = "SELECT * FROM academic_schedule WHERE MONTH(start_date) = ? AND YEAR(start_date) = ? ORDER BY start_date ASC";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, month + 1);  // DB는 1부터 시작
             preparedStatement.setInt(2, CURRENT_YEAR);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Date eventDate = resultSet.getDate("date");
+                Date startDate = resultSet.getDate("start_date");
+                Date endDate = resultSet.getDate("end_date");  // end_date도 가져옵니다.
+                String event = resultSet.getString("event");
 
                 Calendar cal = Calendar.getInstance();
-                cal.setTime(eventDate);
-                int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+                cal.setTime(startDate);
+                int startDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 
-                eventDaysArray[month].add(String.valueOf(dayOfMonth));
-                System.out.println("Added Event Day: " + dayOfMonth); // 이벤트가 있는 날짜를 출력
+                eventDaysArray[month].add(startDayOfMonth);
+                System.out.println("Added Event Day: " + startDayOfMonth); // 이벤트 시작 날짜를 출력
 
-                String event = resultSet.getString("event");
-                eventModels[month].addRow(new Object[]{eventDate, event});
+                if (endDate != null) {
+                    cal.setTime(endDate);
+                    int endDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+                    eventModels[month].addRow(new Object[]{startDate + " ~ " + endDate, event});  // 시작 및 종료 날짜를 모두 보여줍니다.
+                } else {
+                    eventModels[month].addRow(new Object[]{startDate, event});
+                }
             }
-
-
-
-
             resultSet.close();
             preparedStatement.close();
             connection.close();
