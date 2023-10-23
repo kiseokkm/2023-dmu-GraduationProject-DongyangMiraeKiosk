@@ -2,6 +2,10 @@ package admin;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,9 +16,15 @@ public class TimetablePanel extends JPanel {
     private JLabel[][] labels;
     private JComboBox<String> startTimeCombo, endTimeCombo, dayCombo;
     private JTextField subjectField, placeField;
-    private JButton addButton;
+    private JButton addButton, editButton, deleteButton;
     private Connection connection;
     private String studentId;
+
+    // times 배열을 멤버 변수로 선언
+    private String[] times = {
+        "9AM - 10AM", "10AM - 11AM", "11AM - 12PM", "12PM - 1PM",
+        "1PM - 2PM", "2PM - 3PM", "3PM - 4PM", "4PM - 5PM", "5PM - 6PM", "6PM - 7PM"
+    };
 
     public TimetablePanel(String studentId) {
         this.studentId = studentId;
@@ -43,24 +53,8 @@ public class TimetablePanel extends JPanel {
         labels[0][4].setText("목요일");
         labels[0][5].setText("금요일");
         for (int i = 1; i <= 10; i++) {
-            if (i == 1) {
-                labels[i][0].setText("9AM - 10AM");
-            } else if (i == 2) {
-                labels[i][0].setText("10AM - 11AM");
-            } else if (i == 3) {
-                labels[i][0].setText("11AM - 12PM");
-            } else if (i == 4) {
-                labels[i][0].setText("12PM - 1PM");
-            } else {
-                int startHour = (i + 8) % 12 == 0 ? 12 : (i + 8) % 12;
-                int endHour = (i + 9) % 12 == 0 ? 12 : (i + 9) % 12;
-                labels[i][0].setText(startHour + "PM - " + endHour + "PM");
-            }
+            labels[i][0].setText(times[i - 1]);
         }
-        String[] times = {
-            "9AM - 10AM", "10AM - 11AM", "11AM - 12PM", "12PM - 1PM",
-            "1PM - 2PM", "2PM - 3PM", "3PM - 4PM", "4PM - 5PM", "5PM - 6PM", "6PM - 7PM"
-        };
         String[] days = {"월요일", "화요일", "수요일", "목요일", "금요일"};
         startTimeCombo = new JComboBox<>(times);
         endTimeCombo = new JComboBox<>(times);
@@ -84,6 +78,17 @@ public class TimetablePanel extends JPanel {
                 addToDatabase(dayCombo.getSelectedItem().toString(), startTimeCombo.getSelectedItem().toString(), endTimeCombo.getSelectedItem().toString(), subjectField.getText(), placeField.getText());
             }
         });
+
+        editButton = new JButton("수정");
+        editButton.setBackground(new Color(46, 139, 87));
+        editButton.setForeground(Color.WHITE);
+        editButton.addActionListener(e -> editTimetableEntry());
+
+        deleteButton = new JButton("삭제");
+        deleteButton.setBackground(new Color(220, 20, 60));
+        deleteButton.setForeground(Color.WHITE);
+        deleteButton.addActionListener(e -> deleteTimetableEntry());
+
         inputPanel.add(new JLabel("시작 시간:"));
         inputPanel.add(startTimeCombo);
         inputPanel.add(new JLabel("끝 시간:"));
@@ -95,10 +100,115 @@ public class TimetablePanel extends JPanel {
         inputPanel.add(new JLabel("장소:"));
         inputPanel.add(placeField);
         inputPanel.add(addButton);
+        inputPanel.add(editButton);
+        inputPanel.add(deleteButton);
+
         add(mainPanel, BorderLayout.CENTER);
         add(inputPanel, BorderLayout.SOUTH);
+
+        for (int i = 1; i < 11; i++) {
+            for (int j = 1; j < 6; j++) {
+                final int row = i;
+                final int col = j;
+                labels[i][j].addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        fillInputFieldsFromLabel(row, col);
+                    }
+                });
+            }
+        }
         loadTimetableFromDatabase();
     }
+    private void editTimetableEntry() {
+        String oldDay = dayCombo.getSelectedItem().toString();
+        String oldStartTime = startTimeCombo.getSelectedItem().toString();
+        String oldEndTime = endTimeCombo.getSelectedItem().toString();
+
+        String newSubject = subjectField.getText();
+        String newPlace = placeField.getText();
+
+        // 데이터베이스 업데이트
+        updateDatabase(oldDay, oldStartTime, oldEndTime, oldDay, oldStartTime, oldEndTime, newSubject, newPlace);
+        
+        // 표시 업데이트
+        int startIdx = startTimeCombo.getSelectedIndex() + 1;
+        int endIdx = endTimeCombo.getSelectedIndex() + 1;
+        int dayIdx = dayCombo.getSelectedIndex() + 1;
+        String data = "<html>" + newSubject + "<br>" + newPlace + "</html>";
+        for (int i = startIdx; i <= endIdx; i++) {
+            labels[i][dayIdx].setText(data);
+        }
+        
+        JOptionPane.showMessageDialog(null, "수정되었습니다.");
+    }
+
+    // 삭제 메소드
+    private void deleteTimetableEntry() {
+        int startIdx = startTimeCombo.getSelectedIndex() + 1;
+        int endIdx = endTimeCombo.getSelectedIndex() + 1;
+        int dayIdx = dayCombo.getSelectedIndex() + 1;
+
+        String selectedDay = dayCombo.getSelectedItem().toString();
+        String selectedStartTime = startTimeCombo.getSelectedItem().toString();
+        String selectedEndTime = endTimeCombo.getSelectedItem().toString();
+
+        // 데이터베이스에서 삭제
+        deleteFromDatabase(selectedDay, selectedStartTime, selectedEndTime);
+
+        // 표시에서 삭제
+        for (int i = startIdx; i <= endIdx; i++) {
+            labels[i][dayIdx].setText("");
+        }
+    }
+
+    // 데이터베이스 업데이트
+    private void updateDatabase(String oldDay, String oldStartTime, String oldEndTime, String newDay, String newStartTime, String newEndTime, String newSubject, String newPlace) {
+        String query = "UPDATE timetable SET day = ?, startTime = ?, endTime = ?, subject = ?, place = ? WHERE studentId = ? AND day = ? AND startTime = ? AND endTime = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, newDay);
+            preparedStatement.setString(2, newStartTime);
+            preparedStatement.setString(3, newEndTime);
+            preparedStatement.setString(4, newSubject);
+            preparedStatement.setString(5, newPlace);
+            preparedStatement.setString(6, studentId);
+            preparedStatement.setString(7, oldDay);
+            preparedStatement.setString(8, oldStartTime);
+            preparedStatement.setString(9, oldEndTime);
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                JOptionPane.showMessageDialog(null, "해당 항목을 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "수정 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+
+    // 데이터베이스에서 삭제
+    private void deleteFromDatabase(String day, String startTime, String endTime) {
+        String query = "DELETE FROM timetable WHERE studentId = ? AND day = ? AND startTime = ? AND endTime = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, studentId);
+            preparedStatement.setString(2, day);
+            preparedStatement.setString(3, startTime);
+            preparedStatement.setString(4, endTime);
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows == 0) {
+                JOptionPane.showMessageDialog(null, "해당 항목을 찾을 수 없습니다.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "삭제 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
 
     private boolean checkIfTimeSlotExists() {
         String query = "SELECT * FROM timetable WHERE studentId = ? AND day = ? AND startTime = ? AND endTime = ?";
@@ -140,6 +250,7 @@ public class TimetablePanel extends JPanel {
             preparedStatement.setString(5, place);
             preparedStatement.setString(6, studentId);
             preparedStatement.executeUpdate();
+            JOptionPane.showMessageDialog(null, "추가되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -194,6 +305,29 @@ public class TimetablePanel extends JPanel {
             case "5PM - 6PM": return 9;
             case "6PM - 7PM": return 10;
             default: return -1;
+        }
+    }
+    
+    private void fillInputFieldsFromLabel(int row, int col) {
+        String text = labels[row][col].getText();
+        if (text != null && !text.isEmpty()) {
+            String[] split = text.split("<br>");
+            if (split.length == 2) {
+                String subject = split[0].replace("<html>", "").trim();
+                String place = split[1].replace("</html>", "").trim();
+                subjectField.setText(subject);
+                placeField.setText(place);
+                dayCombo.setSelectedIndex(col - 1);
+                
+                // Check for the ending time of this course
+                int endRow = row;
+                while (endRow < 10 && labels[endRow + 1][col].getText().equals(text)) {
+                    endRow++;
+                }
+                
+                startTimeCombo.setSelectedIndex(row - 1);
+                endTimeCombo.setSelectedIndex(endRow - 1);
+            }
         }
     }
 
