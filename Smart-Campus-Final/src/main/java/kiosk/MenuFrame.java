@@ -113,7 +113,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlHobbyClub = new javax.swing.JPanel();
     pnlHobbyClub.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlHobbyClub.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
-    tabbedPane.addTab("취미동아리 / C.Ⅰ. Lab", pnlHobbyClub);
+    tabbedPane.addTab("취미동아리/전공동아리", pnlHobbyClub);
 
     pnlClass.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlClass.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
