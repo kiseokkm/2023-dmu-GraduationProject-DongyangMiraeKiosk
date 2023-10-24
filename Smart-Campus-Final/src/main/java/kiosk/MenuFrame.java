@@ -45,14 +45,26 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
           app.Global.setAppIcon(this);
           initModels();
           initComponents();
+          
+          // 취미동아리 패널 초기화
+          initHobbyClubPanel();
+
           // 공지사항 초기 로드
           NoticeFrame.showNoticeTableOnPanel(pnlNotice);
           initState();
-       } catch (Exception e) {
-           e.printStackTrace(); // 오류 메세지 출력
-           JOptionPane.showMessageDialog(this, "오류발생" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-       }
-   }
+      } catch (Exception e) {
+          e.printStackTrace(); // 오류 메세지 출력
+          JOptionPane.showMessageDialog(this, "오류발생" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+      }
+  }
+
+  // 새로운 메서드: 취미동아리 패널 초기화
+  private void initHobbyClubPanel() {
+      HobbyClub hobbyClubPanel = new HobbyClub();
+      pnlHobbyClub.setLayout(new BorderLayout());
+      pnlHobbyClub.add(hobbyClubPanel, BorderLayout.CENTER);
+  }
+
   @SuppressWarnings("unchecked")
   private javax.swing.JPanel pnlLostThings;
   private void initComponents() {
@@ -77,9 +89,9 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Menu");
-    setMinimumSize(new java.awt.Dimension(800, 860));
+    setMinimumSize(new java.awt.Dimension(1500, 860));
     setName(""); // NOI18N
-    setPreferredSize(new java.awt.Dimension(800, 860));
+    setPreferredSize(new java.awt.Dimension(1000, 860));
 
     pnlContent.setLayout(new java.awt.GridBagLayout());
 
@@ -97,6 +109,11 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlNotice.setPreferredSize(new java.awt.Dimension(560, 500));
     pnlNotice.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("공지사항", pnlNotice);
+    
+    pnlHobbyClub = new javax.swing.JPanel();
+    pnlHobbyClub.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
+    pnlHobbyClub.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
+    tabbedPane.addTab("취미동아리 / C.Ⅰ. Lab", pnlHobbyClub);
 
     pnlClass.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlClass.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
@@ -217,53 +234,53 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     }
   } 
   private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {
-	    int tabIndex = tabbedPane.getSelectedIndex();
+      int tabIndex = tabbedPane.getSelectedIndex();
 
-	    if (tabIndex == 0) {
-	        NoticeFrame.resetNoticeLoadedFlag();
-	        NoticeFrame.showNoticeTableOnPanel(pnlNotice);
-	    }
+      if (tabIndex == 0) {
+          NoticeFrame.resetNoticeLoadedFlag();
+          NoticeFrame.showNoticeTableOnPanel(pnlNotice);
+      }
 
-	    if (tabIndex == 1) { // "강의실 안내" 탭이 선택되었을 때
-	        if (pnlClass.getComponentCount() == 0) { // 패널에 아무 컴포넌트도 없는 경우만 추가
-	            EmergencyClassroom emergencyClassroom = new EmergencyClassroom();
-	            pnlClass.setLayout(new BorderLayout());
-	            pnlClass.add(emergencyClassroom, BorderLayout.CENTER);
-	            pnlClass.revalidate();
-	            pnlClass.repaint();
-	        }
-	    }
+      if (tabIndex == 1) { // "교직원 검색" 탭이 선택되었을 때
+    	    if (pnlClass.getComponentCount() == 0) { // 패널에 아무 컴포넌트도 없는 경우만 추가
+    	        EmergencyClassroom emergencyClassroom = new EmergencyClassroom();
+    	        pnlClass.setLayout(new BorderLayout());
+    	        pnlClass.add(emergencyClassroom, BorderLayout.CENTER);
+    	        pnlClass.revalidate();
+    	        pnlClass.repaint();
+    	    }
+    	}
 
-       if (tabIndex == 2 && itemsFood == null) {
-          JPanel mealInfoPanel = CafeTeria.getMealInfoPanel();
-          
-          pnlFood.removeAll();
-          pnlFood.setLayout(new BorderLayout());
-          pnlFood.add(mealInfoPanel, BorderLayout.CENTER);
-          pnlFood.revalidate();
-          pnlFood.repaint();
-        }
+	       if (tabIndex == 2) { // "취미동아리 / C.Ⅰ. Lab" 탭이 선택되었을 때
+	    	    HobbyClub hobbyClubPanel = new HobbyClub();
+	    	    pnlHobbyClub.removeAll();
+	    	    pnlHobbyClub.setLayout(new BorderLayout());
+	    	    pnlHobbyClub.add(hobbyClubPanel, BorderLayout.CENTER);
+	    	    pnlHobbyClub.revalidate();
+	    	    pnlHobbyClub.repaint();
+	    	}
        
-       if (tabIndex == 3 && itemsMap == null) {
-           java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-           try {
-             java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
-             desktop.browse(uri);
-           } catch (java.net.URISyntaxException | java.io.IOException ex) {
-             ex.printStackTrace();
-           }
-         }
-       
-       if (tabIndex == 4) {
-           // "학사 일정" 탭이 선택되었을 때
-           AcademicScheduleFrame academicScheduleFrame = new AcademicScheduleFrame();
-           
-           pnlAcademicSchedule.removeAll();
-           pnlAcademicSchedule.setLayout(new BorderLayout());
-           pnlAcademicSchedule.add(academicScheduleFrame, BorderLayout.CENTER);
-           pnlAcademicSchedule.revalidate();
-           pnlAcademicSchedule.repaint();
-       }
+	       if (tabIndex == 3) {
+	    	    // "학사 일정" 탭이 선택되었을 때
+	    	    AcademicScheduleFrame academicScheduleFrame = new AcademicScheduleFrame();         
+	    	    pnlAcademicSchedule.removeAll();
+	    	    pnlAcademicSchedule.setLayout(new BorderLayout());
+	    	    pnlAcademicSchedule.add(academicScheduleFrame, BorderLayout.CENTER);
+	    	    pnlAcademicSchedule.revalidate();
+	    	    pnlAcademicSchedule.repaint();
+	    	}
+
+	    	if (tabIndex == 4 && itemsMap == null) {
+	    	    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+	    	    try {
+	    	        java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
+	    	        desktop.browse(uri);
+	    	    } catch (java.net.URISyntaxException | java.io.IOException ex) {
+	    	        ex.printStackTrace();
+	    	    }
+	    	}
+
+
        if (tabIndex == 5) { // "분실물찾기" 탭이 선택되었을 때
            LostThings lostThingsFrame = new LostThings();
            pnlLostThings.removeAll();
@@ -272,96 +289,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
            pnlLostThings.revalidate();
            pnlLostThings.repaint();
        }
-
-   }
-  
-  
-  
-  
- 
-      /* 
-  private void loadNotices() {
-       try {
-           Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-           String sql = "SELECT * FROM notices ORDER BY id DESC";
-           Statement statement = connection.createStatement();
-           ResultSet resultSet = statement.executeQuery(sql);
-           
-           noticeTableModel = new javax.swing.table.DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
-           noticeTable = new javax.swing.JTable(noticeTableModel);
-
-           int noticeCount = 0; // 게시글의 개수를 저장할 변수입니다.
-           
-           while (resultSet.next()) {
-               Object[] row = {
-                   resultSet.getInt("id"),
-                   resultSet.getString("title"),
-                   resultSet.getString("author"),
-                   resultSet.getString("date"),
-                   resultSet.getInt("viewCount")
-               };
-               noticeTableModel.addRow(row);
-               noticeCount++; // 게시글의 개수를 증가시킵니다.
-           }
-
-           // 게시글의 총 개수를 레이블에 표시합니다.
-           JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
-
-           pnlNotice.removeAll();
-           pnlNotice.setLayout(new BorderLayout());
-           pnlNotice.add(lblNoticeCount, BorderLayout.NORTH);
-           pnlNotice.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
-           
-           pnlNotice.revalidate();
-           pnlNotice.repaint();
-       } catch (SQLException e) {
-           e.printStackTrace();
-           JOptionPane.showMessageDialog(null, "데이터베이스 연결 또는 쿼리 중 오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
-       }
-   }
-*/
-
-
-
-
-
-       
-     /*
-  private void showNoticeDetails(String title) {
-     System.out.println("showNoticeDetails called with title: " + title);
-
-       try {
-           Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-           String sql = "SELECT content FROM notices WHERE title = ?";
-           PreparedStatement statement = connection.prepareStatement(sql);
-           statement.setString(1, title);
-           ResultSet rs = statement.executeQuery();
-           if (rs.next()) {
-               String content = rs.getString("content");
-               JTextArea textArea = new JTextArea(10, 40);
-               textArea.setText(content);
-               textArea.setWrapStyleWord(true);
-               textArea.setLineWrap(true);
-               textArea.setCaretPosition(0);
-               textArea.setEditable(false);
-
-               JDialog dialog = new JDialog();
-               dialog.setTitle("Notice Details");
-               dialog.setSize(400, 300);
-               dialog.add(new JScrollPane(textArea));
-               dialog.setLocationRelativeTo(null);  // center on screen
-               dialog.setVisible(true);
-
-           }
-           rs.close();
-           statement.close();
-           connection.close();
-       } catch (Exception ex) {
-           ex.printStackTrace();
-       }
-   }
-   */
-       
+   }       
   private void itemActionPeformed(models.Item item) {
     CustomizeDialog customizeDialog = new CustomizeDialog(item);
     customizeDialog.addObserver(this);
@@ -404,6 +332,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   private javax.swing.JTabbedPane tabbedPane;
   private javax.swing.JTable tblOrder;
   private javax.swing.JPanel pnlAcademicSchedule;
+  private javax.swing.JPanel pnlHobbyClub;
+
 }
 
 class BtnItem extends javax.swing.JButton {

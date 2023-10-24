@@ -73,7 +73,7 @@ public class AdminFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Admin");
         setName(""); // NOI18N
-        setPreferredSize(new java.awt.Dimension(720, 600));
+        setPreferredSize(new java.awt.Dimension(1080, 600));
 
         // 탭들을 추가
         tabbedPane.addTab("수강중인 강좌", new OrdersPanel());

@@ -119,7 +119,6 @@ public class EmergencyClassroom extends JPanel {
             table.setRowHeight(80); // 다른 테이블들의 행 높이도 조금 높게 설정
         }
 
-        // 테이블의 크기를 데이터의 크기에 맞게 조절
         Dimension tableSize = table.getPreferredSize();
         tableSize.height = table.getRowHeight() * table.getRowCount();
         table.setPreferredScrollableViewportSize(tableSize);
@@ -137,9 +136,6 @@ public class EmergencyClassroom extends JPanel {
         return panel;
     }
 
-
-
-
     private void initSearchPanel(JPanel centerPanel) {
         JPanel searchPanel = new JPanel(new FlowLayout());
         JComboBox<String> searchCategoryComboBox = new JComboBox<>(new String[]{"소속", "성명", "담당업무", "전화번호"});
@@ -154,12 +150,24 @@ public class EmergencyClassroom extends JPanel {
         searchButton.addActionListener(e -> {
             String selectedCategory = (String) searchCategoryComboBox.getSelectedItem();
             String query = searchField.getText().trim();
-            searchForStaff(selectedCategory, query, staffTableModel);
-
-            staticPanel.setVisible(false);  // 정적 패널 숨기기
-            resultScrollPane.setVisible(true);  // 결과 패널 보이기
+            
+            // 별도의 스레드에서 데이터베이스 작업을 수행
+            new Thread(() -> {
+                searchForStaff(selectedCategory, query, staffTableModel);
+                // GUI 업데이트는 이벤트 디스패치 스레드에서 수행
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    centerPanel.removeAll();  // centerPanel의 모든 컴포넌트를 제거합니다.
+                    centerPanel.add(searchPanel, BorderLayout.NORTH);  // centerPanel에 검색 패널을 다시 추가합니다.
+                    centerPanel.add(resultScrollPane, BorderLayout.CENTER);  // centerPanel에 검색 결과를 추가합니다.
+                    centerPanel.revalidate();  // centerPanel의 레이아웃을 갱신합니다.
+                    centerPanel.repaint();  // centerPanel을 다시 그립니다.
+                    resultScrollPane.setVisible(true);
+                });
+            }).start();  // 스레드 시작
         });
     }
+
+
 
     public void searchForStaff(String category, String query, DefaultTableModel model) {
         model.setRowCount(0);
@@ -204,4 +212,3 @@ public class EmergencyClassroom extends JPanel {
         return staffTableModel;
     }
 }
-
