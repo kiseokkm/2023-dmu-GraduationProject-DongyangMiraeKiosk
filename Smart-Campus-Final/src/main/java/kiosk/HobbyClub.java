@@ -118,4 +118,36 @@ public class HobbyClub extends JPanel {
     private void switchPanel(String selectedClub) {
         cardLayout.show(cardsPanel, selectedClub);
     }
+
+
+    public void refreshData() {
+        // 모든 행을 삭제하여 테이블을 초기화합니다.
+        tableModel.setRowCount(0);
+
+        // 데이터베이스 연결 및 데이터 추출
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM HobbyClubs");
+
+            while (rs.next()) {
+                int 연번 = rs.getInt("연번");
+                String 동아리명 = rs.getString("동아리명");
+                String CILab = rs.getString("CILab");
+                String 소개및활동내용 = rs.getString("소개및활동내용");
+
+                tableModel.addRow(new Object[]{연번, 동아리명, CILab, 소개및활동내용});
+            }
+
+            rs.close();
+            stmt.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public JTable getTable() {
+        return table;
+    }
+
 }
