@@ -15,7 +15,8 @@ public class ManagerHome extends JFrame {
     private JButton lostThingsButton;
     private JButton staffSearchButton;
     private JButton timeTableButton;
-    private JButton univHopeButton;  // 추가된 버튼
+    private JButton univHopeButton; 
+    private JButton clubManagementButton; 
 
     public ManagerHome() {
         setTitle("Manager Home");
@@ -86,6 +87,15 @@ public class ManagerHome extends JFrame {
                 managerUnivHope.setVisible(true);
             }
         });
+        
+        clubManagementButton = new JButton("동아리 관리");
+        clubManagementButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ManagerClub managerClub = new ManagerClub();
+                managerClub.setVisible(true);
+            }
+        });
 
         setLayout(new FlowLayout());
         add(noteButton);
@@ -94,7 +104,8 @@ public class ManagerHome extends JFrame {
         add(lostThingsButton);
         add(staffSearchButton);
         add(timeTableButton);
-        add(univHopeButton);  // 버튼을 화면에 추가
+        add(univHopeButton);
+        add(clubManagementButton);
     }
 
     public static void main(String[] args) {
