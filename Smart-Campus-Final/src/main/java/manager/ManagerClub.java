@@ -4,6 +4,8 @@ import kiosk.HobbyClub;
 import kiosk.MajorClub;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.sql.*;
 
@@ -26,6 +28,11 @@ public class ManagerClub extends JFrame {
         tabbedPane = new JTabbedPane();
         hobbyClubPanel = new HobbyClub();
         majorClubPanel = MajorClub.createMajorClubPanel();
+
+        JTable majorClubTable = MajorClub.getTableFromPanel(majorClubPanel);
+        DefaultTableModel majorClubModel = (DefaultTableModel) majorClubTable.getModel();
+        majorClubModel.addColumn("ID", new Object[]{});  
+        refreshDataForAdmin(majorClubTable); 
 
         JPanel hobbyButtonPanel = new JPanel();
         JButton hobbyAddButton = new JButton("취미동아리 추가");
@@ -50,7 +57,7 @@ public class ManagerClub extends JFrame {
         majorAddButton.addActionListener(e -> addMajorData());
         majorEditButton.addActionListener(e -> editMajorData());
         majorDeleteButton.addActionListener(e -> deleteMajorData());
-        majorRefreshButton.addActionListener(e -> MajorClub.refreshData(MajorClub.getTableFromPanel(majorClubPanel)));
+        majorRefreshButton.addActionListener(e -> refreshDataForAdmin(majorClubTable));
         majorButtonPanel.add(majorAddButton);
         majorButtonPanel.add(majorEditButton);
         majorButtonPanel.add(majorDeleteButton);
@@ -61,7 +68,8 @@ public class ManagerClub extends JFrame {
         tabbedPane.addTab("전공동아리", majorClubPanel);
         add(tabbedPane, BorderLayout.CENTER);
     }
-
+    
+    
     private void addHobbyData() {
         String clubName = JOptionPane.showInputDialog(this, "동아리명을 입력하세요");
         String ciLab = JOptionPane.showInputDialog(this, "C.Ⅰ. Lab을 입력하세요");
@@ -149,6 +157,33 @@ public class ManagerClub extends JFrame {
             return true;
         } catch (NumberFormatException e) {
             return false;
+        }
+    }
+    
+    private void refreshDataForAdmin(JTable table) {
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        tableModel.setRowCount(0);  // Clear existing data
+
+        try {
+            Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            Statement stmt = connection.createStatement();
+
+            ResultSet rs = stmt.executeQuery("SELECT id, 학부, PDLab, 기본활동, 개발과제, 지도교수 FROM MajorClubs");
+            while (rs.next()) {
+                String 학부 = rs.getString("학부");
+                String PDLab = rs.getString("PDLab");
+                String 기본활동 = rs.getString("기본활동");
+                String 개발과제 = rs.getString("개발과제");
+                String 지도교수 = rs.getString("지도교수");
+                int id = rs.getInt("id");
+                tableModel.addRow(new Object[]{ 학부, PDLab, 기본활동, 개발과제, 지도교수, id});
+            }
+
+            rs.close();
+            stmt.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
