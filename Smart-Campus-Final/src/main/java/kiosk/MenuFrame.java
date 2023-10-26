@@ -87,6 +87,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     btnBack = new javax.swing.JButton();
     btnContinue = new javax.swing.JButton();
 
+
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Menu");
     setMinimumSize(new java.awt.Dimension(1500, 860));
@@ -109,6 +110,12 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlNotice.setPreferredSize(new java.awt.Dimension(560, 500));
     pnlNotice.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("공지사항", pnlNotice);
+    
+    pnlScholarship = new javax.swing.JPanel();
+    pnlScholarship.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
+    pnlScholarship.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
+    tabbedPane.addTab("장학/등록", pnlScholarship);
+
     
     pnlHobbyClub = new javax.swing.JPanel();
     pnlHobbyClub.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
@@ -203,6 +210,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   
   private javax.swing.JTable noticeTable;
   private javax.swing.table.DefaultTableModel noticeTableModel;
+  private javax.swing.JPanel pnlScholarship;
+
   
   private void initModels() {
     itemService = new services.ItemService();
@@ -240,8 +249,18 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
           NoticeFrame.resetNoticeLoadedFlag();
           NoticeFrame.showNoticeTableOnPanel(pnlNotice);
       }
+      
+      if (tabIndex == 1) {
+    	    // 여기에 새로운 탭의 로직을 추가
+    	    ScholarshipMain scholarshipPanel = new ScholarshipMain();
+    	    pnlScholarship.removeAll();
+    	    pnlScholarship.setLayout(new BorderLayout());
+    	    pnlScholarship.add(scholarshipPanel, BorderLayout.CENTER);
+    	    pnlScholarship.revalidate();
+    	    pnlScholarship.repaint();
+    	}
 
-      if (tabIndex == 1) { // "교직원 검색" 탭이 선택되었을 때
+      if (tabIndex == 2) { // "교직원 검색" 탭이 선택되었을 때
     	    if (pnlClass.getComponentCount() == 0) { // 패널에 아무 컴포넌트도 없는 경우만 추가
     	        EmergencyClassroom emergencyClassroom = new EmergencyClassroom();
     	        pnlClass.setLayout(new BorderLayout());
@@ -251,7 +270,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     	    }
     	}
 
-	       if (tabIndex == 2) { // "취미동아리 / C.Ⅰ. Lab" 탭이 선택되었을 때
+	       if (tabIndex == 3) { // "취미동아리 / C.Ⅰ. Lab" 탭이 선택되었을 때
 	    	    HobbyClub hobbyClubPanel = new HobbyClub();
 	    	    pnlHobbyClub.removeAll();
 	    	    pnlHobbyClub.setLayout(new BorderLayout());
@@ -260,7 +279,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	    	    pnlHobbyClub.repaint();
 	    	}
        
-	       if (tabIndex == 3) {
+	       if (tabIndex == 4) {
 	    	    // "학사 일정" 탭이 선택되었을 때
 	    	    AcademicScheduleFrame academicScheduleFrame = new AcademicScheduleFrame();         
 	    	    pnlAcademicSchedule.removeAll();
@@ -270,7 +289,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	    	    pnlAcademicSchedule.repaint();
 	    	}
 
-	    	if (tabIndex == 4 && itemsMap == null) {
+	    	if (tabIndex == 5 && itemsMap == null) {
 	    	    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
 	    	    try {
 	    	        java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
@@ -281,7 +300,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	    	}
 
 
-       if (tabIndex == 5) { // "분실물찾기" 탭이 선택되었을 때
+       if (tabIndex == 6) { // "분실물찾기" 탭이 선택되었을 때
            LostThings lostThingsFrame = new LostThings();
            pnlLostThings.removeAll();
            pnlLostThings.setLayout(new BorderLayout());
