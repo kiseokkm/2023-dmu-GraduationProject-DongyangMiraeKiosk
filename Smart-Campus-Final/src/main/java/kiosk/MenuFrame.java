@@ -91,7 +91,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Menu");
-    setMinimumSize(new java.awt.Dimension(1500, 860));
+    setMinimumSize(new java.awt.Dimension(1800, 860));
     setName(""); // NOI18N
     setPreferredSize(new java.awt.Dimension(1000, 860));
 
