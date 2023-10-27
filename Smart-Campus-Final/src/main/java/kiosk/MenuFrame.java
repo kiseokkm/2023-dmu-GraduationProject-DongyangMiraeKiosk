@@ -27,6 +27,7 @@ import javax.swing.ListModel;
 import AcademicSchedule.AcademicScheduleFrame;
 import LostThi.LostThings;
 import Notice.NoticeFrame;
+import Scholarship.ScholarshipMain;
 
 import java.awt.FlowLayout;
 
@@ -251,7 +252,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
       }
       
       if (tabIndex == 1) {
-    	    // 여기에 새로운 탭의 로직을 추가
     	    ScholarshipMain scholarshipPanel = new ScholarshipMain();
     	    pnlScholarship.removeAll();
     	    pnlScholarship.setLayout(new BorderLayout());
@@ -259,6 +259,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     	    pnlScholarship.revalidate();
     	    pnlScholarship.repaint();
     	}
+
 
       if (tabIndex == 2) { // "교직원 검색" 탭이 선택되었을 때
     	    if (pnlClass.getComponentCount() == 0) { // 패널에 아무 컴포넌트도 없는 경우만 추가
