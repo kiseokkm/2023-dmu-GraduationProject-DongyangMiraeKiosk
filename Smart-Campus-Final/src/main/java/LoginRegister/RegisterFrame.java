@@ -48,7 +48,11 @@ public class RegisterFrame extends JFrame {
         JLabel lblStudentId = new JLabel("학번:");
         JLabel lblname = new JLabel("이름:");
         JLabel lblPhoneNumber = new JLabel("전화번호:");
-        JLabel lblMostPreciousThing = new JLabel("당신의 가장 소중한것은:");
+        JComboBox<String> comboMostPreciousThing = new JComboBox<>();
+        comboMostPreciousThing.addItem("당신의 가장 소중한것은?");
+        comboMostPreciousThing.addItem("당신이 나온 초등학교는?");
+        comboMostPreciousThing.addItem("당신이 나온 중학교는?");
+
 
         txtUsername = new JTextField(20);
         txtPassword = new JPasswordField(20);
@@ -110,8 +114,25 @@ public class RegisterFrame extends JFrame {
                 String password = new String(txtPassword.getPassword());
                 String confirmPassword = new String(txtConfirmPassword.getPassword());
                 String studentId = txtStudentId.getText();
+                if (!isValidStudentId(studentId)) {
+                    JOptionPane.showMessageDialog(RegisterFrame.this, "학번을 다시 입력하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (checkDuplicateStudentId(studentId)) {
+                    JOptionPane.showMessageDialog(RegisterFrame.this, "학번 중복입니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 String name = txtname.getText();
                 String phoneNumber = txtPhoneNumber.getText();
+                if (!isValidPhoneNumber(phoneNumber)) {
+                    JOptionPane.showMessageDialog(RegisterFrame.this, "전화번호는 11자리의 숫자만 가능합니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (checkDuplicatePhoneNumber(phoneNumber)) {
+                    JOptionPane.showMessageDialog(RegisterFrame.this, "휴대폰 번호 중복입니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 String major = (String) comboMajor.getSelectedItem();
                 String mostPreciousThing = txtMostPreciousThing.getText();
 
@@ -138,6 +159,8 @@ public class RegisterFrame extends JFrame {
                 }
             }
         });
+        
+        
 
 
         btnCancel = new JButton("취소");
@@ -175,6 +198,8 @@ public class RegisterFrame extends JFrame {
         comboMajor.addItem("호텔관광학과");
         comboMajor.addItem("경영정보학과");
         comboMajor.addItem("빅데이터경영과");
+        
+        
 
         panel.add(lblUsername);
         panel.add(txtUsername);
@@ -197,7 +222,7 @@ public class RegisterFrame extends JFrame {
         panel.add(lblPhoneNumber);
         panel.add(txtPhoneNumber);
         panel.add(new JLabel());
-        panel.add(lblMostPreciousThing);
+        panel.add(comboMostPreciousThing);
         panel.add(txtMostPreciousThing);
         panel.add(new JLabel());
         panel.add(new JLabel());
@@ -286,14 +311,66 @@ public class RegisterFrame extends JFrame {
     public static void main(String[] args) {
         RegisterFrame registerFrame = new RegisterFrame();
         registerFrame.setVisible(true);
+    }    
+    
+    private boolean isValidStudentId(String studentId) {
+        if (studentId.length() != 8) {
+            return false;
+        }
+        for (char c : studentId.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        return true;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        if (phoneNumber.length() != 11) {
+            return false;
+        }
+        for (char c : phoneNumber.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean checkDuplicateStudentId(String studentId) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql = "SELECT * FROM user1 WHERE studentId = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, studentId);
+            ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    private boolean checkDuplicatePhoneNumber(String phoneNumber) {
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            String sql = "SELECT * FROM user1 WHERE phoneNumber = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, phoneNumber);
+            ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 }
