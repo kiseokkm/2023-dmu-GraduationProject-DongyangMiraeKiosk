@@ -28,6 +28,7 @@ import AcademicSchedule.AcademicScheduleFrame;
 import LostThi.LostThings;
 import Notice.NoticeFrame;
 import Scholarship.ScholarshipMain;
+import graduation.GraduationMain;
 
 import java.awt.FlowLayout;
 
@@ -42,29 +43,93 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   java.util.ArrayList<models.Item> itemsMap;
 
   public MenuFrame() {
-      try {
-          app.Global.setAppIcon(this);
-          initModels();
-          initComponents();
-          
-          // 취미동아리 패널 초기화
-          initHobbyClubPanel();
+	    try {
+	        app.Global.setAppIcon(this);
+	        initModels();
+	        initComponents();
 
-          // 공지사항 초기 로드
-          NoticeFrame.showNoticeTableOnPanel(pnlNotice);
-          initState();
-      } catch (Exception e) {
-          e.printStackTrace(); // 오류 메세지 출력
-          JOptionPane.showMessageDialog(this, "오류발생" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-      }
-  }
+	        // 모든 탭들을 초기화
+	        initAllTabs();
+	        initState();
+	    } catch (Exception e) {
+	        e.printStackTrace(); // 오류 메세지 출력
+	        JOptionPane.showMessageDialog(this, "오류발생" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+  
+  private void initAllTabs() {
+	    // 공지사항 패널 초기화
+	    NoticeFrame.showNoticeTableOnPanel(pnlNotice);
+
+	    // 취미동아리 패널 초기화
+	    initHobbyClubPanel();
+
+	    // 장학/등록 패널 초기화
+	    initScholarshipPanel();
+
+	    // 교직원 검색 패널 초기화
+	    initClassPanel();
+
+	    // 학사 일정 패널 초기화
+	    initAcademicSchedulePanel();
+
+	    // 분실물찾기 패널 초기화
+	    initLostThingsPanel();
+
+	    // 졸업정보 패널 초기화
+	    initGraduationPanel();
+	}
 
   // 새로운 메서드: 취미동아리 패널 초기화
   private void initHobbyClubPanel() {
-      HobbyClub hobbyClubPanel = new HobbyClub();
-      pnlHobbyClub.setLayout(new BorderLayout());
-      pnlHobbyClub.add(hobbyClubPanel, BorderLayout.CENTER);
-  }
+	    HobbyClub hobbyClubPanel = new HobbyClub();
+	    pnlHobbyClub.setLayout(new BorderLayout());
+	    pnlHobbyClub.add(hobbyClubPanel, BorderLayout.CENTER);
+	}
+  
+  private void initScholarshipPanel() {
+	    ScholarshipMain scholarshipPanel = new ScholarshipMain();
+	    pnlScholarship.setLayout(new BorderLayout());
+	    pnlScholarship.add(scholarshipPanel, BorderLayout.CENTER);
+	}
+  private void initClassPanel() {
+	    EmergencyClassroom emergencyClassroom = new EmergencyClassroom();
+	    pnlClass.removeAll();
+	    pnlClass.setLayout(new BorderLayout());
+	    pnlClass.add(emergencyClassroom, BorderLayout.CENTER);
+	    pnlClass.revalidate();
+	    pnlClass.repaint();
+	}
+
+	private void initAcademicSchedulePanel() {
+	    AcademicScheduleFrame academicScheduleFrame = new AcademicScheduleFrame();         
+	    pnlAcademicSchedule.removeAll();
+	    pnlAcademicSchedule.setLayout(new BorderLayout());
+	    pnlAcademicSchedule.add(academicScheduleFrame, BorderLayout.CENTER);
+	    pnlAcademicSchedule.revalidate();
+	    pnlAcademicSchedule.repaint();
+	}
+
+	private void initLostThingsPanel() {
+	    LostThings lostThingsFrame = new LostThings();
+	    pnlLostThings.removeAll();
+	    pnlLostThings.setLayout(new BorderLayout());
+	    pnlLostThings.add(lostThingsFrame, BorderLayout.CENTER);
+	    pnlLostThings.revalidate();
+	    pnlLostThings.repaint();
+	}
+
+	private void initGraduationPanel() {
+	    GraduationMain graduationMainPanel = new GraduationMain();
+	    pnlGraduation.removeAll();
+	    pnlGraduation.setLayout(new BorderLayout());
+	    pnlGraduation.add(graduationMainPanel, BorderLayout.CENTER);
+	    pnlGraduation.revalidate();
+	    pnlGraduation.repaint();
+	}
+
+
+  
 
   @SuppressWarnings("unchecked")
   private javax.swing.JPanel pnlLostThings;
@@ -144,6 +209,12 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlLostThings.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlLostThings.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("분실물찾기", pnlLostThings);
+    
+    pnlGraduation = new javax.swing.JPanel();
+    pnlGraduation.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
+    pnlGraduation.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
+    tabbedPane.addTab("졸업정보", pnlGraduation);
+
 
 
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -244,12 +315,12 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     }
   } 
   private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {
-      int tabIndex = tabbedPane.getSelectedIndex();
+	    int tabIndex = tabbedPane.getSelectedIndex();
 
-      if (tabIndex == 0) {
-          NoticeFrame.resetNoticeLoadedFlag();
-          NoticeFrame.showNoticeTableOnPanel(pnlNotice);
-      }
+	    if (tabIndex == 0) {
+	        NoticeFrame.resetNoticeLoadedFlag();
+	        NoticeFrame.showNoticeTableOnPanel(pnlNotice);
+	    }
       
       if (tabIndex == 1) {
     	    ScholarshipMain scholarshipPanel = new ScholarshipMain();
@@ -309,7 +380,22 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
            pnlLostThings.revalidate();
            pnlLostThings.repaint();
        }
-   }       
+       
+       if (tabIndex == 7) { 
+           GraduationMain graduationMainPanel = new GraduationMain();
+           pnlGraduation.removeAll();
+           pnlGraduation.setLayout(new BorderLayout());
+           pnlGraduation.add(graduationMainPanel, BorderLayout.CENTER);
+           pnlGraduation.revalidate();
+           pnlGraduation.repaint();
+       }
+
+
+   }  
+  
+  		
+  
+  
   private void itemActionPeformed(models.Item item) {
     CustomizeDialog customizeDialog = new CustomizeDialog(item);
     customizeDialog.addObserver(this);
@@ -353,6 +439,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   private javax.swing.JTable tblOrder;
   private javax.swing.JPanel pnlAcademicSchedule;
   private javax.swing.JPanel pnlHobbyClub;
+  private javax.swing.JPanel pnlGraduation;
 
 }
 
