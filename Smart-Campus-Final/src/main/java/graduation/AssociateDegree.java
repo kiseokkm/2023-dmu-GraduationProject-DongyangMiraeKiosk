@@ -3,15 +3,13 @@ package graduation;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 public class AssociateDegree extends JPanel {
-
-    private JTextPane textPane;
 
     public AssociateDegree() {
         initUI();
@@ -26,13 +24,23 @@ public class AssociateDegree extends JPanel {
         lblTitle.setHorizontalAlignment(SwingConstants.CENTER); // Center the label
         add(lblTitle, BorderLayout.NORTH);
 
-        // Create a panel to hold the textPane and the table
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        // Main content panel
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0)); // 여기를 수정했습니다.
 
-        textPane = new JTextPane();
+        // Text Pane section
+        addTextPaneSection(contentPanel);
+        // Degree table section
+        addDegreeSection(contentPanel);
+
+        add(contentPanel, BorderLayout.CENTER);
+    }
+
+
+    private void addTextPaneSection(JPanel container) {
+        JTextPane textPane = new JTextPane();
         textPane.setEditable(false);
-        textPane.setMargin(new Insets(40, 0, 40, 0));
+        textPane.setMargin(new Insets(5, 0, 0, 0)); // Adjusted margin to reduce gap below the text
 
         // Center-align the text
         StyledDocument doc = textPane.getStyledDocument();
@@ -53,24 +61,33 @@ public class AssociateDegree extends JPanel {
         textPane.setFont(new Font("SansSerif", Font.BOLD, 18));
         textPane.setOpaque(false);
 
-        JScrollPane textScrollPane = new JScrollPane(textPane);
-        textScrollPane.setOpaque(false);
-        textScrollPane.getViewport().setOpaque(false);
-        textScrollPane.setBorder(null);
-        textScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));  // Hide vertical scroll bar
+        container.add(textPane);
+    }
 
-        centerPanel.add(textScrollPane);
-
-        // Create the table for 학위종별
-        String[][] data = {
+    private void addDegreeSection(JPanel container) {
+        String[] columnNames = {"종별", "해당 학과"};
+        Object[][] data = {
             {"공학 전문학사", "기계공학과, 기계설계공학과, 자동화공학과, 로봇공학과, 전기공학과, 정보전자공학과, 반도체전자공학과, 정보통신공학과, 컴퓨터정보공학과, 컴퓨터소프트웨어공학과, 인공지능소프트웨어학과, 생명화학공학과, 바이오융합공학과, 건축과, 실내건축디자인과, 시각디자인과, 식품공학과, 실내환경디자인과, 시각정보디자인과"},
             {"경영 전문학사", "경영학과, 세무회계학과, 유통마케팅학과, 경영정보학과, 빅데이터경영과"},
             {"관광 전문학사", "호텔관광학과"}
         };
-        String[] columnNames = {"종별", "해당 학과"};
 
-        DefaultTableModel model = new DefaultTableModel(data, columnNames);
-        JTable table = new JTable(model);
+        JTable table = new JTable(data, columnNames);
+        table.setPreferredScrollableViewportSize(new Dimension(1500, 180));
+        table.setRowHeight(60);
+        table.setBackground(new Color(220, 220, 220));
+        table.getTableHeader().setBackground(Color.GRAY);
+        table.getTableHeader().setForeground(Color.WHITE);
+        TableColumnModel columnModel = table.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(200); 
+        columnModel.getColumn(1).setPreferredWidth(1500);
+
+        DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+        leftRenderer.setHorizontalAlignment(JLabel.LEFT);
+        leftRenderer.setBackground(new Color(220, 220, 220));
+        leftRenderer.setForeground(Color.BLACK);
+        table.setDefaultRenderer(Object.class, leftRenderer);
+        
 
         // Custom cell renderer for wrapping text in cell
         class TextAreaRenderer extends JTextArea implements TableCellRenderer {
@@ -90,15 +107,10 @@ public class AssociateDegree extends JPanel {
             }
         }
 
-        table.setDefaultRenderer(String.class, new TextAreaRenderer()); // Use custom renderer for String data
-
-        // Adjust the table height to fit the contents
-        table.setFillsViewportHeight(true);
-
-        JScrollPane tableScrollPane = new JScrollPane(table);
-        centerPanel.add(tableScrollPane);
-
-        add(centerPanel, BorderLayout.CENTER);
+        table.setDefaultRenderer(String.class, new TextAreaRenderer());
+        
+        
+        JScrollPane scrollPane = new JScrollPane(table);
+        container.add(scrollPane);
     }
 }
-
