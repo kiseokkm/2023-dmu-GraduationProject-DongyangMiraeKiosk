@@ -99,13 +99,7 @@ public class LaunchFrame extends javax.swing.JFrame {
 
     mnuFile.setText("File");
 
-    mniExit.setText("Exit");
-    mniExit.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        mniExitActionPerformed(evt);
-      }
-    });
-    mnuFile.add(mniExit);
+
 
     menuBar.add(mnuFile);
 
