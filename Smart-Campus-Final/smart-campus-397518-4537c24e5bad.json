@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "smart-campus-397518",
+  "private_key_id": "4537c24e5bad55d990201d017f3430fc07f00caa",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCDhBfN3azAMZCe\nhm3OOksf19UB9vNtZsAOGohpYl6FyIA7uObe4OA2T7nyRHCNna8TAKGRleBpgpK7\n/X6niclkVkizeQvzfza7KkHcgFiftIJsuL2ZKDkW8rL/78A58BqjZHVXWXmJq5Nf\n7NHSK8aypWd2nXoSZPnGd450KwF3hnngM/gICOZwk+Y3p0rql8vHMRuwkS4TXdUE\nJp53izgdw6caNWOMgzHoRdXQSUk3moFRo3o9vjNm/vUfXcWwmzhXyPwxIA6UOfDW\ntTb4/0uAdKdnnGCoXwZZmAxVn4IEf5i+BdWuCkmWjhsbtYp9SDqjWoNNi941OlBu\nUdC/8BCbAgMBAAECggEAJASeslJWF/LbHRdK5lJ/tZJaM2YLJ/iee55Xoqj+oxwU\nxoZusDadITK3hbqpqpc3Vfhzx1fpNGw+vH6B2+d4AONCmOh7Ve4Osraxf+6kluSM\nXbNAtbvW2sqQLFjgZ92ypfIC0u/dwc78FybYFfvIOK/lBI6/Wl9OKsUefgEzLyUA\nI01J5Kn3fTA+YcvyLvwvYaUUmGsvKA57tCCzpXweNGTCbcZD5xXD3XlY9+wnojAb\n/F8CtPrbWxZEq8Echtm5wIQOIOAbdu7LtEADJ9RpB5bFzYxeN4h4k/UFQkT5xKlh\nJWK32sSAC7LoJAuBG+NeUn67AX5AALEHuwFjbOOl9QKBgQC59bJBZrL2Odq0Xftf\nfDXq8ue+jWCdPPxGGlMVFD9j2naXpBVWpKhdPddVB3gorUjCwc1KgZv7MxR+Xg5L\n8ZyaWvbvIDlW1oilmv0+S9PcnTLNycbgHD1AhoTibdelPj+r2XGdCygdyj+utaz/\nvmRbs/I1j+0woHSBxfsYVfQi9wKBgQC1DOkA5DBCpuCftfAgMOzAjBvrGsNuXgyN\n0+tuMytBvul+IoqDp5jzU+4zZ1Wfa1nOwf/yj5bdbTHGfgVEpTXoBDJ+3ymmN+FW\nQgi5DvaTjQTFKnjfzfBZimVsMiFrX82qvoqawkzEvNpf4/z1TJYmCdCPLSG2av0Z\nWG2tfd9yfQKBgC6/WCdexOBnHNa4xYd0dy1wENfzPHVqrlSFK5uh8mmMssFeK0sT\nq4t9D1O9w/Qd06u6AnyXZnnYlm9J/7gRrfeTpH3qkN+GoOVYuA7gCwtrrSjUb51J\nHBDLgD5XtJ1Cr8joqcn70wLiI+4sl6fW2e2/p8TVQKA3xfIVrhCpEu1zAoGBAJqR\nhg9jwSv2KolPm8zv2ABe3arvc2+zTYZ8KWAwwTplEhTEynqxyCvdONyb2Qa8cLTK\n/YeJPSSXh8pNZpP/dDE7/BxCy90DkhbBU48ijjLUTwFBTGbN++eF9ybS+aMg7IZc\nHBsZzM6d6NW64AhQNVQORwclYcXKO4C69RAMCYtFAoGBAI5RfVAgLqFSNL79AxZP\nchzkMajGWXKvUrA26XSuv3d9NpljEXZy/cILMN7ZZfXIpy/AvHByqZR1SAKow0jt\n8i350lB4g8HfGLvk2shI8drZg9WNe/ArzZ7Znj2NLpf0ttOBX3kw4f4mPUrBegOV\nCpxDpHT/F7SKdoZkSgcScUUu\n-----END PRIVATE KEY-----\n",
+  "client_email": "jongmin@smart-campus-397518.iam.gserviceaccount.com",
+  "client_id": "111198381814236302931",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/jongmin%40smart-campus-397518.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
