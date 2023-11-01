@@ -9,18 +9,14 @@ public class JDateChooser extends JPanel {
     private JSpinner dateSpinner;
 
     public JDateChooser() {
-        // Set the spinner with a date model
         SpinnerDateModel model = new SpinnerDateModel();
         dateSpinner = new JSpinner(model);
         
-        // Set the editor format
         JSpinner.DateEditor editor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd");
         dateSpinner.setEditor(editor);
 
-        // Add the spinner to the panel
         add(dateSpinner);
 
-        // Listener to update the selectedDate when changed
         dateSpinner.addChangeListener(e -> selectedDate = (Date) dateSpinner.getValue());
     }
 
