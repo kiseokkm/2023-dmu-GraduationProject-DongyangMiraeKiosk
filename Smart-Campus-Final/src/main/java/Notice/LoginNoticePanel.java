@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,7 +31,8 @@ public class LoginNoticePanel extends JPanel {
     private static final int PAGE_SIZE = 22;
     private static int pageNumber = 1;
     private static String searchQuery = "";
-    private static String userMajor; // 사용자의 전공
+    private static String userMajor; 
+    private static String searchType = "제목";
 
     public LoginNoticePanel(String major) {
         this.userMajor = major;
@@ -46,7 +48,7 @@ public class LoginNoticePanel extends JPanel {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
             String sql;
             PreparedStatement statement;
-            
+
             // 검색어가 있으면 검색어와 일치하는 공지사항을, 없으면 전공과 일치하거나 전체 공지사항을 가져옴
             if (searchQuery.isEmpty()) {
                 sql = "SELECT * FROM notices WHERE type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
@@ -55,33 +57,58 @@ public class LoginNoticePanel extends JPanel {
                 statement.setInt(2, PAGE_SIZE);
                 statement.setInt(3, offset);
             } else {
-                sql = "SELECT * FROM notices WHERE (title LIKE ? OR content LIKE ?) AND type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
-                statement = connection.prepareStatement(sql);
-                statement.setString(1, "%" + searchQuery + "%");
-                statement.setString(2, "%" + searchQuery + "%");
-                statement.setString(3, userMajor);
-                statement.setInt(4, PAGE_SIZE);
-                statement.setInt(5, offset);
+                switch (searchType) {
+                    case "제목":
+                        sql = "SELECT * FROM notices WHERE title LIKE ? AND type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                        statement = connection.prepareStatement(sql);
+                        statement.setString(1, "%" + searchQuery + "%");
+                        statement.setString(2, userMajor);
+                        statement.setInt(3, PAGE_SIZE);
+                        statement.setInt(4, offset);
+                        break;
+                    case "작성자":
+                        sql = "SELECT * FROM notices WHERE author LIKE ? AND type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                        statement = connection.prepareStatement(sql);
+                        statement.setString(1, "%" + searchQuery + "%");
+                        statement.setString(2, userMajor);
+                        statement.setInt(3, PAGE_SIZE);
+                        statement.setInt(4, offset);
+                        break;
+                    case "내용":
+                        sql = "SELECT * FROM notices WHERE content LIKE ? AND type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                        statement = connection.prepareStatement(sql);
+                        statement.setString(1, "%" + searchQuery + "%");
+                        statement.setString(2, userMajor);
+                        statement.setInt(3, PAGE_SIZE);
+                        statement.setInt(4, offset);
+                        break;
+                    default:
+                        sql = "SELECT * FROM notices WHERE type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                        statement = connection.prepareStatement(sql);
+                        statement.setString(1, userMajor);
+                        statement.setInt(2, PAGE_SIZE);
+                        statement.setInt(3, offset);
+                        break;
+                }
             }
-
 
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Object identifier; 
+                Object identifier;
                 boolean isPinned = rs.getBoolean("pinned");
                 if (isPinned) {
-                    identifier = "★"; 
+                    identifier = "★";
                 } else {
                     identifier = rs.getInt("id");
                 }
 
                 Object[] row = {
-                    identifier,
-                    rs.getString("title"),
-                    rs.getString("author"),
-                    rs.getString("date"),
-                    rs.getInt("viewCount")
+                        identifier,
+                        rs.getString("title"),
+                        rs.getString("author"),
+                        rs.getString("date"),
+                        rs.getInt("viewCount")
                 };
                 noticeTableModel.addRow(row);
             }
@@ -245,13 +272,16 @@ public class LoginNoticePanel extends JPanel {
             }
         });
 
+        JComboBox<String> searchComboBox = new JComboBox<>(new String[]{"제목", "작성자", "내용"});
         JTextField searchField = new JTextField(20);
         JButton searchButton = new JButton("검색");
         searchButton.addActionListener(e -> {
-            searchQuery = searchField.getText().trim(); // 사용자가 입력한 검색어 가져오기
-            pageNumber = 1; // 검색 결과의 첫 페이지를 보여주기 위해 pageNumber를 1로 설정
-            isNoticesLoaded = false; // 공지사항을 다시 로드하기 위한 플래그 초기화
-            showNoticeTableOnPanel(panel); // 검색 결과를 반영하여 테이블을 다시 표시
+            String selectedOption = (String) searchComboBox.getSelectedItem();
+            searchQuery = searchField.getText().trim();
+            searchType = selectedOption; // 선택한 검색 유형 저장
+            pageNumber = 1;
+            isNoticesLoaded = false;
+            showNoticeTableOnPanel(panel);
         });
 
         JPanel navigationPanel = new JPanel(new FlowLayout());
@@ -259,7 +289,8 @@ public class LoginNoticePanel extends JPanel {
         navigationPanel.add(prevButton);
         navigationPanel.add(pageInfo); 
         navigationPanel.add(nextButton);
-        navigationPanel.add(lastPageButton);  // 마지막 페이지로 이동하는 버튼 추가
+        navigationPanel.add(lastPageButton);
+        navigationPanel.add(searchComboBox);
         navigationPanel.add(searchField);
         navigationPanel.add(searchButton);
 
