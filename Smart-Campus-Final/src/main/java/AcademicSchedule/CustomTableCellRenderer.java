@@ -2,43 +2,77 @@ package AcademicSchedule;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.HashSet;
 
 public class CustomTableCellRenderer extends DefaultTableCellRenderer {
     private HashSet<Integer> eventDays;
+    private Color bodyColor = new Color(255, 239, 213); // 연한 살색
 
-    // 생성자를 통해 이벤트가 있는 날짜의 HashSet을 받아옵니다.
     public CustomTableCellRenderer(HashSet<Integer> eventDays) {
-        this.eventDays = eventDays != null ? eventDays : new HashSet<>(); // null 체크를 추가
+        this.eventDays = eventDays != null ? eventDays : new HashSet<>();
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        System.out.println("Rendering cell for day: " + value);
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         
         if (value != null) {
-            Integer dayValue = (Integer) value;
-            if (eventDays.contains(dayValue)) {
-                System.out.println("Coloring Day: " + dayValue);  // 노란색으로 색칠되는 날짜를 출력
+            Integer dayValue = null;
+            if (value instanceof Integer) {
+                dayValue = (Integer) value;
+            } else if (value instanceof String) {
+                try {
+                    dayValue = Integer.parseInt((String) value);
+                } catch (NumberFormatException e) {
+                    dayValue = null;
+                }
+            }
+            if (dayValue != null && eventDays.contains(dayValue)) {
                 setBackground(Color.YELLOW);
             } else {
-                setBackground(Color.WHITE);
+                setBackground(bodyColor); // 연한 살색으로 배경 설정
             }
         } else {
-            setBackground(Color.WHITE);
-        }
-        
-        // 주말 색상 설정
-        if (column == 6) {
-            setForeground(Color.BLUE);
-        } else if (column == 0) {
-            setForeground(Color.RED);
-        } else {
-            setForeground(Color.BLACK);
+            setBackground(bodyColor); // 연한 살색으로 배경 설정
         }
 
         return this;
+    }
+
+    public static class HeaderRenderer extends DefaultTableCellRenderer {
+        public HeaderRenderer() {
+            setHorizontalAlignment(JLabel.CENTER);
+            setOpaque(true);
+            setBackground(new Color(255, 228, 196)); // 살색
+        }
+
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+            if ("Sun".equals(value)) {
+                setForeground(Color.RED);
+            } else if ("Sat".equals(value)) {
+                setForeground(Color.BLUE);
+            } else {
+                setForeground(Color.BLACK);
+            }
+
+            return this;
+        }
+    }
+    public static class CustomTableCellRendererForEvents extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setBackground(new Color(255, 239, 213)); // 연한 살색
+            return this;
+        }
+    }
+
+    public static void setHeaderRenderer(JTable table) {
+        JTableHeader header = table.getTableHeader();
+        header.setDefaultRenderer(new HeaderRenderer());
     }
 }
