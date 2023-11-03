@@ -147,7 +147,7 @@ public class LaunchFrame extends javax.swing.JFrame {
   }
 
   private void btnLaunchAdminActionPerformed(java.awt.event.ActionEvent evt) {
-    new LoginRegister.LoginFrame().setVisible(true);
+    new Admin_LoginRegister.LoginFrame().setVisible(true);
   
   }
 

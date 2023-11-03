@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2020 Self-Order Kiosk
- */
 package kiosk;
 
 public class EndFrame extends javax.swing.JFrame {

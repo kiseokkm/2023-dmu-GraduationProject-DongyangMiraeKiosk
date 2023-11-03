@@ -24,14 +24,14 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
 
-import AcademicSchedule.AcademicScheduleFrame;
-import LostThi.LostThings;
-import Notice.NoticeFrame;
-import Scholarship.ScholarshipMain;
-import graduation.GraduationMain;
+import Admin_Login_Notice.NoticeFrame;
+import Admin_LostThi.LostThings;
+import Kiosk_AcademicSchedule.AcademicScheduleFrame;
+import Kiosk_Club.HobbyClub;
+import Kiosk_graduation.GraduationMain;
+import Kisok_Scholarship.ScholarshipMain;
 
 import java.awt.FlowLayout;
-
 
 public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 
@@ -56,7 +56,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	        JOptionPane.showMessageDialog(this, "오류발생" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	    }
 	}
-  
   private void initAllTabs() {
 	    // 공지사항 패널 초기화
 	    NoticeFrame.showNoticeTableOnPanel(pnlNotice);
@@ -73,14 +72,9 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	    // 학사 일정 패널 초기화
 	    initAcademicSchedulePanel();
 
-	    // 분실물찾기 패널 초기화
-	    initLostThingsPanel();
-
 	    // 졸업정보 패널 초기화
 	    initGraduationPanel();
 	}
-
-  // 새로운 메서드: 취미동아리 패널 초기화
   private void initHobbyClubPanel() {
 	    HobbyClub hobbyClubPanel = new HobbyClub();
 	    pnlHobbyClub.setLayout(new BorderLayout());
@@ -128,9 +122,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	    pnlGraduation.repaint();
 	}
 
-
-  
-
   @SuppressWarnings("unchecked")
   private javax.swing.JPanel pnlLostThings;
   private void initComponents() {
@@ -153,11 +144,10 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     btnBack = new javax.swing.JButton();
     btnContinue = new javax.swing.JButton();
 
-
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Menu");
     setMinimumSize(new java.awt.Dimension(1800, 800));
-    setName(""); // NOI18N
+    setName("");
     setPreferredSize(new java.awt.Dimension(1800, 800));
 
     pnlContent.setLayout(new java.awt.GridBagLayout());
@@ -182,7 +172,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlScholarship.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("장학/등록", pnlScholarship);
 
-    
     pnlHobbyClub = new javax.swing.JPanel();
     pnlHobbyClub.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlHobbyClub.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
@@ -205,17 +194,10 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlAcademicSchedule.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("학사 일정", pnlAcademicSchedule);
     
-    pnlLostThings = new javax.swing.JPanel();
-    pnlLostThings.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
-    pnlLostThings.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
-    tabbedPane.addTab("분실물찾기", pnlLostThings);
-    
     pnlGraduation = new javax.swing.JPanel();
     pnlGraduation.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlGraduation.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("졸업정보", pnlGraduation);
-
-
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -240,7 +222,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
     pnlOrder.add(pnlTotal, gridBagConstraints);
 
-    //레이아웃 빈공간없이 크기 늘릴 수 있음 weighty
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
@@ -305,7 +286,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     new StartFrame().setVisible(true);
     dispose();
   }
-  private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinueActionPerformed
+  private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {
     java.util.ArrayList<models.OrderDetail> orderedItems = StateManager.getOrderedItems();
     if (orderedItems != null && orderedItems.size() > 0) {
       new OrderSummaryFrame().setVisible(true);
@@ -369,19 +350,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	    	    } catch (java.net.URISyntaxException | java.io.IOException ex) {
 	    	        ex.printStackTrace();
 	    	    }
-	    	}
-
-
-       if (tabIndex == 6) { // "분실물찾기" 탭이 선택되었을 때
-           LostThings lostThingsFrame = new LostThings();
-           pnlLostThings.removeAll();
-           pnlLostThings.setLayout(new BorderLayout());
-           pnlLostThings.add(lostThingsFrame, BorderLayout.CENTER);
-           pnlLostThings.revalidate();
-           pnlLostThings.repaint();
-       }
-       
-       if (tabIndex == 7) { 
+	    	}       
+       if (tabIndex == 6) { 
            GraduationMain graduationMainPanel = new GraduationMain();
            pnlGraduation.removeAll();
            pnlGraduation.setLayout(new BorderLayout());
