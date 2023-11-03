@@ -1,4 +1,4 @@
-package kiosk;
+package Kiosk_Club;
 
 import java.awt.*;
 import javax.swing.*;
