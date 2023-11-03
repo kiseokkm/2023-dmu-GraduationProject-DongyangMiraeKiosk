@@ -1,9 +1,9 @@
 package Admin_Login_Notice;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
@@ -22,12 +22,14 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
 import com.google.cloud.speech.v1.RecognitionAudio;
@@ -59,7 +61,7 @@ public class NoticeFrame {
         int offset = (pageNumber - 1) * PAGE_SIZE;
 
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql;
             PreparedStatement statement;
             if (searchQuery.isEmpty()) {
@@ -113,7 +115,7 @@ public class NoticeFrame {
     public static JTextArea getNoticeDetails(String title) {
         JTextArea textArea = new JTextArea(10, 40);
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql = "SELECT content FROM notices WHERE title = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, title);
@@ -139,7 +141,7 @@ public class NoticeFrame {
     
     public static void incrementViewCount(String title) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql = "UPDATE notices SET viewCount = viewCount + 1 WHERE title = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, title);
@@ -159,7 +161,7 @@ public class NoticeFrame {
     public static int getNoticeCount() {
         int count = 0;
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql = "SELECT COUNT(*) FROM notices";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
@@ -268,7 +270,23 @@ voiceButton.addActionListener(e -> {
         int numBytesRead;
         byte[] data = new byte[microphone.getBufferSize() / 5];
 
-        // JOptionPane for '녹음 시작...' removed for automatic progression
+
+        final JOptionPane pane = new JOptionPane("음성을 입력해주세요.", JOptionPane.INFORMATION_MESSAGE);
+        final JDialog dialog = pane.createDialog(null, "알림");
+
+        // Timer를 사용하여 1~2초 후에 JOptionPane을 자동으로 닫습니다.
+        new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();
+            }
+        }) {{
+            setRepeats(false); // Timer가 한 번만 실행되도록 설정
+            start(); // Timer 시작
+        }};
+
+        dialog.setVisible(true); // 알림창 표시
+
 
         // TODO: 녹음 시간 설정 (여기서는 5초로 설정)
         long end = System.currentTimeMillis() + 5000;  
@@ -286,9 +304,6 @@ voiceButton.addActionListener(e -> {
 
         microphone.close();
 
-        
-// JOptionPane for '녹음 완료.' removed for automatic progression
-// JOptionPane for '음성을 텍스트로 변환 중...' removed for automatic progression
     
 
         // 2. Google Cloud Speech-to-Text API 사용
@@ -308,12 +323,15 @@ voiceButton.addActionListener(e -> {
             // Just use the first alternative here.
             SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
             searchField.setText(alternative.getTranscript());
+System.out.println("음성 입력 결과: " + alternative.getTranscript());
+searchButton.doClick();
         }
 
     } catch (Exception ex) {
         ex.printStackTrace();
     }
 });
+
 
     
 
@@ -369,7 +387,7 @@ navigationPanel.add(searchButton);
                 JScrollPane scrollPane = new JScrollPane(noticeContent);
 
                 JPanel contentPanel = new JPanel(new BorderLayout());
-                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang")) {
+                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234")) {
                     String sql = "SELECT * FROM notices WHERE title = ?";
                     PreparedStatement statement = connection.prepareStatement(sql);
                     statement.setString(1, title);
@@ -402,6 +420,7 @@ navigationPanel.add(searchButton);
                     panel.repaint();
                     isNoticesLoaded = true;
                 });
+
                 contentPanel.add(backButton, BorderLayout.SOUTH);
                 panel.removeAll();
                 panel.setLayout(new BorderLayout());
@@ -410,6 +429,9 @@ navigationPanel.add(searchButton);
                 panel.repaint();
             }
         });
+
+
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(lblNoticeCount, BorderLayout.WEST);
         topPanel.add(toMainButton, BorderLayout.CENTER);

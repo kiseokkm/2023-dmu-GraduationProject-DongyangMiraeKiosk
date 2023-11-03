@@ -21,26 +21,33 @@ public class AdminFrame extends javax.swing.JFrame {
     private JButton profileButton;
     private String currentLoggedInUsername; 
     private String currentLoggedInUserMajor = "전체"; // default value
+    private String currentLoggedInName; // 멤버 변수로 선언
+    
+    
 
     public AdminFrame(String loggedInUsername) {
-        this.currentLoggedInUsername = loggedInUsername; 
-        this.currentLoggedInUserMajor = getUserMajor(loggedInUsername); // 로그인한 사용자의 전공
+        String[] userInfo = getUserInfo(loggedInUsername);
+        this.currentLoggedInUsername = loggedInUsername; // 현재 로그인한 사용자의 username
+        this.currentLoggedInUserMajor = userInfo[0]; // 로그인한 사용자의 전공
+        this.currentLoggedInName = userInfo[1]; // 로그인한 사용자의 이름, 멤버 변수에 저장
         initComponents();
         app.Global.setAppIcon(this);
         initProfileButton();
     }
 
-    private String getUserMajor(String username) {
-        // 여기에서 DB에서 사용자의 전공을 가져옵니다.
+    private String[] getUserInfo(String username) {
+        // DB에서 사용자의 전공과 이름을 가져옵니다.
         String major = "전체";
+        String name = "";
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-            String sql = "SELECT major FROM user1 WHERE username = ?";
+            String sql = "SELECT major, name FROM user1 WHERE Username = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, username);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
                 major = rs.getString("major");
+                name = rs.getString("name");
             }
             rs.close();
             statement.close();
@@ -48,7 +55,7 @@ public class AdminFrame extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return major;
+        return new String[] { major, name };
     }
 
     private void initProfileButton() {
@@ -67,7 +74,6 @@ public class AdminFrame extends javax.swing.JFrame {
         tabbedPane.addTab("", null); // 빈 탭 추가
         tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, buttonPanel); // 마지막 빈 탭에 버튼 추가
     }
-
     @SuppressWarnings("unchecked")
     private void initComponents() {
         tabbedPane = new javax.swing.JTabbedPane();
@@ -78,9 +84,9 @@ public class AdminFrame extends javax.swing.JFrame {
         
         // 탭들을 추가
         tabbedPane.addTab("시간표", new TimetablePanel(currentLoggedInUsername));
-        tabbedPane.addTab("학교에 바란다", new UnivHope());
+        tabbedPane.addTab("학교에 바란다", new UnivHope(currentLoggedInName));
         tabbedPane.addTab("학과 공지사항", new LoginNoticePanel(currentLoggedInUserMajor));
-        tabbedPane.addTab("분실물찾기", new LostThings());
+        tabbedPane.addTab("분실물찾기", new LostThings(currentLoggedInName));
         tabbedPane.addTab("사용자 목록", new UsersPanel());
 
         getContentPane().add(tabbedPane, java.awt.BorderLayout.CENTER);

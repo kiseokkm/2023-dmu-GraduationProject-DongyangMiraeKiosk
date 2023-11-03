@@ -7,11 +7,17 @@ import java.awt.event.ActionListener;
 
 public class LostThings extends JPanel {
 
-    public LostThings() {
-        setLayout(new BorderLayout());
+    private String loggedInUsername; // 로그인한 사용자의 이름을 저장하는 변수
 
+    public LostThings(String loggedInUsername) {
+        this.loggedInUsername = loggedInUsername;
+        setLayout(new BorderLayout());
+        initializeComponents();
+    }
+
+    private void initializeComponents() {
         JLabel headline = new JLabel("분실물찾기", SwingConstants.CENTER);
-        headline.setFont(new java.awt.Font("Malgun Gothic", java.awt.Font.BOLD, 40));
+        headline.setFont(new Font("Malgun Gothic", Font.BOLD, 40));
         headline.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(headline, BorderLayout.NORTH);
 
@@ -26,7 +32,7 @@ public class LostThings extends JPanel {
                 reportFrame.setSize(600, 400);
                 reportFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 reportFrame.setLocationRelativeTo(null);
-                reportFrame.add(new LostThingsReport());
+                reportFrame.add(new LostThingsReport(loggedInUsername)); // 로그인한 사용자 이름을 전달
                 reportFrame.setVisible(true);
             }
         });
@@ -52,7 +58,7 @@ public class LostThings extends JPanel {
         ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
         Image img = icon.getImage().getScaledInstance(100, 40, Image.SCALE_SMOOTH);
         button.setIcon(new ImageIcon(img));
-        button.setFont(new java.awt.Font("Malgun Gothic", java.awt.Font.BOLD, 18));
+        button.setFont(new Font("Malgun Gothic", Font.BOLD, 18));
         button.setBackground(Color.LIGHT_GRAY);
         button.setOpaque(true);
         button.setBorderPainted(false);

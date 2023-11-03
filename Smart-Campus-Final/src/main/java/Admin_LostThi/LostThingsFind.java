@@ -142,6 +142,8 @@ public class LostThingsFind extends JPanel {
 
         // 컬럼 너비 설정
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.getColumnModel().getColumn(2).setPreferredWidth(400);
+        table.getColumnModel().getColumn(3).setPreferredWidth(200);
         table.getColumnModel().getColumn(4).setPreferredWidth(217); // 작성일 컬럼 너비 설정
         table.getColumnModel().getColumn(5).setPreferredWidth(50);
 
@@ -181,6 +183,23 @@ public class LostThingsFind extends JPanel {
             int numBytesRead;
             byte[] data = new byte[microphone.getBufferSize() / 5];
 
+            final JOptionPane pane = new JOptionPane("음성을 입력해주세요.", JOptionPane.INFORMATION_MESSAGE);
+            final JDialog dialog = pane.createDialog(null, "알림");
+
+            // Timer를 사용하여 1~2초 후에 JOptionPane을 자동으로 닫습니다.
+            new Timer(1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dialog.dispose();
+                }
+            }) {{
+                setRepeats(false); // Timer가 한 번만 실행되도록 설정
+                start(); // Timer 시작
+            }};
+
+            dialog.setVisible(true); // 알림창 표시
+            
+            // TODO: 녹음 시간 설정 (여기서는 5초로 설정)
             long end = System.currentTimeMillis() + 5000;  
             while (System.currentTimeMillis() < end) {
                 numBytesRead = microphone.read(data, 0, data.length);
@@ -218,7 +237,7 @@ public class LostThingsFind extends JPanel {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }   
+    }  
     private void loadDataFromDatabase1(String tableName) {
         loadDataFromDatabase(tableName, null, null);
     }
@@ -231,10 +250,12 @@ public class LostThingsFind extends JPanel {
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
              Statement stmt = conn.createStatement()) {
+            // 검색 조건이 있는 경우 SQL 쿼리 수정
             String query = "SELECT * FROM " + tableName;
             if (searchColumn != null && !searchColumn.isEmpty() && searchText != null && !searchText.isEmpty()) {
                 query += " WHERE " + searchColumn + " LIKE '%" + searchText + "%'";
             }
+
             ResultSet rs = stmt.executeQuery(query);
 
             tableModel.setRowCount(0);
@@ -244,6 +265,7 @@ public class LostThingsFind extends JPanel {
                 String title = rs.getString("title");
                 String content = rs.getString("content");
                 String author = rs.getString("author");
+
                 // 작성일 포맷 변경
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String postDate = sdf.format(rs.getTimestamp("post_date"));
@@ -256,11 +278,11 @@ public class LostThingsFind extends JPanel {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "데이터 로딩 중 오류가 발생했습니다.");
         }
-    } 
+    }
     public void incrementViewCount(int postId, String category) {
         String url = "jdbc:mysql://localhost:3306/self_order_kiosk?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
         String user = "root";
-        String password = "dongyang";
+        String password = "1234";
 
         String sql = "UPDATE " + category + " SET views = views + 1 WHERE id = ?";
 
@@ -276,6 +298,8 @@ public class LostThingsFind extends JPanel {
                e.printStackTrace();
            }
        }
+    
+
     private void showContentInPanel(String content) {
         JTextArea textArea = new JTextArea(10, 40);
         textArea.setText(content);
@@ -305,6 +329,7 @@ public class LostThingsFind extends JPanel {
             mainPanel.revalidate();
             mainPanel.repaint();
         });
+
         setLayout(new BorderLayout());
         add(scrollPane, BorderLayout.CENTER);
         add(backButton, BorderLayout.SOUTH);

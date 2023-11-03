@@ -34,16 +34,48 @@ public class ManagerDashboard extends JFrame {
         setLayout(new FlowLayout());
         addNoticeButton = new JButton("공지 추가");
         addNoticeButton.addActionListener(e -> {
-            String title = JOptionPane.showInputDialog("공지 제목을 입력하세요:");
-            if (title != null && !title.isEmpty()) {
-                String content = JOptionPane.showInputDialog("Enter notice content:");
-                String author = JOptionPane.showInputDialog("Enter author:");
-                JComboBox<String> typeComboBox = new JComboBox<>(types);
-                JOptionPane.showMessageDialog(null, typeComboBox, "Select Type", JOptionPane.QUESTION_MESSAGE);
+            JPanel panel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridwidth = GridBagConstraints.REMAINDER;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.anchor = GridBagConstraints.WEST;
+
+            // 제목 입력 필드와 레이블
+            panel.add(new JLabel("공지 제목을 입력하세요:"), gbc);
+            JTextField titleField = new JTextField(20);
+            panel.add(titleField, gbc);
+
+            // 내용 입력 필드와 레이블
+            panel.add(new JLabel("공지 내용을 입력하세요:"), gbc);
+            JTextArea contentArea = new JTextArea(5, 20);
+            contentArea.setLineWrap(true);
+            contentArea.setWrapStyleWord(true);
+            JScrollPane contentScrollPane = new JScrollPane(contentArea);
+            panel.add(contentScrollPane, gbc);
+
+            // 저자 입력 필드와 레이블
+            panel.add(new JLabel("작성자를 입력하세요:"), gbc);
+            JTextField authorField = new JTextField(20);
+            panel.add(authorField, gbc);
+
+            // 유형 선택 콤보 박스와 레이블
+            panel.add(new JLabel("학과를 선택하세요:"), gbc);
+            JComboBox<String> typeComboBox = new JComboBox<>(types);
+            panel.add(typeComboBox, gbc);
+
+            int result = JOptionPane.showConfirmDialog(null, panel, "Enter Notice Details", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+            if (result == JOptionPane.OK_OPTION) {
+                String title = titleField.getText();
+                String content = contentArea.getText();
+                String author = authorField.getText();
                 String selectedType = (String) typeComboBox.getSelectedItem();
+
                 int rowIndex = noticeTable.getSelectedRow();
                 boolean pinned = rowIndex != -1 && (boolean) noticeTableModel.getValueAt(rowIndex, 2);
-                if (content != null && author != null && selectedType != null && !content.isEmpty() && !author.isEmpty()) {
+
+                // 입력 값 검증 및 공지 추가 함수 호출
+                if (!title.isEmpty() && !content.isEmpty() && !author.isEmpty() && selectedType != null) {
                     addNotice(title, content, author, selectedType, pinned);
                 }
             }

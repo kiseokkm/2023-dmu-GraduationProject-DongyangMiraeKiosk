@@ -103,16 +103,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	    pnlAcademicSchedule.revalidate();
 	    pnlAcademicSchedule.repaint();
 	}
-
-	private void initLostThingsPanel() {
-	    LostThings lostThingsFrame = new LostThings();
-	    pnlLostThings.removeAll();
-	    pnlLostThings.setLayout(new BorderLayout());
-	    pnlLostThings.add(lostThingsFrame, BorderLayout.CENTER);
-	    pnlLostThings.revalidate();
-	    pnlLostThings.repaint();
-	}
-
+	
 	private void initGraduationPanel() {
 	    GraduationMain graduationMainPanel = new GraduationMain();
 	    pnlGraduation.removeAll();
