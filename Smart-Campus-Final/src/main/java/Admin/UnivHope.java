@@ -408,8 +408,9 @@ public class UnivHope extends JPanel {
             JScrollPane scrollPane = new JScrollPane(contentArea);
             postButton = new JButton("게시");
             postButton.addActionListener(e -> {
-                String author = anonymousCheckBox.isSelected() ? "익명" : authorField.getText();
-                savePostToDatabase(titleField.getText(), author, contentArea.getText());
+                boolean isAnonymous = anonymousCheckBox.isSelected();
+                String author = isAnonymous ? "익명" : displayAuthor;
+                savePostToDatabase(titleField.getText(), author, contentArea.getText(), isAnonymous);
                 loadDataFromDatabase();
                 dispose();
             });
@@ -423,20 +424,37 @@ public class UnivHope extends JPanel {
             authorField.setText(displayAuthor); // 사용자 이름으로 작성자 필드를 미리 채움
             authorField.setEditable(!"익명".equals(displayAuthor)); // If the name is "익명", make it non-editable
         }
-        private void savePostToDatabase(String title, String author, String content) {
-            boolean isAnonymous = "익명".equals(author);
+        private void savePostToDatabase(String title, String author, String content, boolean isAnonymous) {
             try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                 PreparedStatement stmt = conn.prepareStatement("INSERT INTO communication_board (title, author, content, anonymous, admin_reply) VALUES (?, ?, ?, ?, ?)")) {
                 stmt.setString(1, title);
-                stmt.setString(2, author);
+                stmt.setString(2, author); // 여기에 실제 작성자 이름을 저장합니다.
                 stmt.setString(3, content);
-                stmt.setBoolean(4, isAnonymous);
-                stmt.setString(5, "");
+                stmt.setBoolean(4, isAnonymous); // 익명 여부를 저장합니다. 사용자가 익명을 선택한 경우 true
+                stmt.setString(5, ""); // 관리자 답변은 초기에는 비어 있음
                 stmt.executeUpdate();
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "데이터 저장 중 오류가 발생했습니다.");
             }
+        }
+        private String getDisplayName(int postId) {
+            String displayName = "익명"; // 기본값으로 익명 설정
+            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                 PreparedStatement stmt = conn.prepareStatement("SELECT author, anonymous FROM communication_board WHERE id = ?")) {
+                stmt.setInt(1, postId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    boolean isAnonymous = rs.getBoolean("anonymous");
+                    if (!isAnonymous) {
+                        displayName = rs.getString("author"); // 익명이 아니면 실제 이름을 사용
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "데이터 저장 중 오류가 발생했습니다.");
+            }
+            return displayName; // 이 메서드의 결과로 displayName을 반환합니다.
         }
     }
 }
