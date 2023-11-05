@@ -2,6 +2,8 @@ package Admin_Manager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -38,6 +40,23 @@ public class LostThingsManager extends JFrame {
         categoryPanel.add(foundButton);
         categoryPanel.add(searchButton);
         add(categoryPanel, BorderLayout.NORTH);
+        
+        String[] columnNames = {"ID", "제목", "내용", "작성자", "작성일", "조회수"};
+        lostThingsTableModel = new DefaultTableModel(columnNames, 0);
+        lostThingsTable = new JTable(lostThingsTableModel);
+        
+        lostThingsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { 
+                    int rowIndex = lostThingsTable.getSelectedRow();
+                    if (rowIndex != -1) {
+                        String content = (String) lostThingsTableModel.getValueAt(rowIndex, 2);
+                        JOptionPane.showMessageDialog(null, new JScrollPane(new JTextArea(content, 5, 30)), "상세 내용", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
 
         addButton = new JButton("분실물 추가");
         addButton.addActionListener(e -> {
@@ -96,9 +115,7 @@ public class LostThingsManager extends JFrame {
         buttonPanel.add(refreshButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        String[] columnNames = {"ID", "제목", "내용", "작성자", "작성일", "조회수"};
-        lostThingsTableModel = new DefaultTableModel(columnNames, 0);
-        lostThingsTable = new JTable(lostThingsTableModel);
+
         add(new JScrollPane(lostThingsTable), BorderLayout.CENTER);
 
         loadDataFromDatabase(currentCategory);
