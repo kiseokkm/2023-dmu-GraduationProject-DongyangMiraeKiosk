@@ -34,135 +34,75 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 public class LostThingsFind extends JPanel {
-
     private JTable table;
     private DefaultTableModel tableModel;
     private JPanel mainPanel;
-    private String currentCategory = "found_items"; 
+    private String currentCategory = "found_items";
     private JTextField searchField;
     private JButton seButton;
+    private JPanel categoryPanel;
+    private JPanel searchPanel;
+
+    // 생성자 메소드입니다.
     public LostThingsFind() {
-        
-    // 하단 중앙 패널 생성
-    JPanel bottomPanel = new JPanel();
-    bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-    // 드롭박스 생성 및 추가
-    String[] categories = {"제목", "내용", "작성자"};
-    JComboBox<String> categoryComboBox = new JComboBox<>(categories);
-    bottomPanel.add(categoryComboBox);
-
-    // 검색필드 생성 및 추가
-    searchField = new JTextField(20);  // 인스턴스 변수로 변경
-    bottomPanel.add(searchField);
-
-    // 음성인식 버튼 생성 및 추가 (아이콘이나 텍스트로 설정 가능)
-    JButton voiceButton = new JButton("음성인식");
-    bottomPanel.add(voiceButton);
-
-    // 검색 버튼 생성 및 추가
-    seButton = new JButton("검색");
-    bottomPanel.add(seButton);
-    // 새로고침 버튼 생성 및 추가
-    JButton refreshButton = new JButton("새로고침");
-    bottomPanel.add(refreshButton);
-
-    // 하단 중앙 패널을 메인 패널에 추가
-    add(bottomPanel, BorderLayout.SOUTH);
-
         mainPanel = this;
         setLayout(new BorderLayout());
-
-        JPanel categoryPanel = new JPanel();
+        categoryPanel = new JPanel();
         JButton foundButton = new JButton("분실물 발견");
         JButton shButton = new JButton("분실물 찾습니다");
-
-        foundButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadDataFromDatabase1("found_items");
-            }
-        });
-        shButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadDataFromDatabase1("lost_items");
-            }
-        });
-        JPanel searchPanel = new JPanel();
-        searchPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        
+        foundButton.addActionListener(e -> loadDataFromDatabase1("found_items"));
+        shButton.addActionListener(e -> loadDataFromDatabase1("lost_items"));
+        categoryPanel.add(foundButton);
+        categoryPanel.add(shButton);
+        searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         String[] searchOptions = {"제목", "내용", "작성자"};
         JComboBox<String> searchComboBox = new JComboBox<>(searchOptions);
-
-        JTextField searchTextField = new JTextField(20);
-        
-        seButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String selectedOption = (String) searchComboBox.getSelectedItem();
-                String searchText = searchField.getText();  // searchTextField -> searchField
-                
-                String searchColumn = "";
-                if ("제목".equals(selectedOption)) {
-                    searchColumn = "title";
-                } else if ("내용".equals(selectedOption)) {
-                    searchColumn = "content";
-                } else if ("작성자".equals(selectedOption)) {
-                    searchColumn = "author";
-                }
-
-                loadDataFromDatabase(currentCategory, searchColumn, searchText);
+        searchField = new JTextField(20);
+        seButton = new JButton("검색");
+        seButton.addActionListener(e -> {
+            String selectedOption = (String) searchComboBox.getSelectedItem();
+            String searchText = searchField.getText();
+            String searchColumn = "";
+            if ("제목".equals(selectedOption)) {
+                searchColumn = "title";
+            } else if ("내용".equals(selectedOption)) {
+                searchColumn = "content";
+            } else if ("작성자".equals(selectedOption)) {
+                searchColumn = "author";
             }
+            loadDataFromDatabase(currentCategory, searchColumn, searchText);
         });
-        JButton voiceSearchButton = new JButton("음성");
-        voiceSearchButton.addActionListener(e -> startSpeechRecognition());
-        
-        JButton rehButton = new JButton("새로고침");
-        refreshButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadDataFromDatabase1(currentCategory);
-            }
-        });
+        JButton refreshButton = new JButton("새로고침");
+        refreshButton.addActionListener(e -> loadDataFromDatabase1(currentCategory));
         searchPanel.add(searchComboBox);
         searchPanel.add(searchField);
-        searchPanel.add(voiceSearchButton);
         searchPanel.add(seButton);
         searchPanel.add(refreshButton);
 
-        // 메인 패널에 검색 패널 추가
+        add(categoryPanel, BorderLayout.NORTH);
         add(searchPanel, BorderLayout.SOUTH);
 
-        categoryPanel.add(foundButton);
-        categoryPanel.add(shButton);
-        add(categoryPanel, BorderLayout.NORTH);
-
+        // 테이블 모델을 초기화하고 JTable을 생성합니다.
         tableModel = new DefaultTableModel(new Object[]{"번호", "제목", "내용", "작성자", "작성일", "조회수"}, 0);
         table = new JTable(tableModel);
-
-        // 컬럼 너비 설정
+        // 컬럼 너비를 설정합니다.
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.getColumnModel().getColumn(2).setPreferredWidth(400);
         table.getColumnModel().getColumn(3).setPreferredWidth(200);
-        table.getColumnModel().getColumn(4).setPreferredWidth(217); // 작성일 컬럼 너비 설정
+        table.getColumnModel().getColumn(4).setPreferredWidth(217);
         table.getColumnModel().getColumn(5).setPreferredWidth(50);
-
+        // 테이블에 마우스 리스너를 추가합니다.
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int rowIndex = table.getSelectedRow();
                 int postId = (int) tableModel.getValueAt(rowIndex, 0);
-                String category = currentCategory;
-                incrementViewCount(postId, category);
-                loadDataFromDatabase1(currentCategory);
-
-                String title = (String) tableModel.getValueAt(rowIndex, 1);
                 String content = (String) tableModel.getValueAt(rowIndex, 2);
-                mainPanel.removeAll();
                 showContentInPanel(content);
             }
         });
-       add(new JScrollPane(table), BorderLayout.CENTER);
+        // 테이블을 스크롤 패인에 추가하고 메인 패널에 추가합니다.
+        add(new JScrollPane(table), BorderLayout.CENTER);
     }
     private void startSpeechRecognition() {
         try {
@@ -231,7 +171,7 @@ public class LostThingsFind extends JPanel {
                 SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
                 searchField.setText(alternative.getTranscript());
                 System.out.println("음성 입력 결과: " + alternative.getTranscript());
-			    seButton.doClick();
+             seButton.doClick();
             }
 
         } catch (Exception ex) {
@@ -265,8 +205,11 @@ public class LostThingsFind extends JPanel {
                 String title = rs.getString("title");
                 String content = rs.getString("content");
                 String author = rs.getString("author");
-
-                // 작성일 포맷 변경
+                boolean isAnonymous = rs.getBoolean("is_anonymous");
+                
+                if (isAnonymous) {
+                    author = "익명";
+                }
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String postDate = sdf.format(rs.getTimestamp("post_date"));
 
@@ -298,42 +241,38 @@ public class LostThingsFind extends JPanel {
                e.printStackTrace();
            }
        }
-    
-
     private void showContentInPanel(String content) {
-        JTextArea textArea = new JTextArea(10, 40);
-        textArea.setText(content);
-        textArea.setWrapStyleWord(true);
-        textArea.setLineWrap(true);
-        textArea.setCaretPosition(0);
-        textArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(textArea);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JTextArea textArea = new JTextArea(10, 40);
+                textArea.setText(content);
+                textArea.setWrapStyleWord(true);
+                textArea.setLineWrap(true);
+                textArea.setCaretPosition(0);
+                textArea.setEditable(false);
+                JScrollPane scrollPane = new JScrollPane(textArea);
 
-        JButton backButton = new JButton("뒤로 가기");
-        backButton.addActionListener(event -> {
-            mainPanel.removeAll();
-            mainPanel.setLayout(new BorderLayout());
-            
-            JPanel categoryPanel = new JPanel();
-            JButton foundButton = new JButton("분실물 발견");
-            JButton searchButton = new JButton("분실물 찾습니다");
-
-            foundButton.addActionListener(e -> loadDataFromDatabase1("found_items"));
-            searchButton.addActionListener(e -> loadDataFromDatabase1("lost_items"));
-
-            categoryPanel.add(foundButton);
-            categoryPanel.add(searchButton);
-            
-            mainPanel.add(categoryPanel, BorderLayout.NORTH);
-            mainPanel.add(new JScrollPane(table), BorderLayout.CENTER);
-            mainPanel.revalidate();
-            mainPanel.repaint();
+                JButton backButton = new JButton("뒤로 가기");
+                backButton.addActionListener(event -> {
+                    mainPanel.removeAll();
+                    mainPanel.setLayout(new BorderLayout());
+                    mainPanel.add(categoryPanel, BorderLayout.NORTH);
+                    mainPanel.add(new JScrollPane(table), BorderLayout.CENTER);
+                    mainPanel.add(searchPanel, BorderLayout.SOUTH);
+                    mainPanel.revalidate();
+                    mainPanel.repaint();
+                });
+                mainPanel.setLayout(new BorderLayout());
+                mainPanel.removeAll(); // 이전에 추가된 모든 컴포넌트를 제거합니다.
+                mainPanel.add(scrollPane, BorderLayout.CENTER);
+                mainPanel.add(backButton, BorderLayout.SOUTH);
+                mainPanel.revalidate();
+                mainPanel.repaint();
+            }
         });
-
-        setLayout(new BorderLayout());
-        add(scrollPane, BorderLayout.CENTER);
-        add(backButton, BorderLayout.SOUTH);
-        revalidate();
-        repaint();
     }
+
+
+	
 }

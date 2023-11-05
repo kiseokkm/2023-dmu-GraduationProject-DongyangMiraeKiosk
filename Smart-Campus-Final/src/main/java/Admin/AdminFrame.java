@@ -15,6 +15,7 @@ import javax.swing.event.ChangeListener;
 
 import Admin_Login_Notice.LoginNoticePanel;
 import Admin_LostThi.LostThings;
+import Admin_UnivHope.UnivHope;
 
 public class AdminFrame extends javax.swing.JFrame {
     

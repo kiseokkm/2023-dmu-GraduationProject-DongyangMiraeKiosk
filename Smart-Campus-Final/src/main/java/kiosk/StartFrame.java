@@ -1,12 +1,11 @@
 package kiosk;
 
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javax.swing.JOptionPane;
 
 public class StartFrame extends javax.swing.JFrame {
 
@@ -65,8 +64,6 @@ public class StartFrame extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(60, 60, 60, 60);
         pnlContainer.add(lblLogo, gridBagConstraints);
 
-        btnStart.setFont(btnStart.getFont().deriveFont(btnStart.getFont().getSize()+3f)); // 폰트 크기를 10pt 증가시킵니다.
-        btnStart.setPreferredSize(new Dimension(300, 100)); // 버튼의 크기를 400x100으로 조절합니다.
         btnStart.setText("동양미래대학교 방문을 환영합니다.");
         btnStart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -75,7 +72,7 @@ public class StartFrame extends javax.swing.JFrame {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 35;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
         pnlContainer.add(btnStart, gridBagConstraints);
         // Weather components initialization
@@ -184,7 +181,8 @@ public class StartFrame extends javax.swing.JFrame {
             while ((line = reader.readLine()) != null) {
                 response.append(line);
             }
-            reader.close();          
+            reader.close();
+            
             org.json.JSONObject jsonObject = new org.json.JSONObject(response.toString());
             org.json.JSONObject main = jsonObject.getJSONObject("main");
             org.json.JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
@@ -197,19 +195,19 @@ public class StartFrame extends javax.swing.JFrame {
             String weatherMain = weather.getString("main").toLowerCase();
             String iconPath;
             switch (weatherMain) {
-                case "clear":
-                    iconPath = "/icons/sunny.png";
-                    break;
-                case "clouds":
-                    iconPath = "/icons/cloud.png";
-                    break;
-                case "rain":
-                    iconPath = "/icons/rain.png";
-                    break;
-                default:
-                    iconPath = "/icons/weather.png"; // default icon if the condition is not matched
-                    break;
-            }
+            case "clear":
+                iconPath = "/icons/sunny.png";
+                break;
+            case "clouds":
+                iconPath = "/icons/cloud.png";
+                break;
+            case "rain":
+                iconPath = "/icons/rain.png";
+                break;
+            default:
+                iconPath = "/icons/weather.png";
+                break;
+        }
             
             // Resize the image to 300x300
             java.awt.Image originalImage = new javax.swing.ImageIcon(getClass().getResource(iconPath)).getImage();

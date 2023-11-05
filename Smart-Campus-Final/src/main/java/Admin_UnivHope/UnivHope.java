@@ -1,4 +1,4 @@
-package Admin;
+package Admin_UnivHope;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -43,6 +43,8 @@ public class UnivHope extends JPanel {
     private JPanel mainPanel;
     private JPanel buttonPanel;
     private JButton postButton;
+    private JButton editButton;
+    private JButton deleteButton;
     private JButton voiceButton;
     private JButton searchButton;
     private JComboBox<String> searchComboBox;
@@ -112,26 +114,7 @@ public class UnivHope extends JPanel {
         loadDataFromDatabase();
     }  
     private void searchInDatabase(String fieldName, String searchQuery) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM communication_board WHERE " + fieldName + " LIKE ?")) {
-            stmt.setString(1, "%" + searchQuery + "%");
-            ResultSet rs = stmt.executeQuery();
-            tableModel.setRowCount(0);
-            while (rs.next()) {
-                Object[] row = {
-                    rs.getInt("id"),
-                    rs.getString("title"),
-                    rs.getString("status").isEmpty() ? "답변 대기" : "답변 완료",
-                    rs.getString("author"),
-                    rs.getTimestamp("post_date"),
-                    rs.getInt("views")
-                };
-                tableModel.addRow(row);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "검색 중 오류가 발생했습니다.");
-        }
+        UnivHopeDb.searchInDatabase(tableModel, fieldName, searchQuery);
     }
     private void openPostDialog() {
         PostDialog postDialog = new PostDialog(loggedInUsername); // Pass the logged-in user's name
@@ -160,7 +143,6 @@ public class UnivHope extends JPanel {
                     ResultSet rs = stmt.executeQuery();
                     tableModel.setRowCount(0);
                     while (rs.next()) {
-                        // ... 결과 처리 코드 ...
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -171,199 +153,69 @@ public class UnivHope extends JPanel {
             }
         });
     }
-  private void loadDataFromDatabase() {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM communication_board")) {
-            ResultSet rs = stmt.executeQuery();
-            tableModel.setRowCount(0);
-            while (rs.next()) {
-                Object[] row = {
-                    rs.getInt("id"),
-                    rs.getString("title"),
-                    rs.getString("admin_reply").isEmpty() ? "답변 대기" : "답변 완료",
-                    rs.getString("author"),
-                    rs.getTimestamp("post_date"),
-                    rs.getInt("views")
-                };
-                tableModel.addRow(row);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "데이터 로딩 중 오류가 발생했습니다.");
-        }
+    private void loadDataFromDatabase() {
+        UnivHopeDb.loadDataFromDatabase(tableModel);
     }
     private void showPostDetails(String title) {
-        increasePostViews(title);
-        JTextArea postContent = getPostDetails(title);
-        JTextArea adminReply = new JTextArea(getAdminReply(title));
-        String replyText = getAdminReply(title);
-        String replyDate = getAdminReplyDate(title);
+        // Call the static method from UnivHopeDb class
+        UnivHopeDb.increasePostViews(title);
+
+        // Retrieve the content and admin reply using UnivHopeDb static methods
+        String postContentText = UnivHopeDb.getPostContent(title);
+        String replyText = UnivHopeDb.getAdminReply(title);
+        String replyDate = UnivHopeDb.getAdminReplyDate(title);
         if (replyDate != null && !replyDate.isEmpty()) {
             replyText += "\n\n답변 작성일: " + replyDate;
         }
-        adminReply.setText(replyText);
+        JTextArea postContent = new JTextArea(postContentText, 10, 40);
+        JTextArea adminReply = new JTextArea(replyText);
+
+        postContent.setWrapStyleWord(true);
+        postContent.setLineWrap(true);
+        postContent.setEditable(false);
+        postContent.setCaretPosition(0);
+        postContent.setBorder(BorderFactory.createTitledBorder("게시물 내용"));
         adminReply.setEditable(false);
         adminReply.setBorder(BorderFactory.createTitledBorder("관리자 답변"));
-        postContent.setBorder(BorderFactory.createTitledBorder("게시물 내용"));
+
         JButton backButton = new JButton("목록");
         JLabel titleLabel = new JLabel("제목: " + title);
-        JLabel dateLabel = new JLabel("날짜: " + getPostDate(title));
-        JLabel authorLabel = new JLabel("작성자: " + getPostAuthor(title));
-        JLabel viewsLabel = new JLabel("조회수: " + getPostViews(title));
+        JLabel dateLabel = new JLabel("날짜: " + UnivHopeDb.getPostDate(title));
+        JLabel authorLabel = new JLabel("작성자: " + UnivHopeDb.getPostAuthor(title));
+        JLabel viewsLabel = new JLabel("조회수: " + UnivHopeDb.getPostViews(title));
+
         JPanel infoPanel = new JPanel(new GridLayout(4, 1));
         infoPanel.add(titleLabel);
         infoPanel.add(dateLabel);
         infoPanel.add(authorLabel);
         infoPanel.add(viewsLabel);
+
         JPanel contentPanel = new JPanel(new GridLayout(2, 1));
         contentPanel.add(new JScrollPane(postContent));
         contentPanel.add(new JScrollPane(adminReply));
-  
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(infoPanel, BorderLayout.NORTH);
         topPanel.add(contentPanel, BorderLayout.CENTER);
         topPanel.add(backButton, BorderLayout.SOUTH);
+
         mainPanel.removeAll();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(topPanel, BorderLayout.CENTER);
         mainPanel.revalidate();
         mainPanel.repaint();
-        
+
         backButton.addActionListener(e -> {
-            mainPanel.removeAll(); // Remove all components
-               mainPanel.setLayout(new BorderLayout()); // Reset the layout manager
-               JScrollPane tableScrollPane = new JScrollPane(table); // Create a new JScrollPane
-               mainPanel.add(tableScrollPane, BorderLayout.CENTER); // Add the table back
-               mainPanel.add(buttonPanel, BorderLayout.SOUTH); // Add the button panel back
-               loadDataFromDatabase();
-               mainPanel.revalidate();
-               mainPanel.repaint();
-           
+            mainPanel.removeAll();
+            mainPanel.setLayout(new BorderLayout());
+            JScrollPane tableScrollPane = new JScrollPane(table);
+            mainPanel.add(tableScrollPane, BorderLayout.CENTER);
+            mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+            loadDataFromDatabase(); // This should now call the static method from UnivHopeDb class
+            mainPanel.revalidate();
+            mainPanel.repaint();
         });
-    }
-    private String getAdminReplyDate(String title) {
-        String replyDate = "";
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT admin_reply_date FROM communication_board WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, title);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                replyDate = rs.getString("admin_reply_date");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return replyDate;
-    }
-    
-    private String getPostDate(String title) {
-        String date = "";
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT post_date FROM communication_board WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, title);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                date = rs.getString("post_date");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return date;
-    }
-
-    private String getPostAuthor(String title) {
-        String author = "";
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT author FROM communication_board WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, title);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                author = rs.getString("author");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return author;
-    }
-
-    private int getPostViews(String title) {
-        int views = 0;
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT views FROM communication_board WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, title);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                views = rs.getInt("views");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return views;
-    }
-    private void increasePostViews(String title) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "UPDATE communication_board SET views = views + 1 WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, title);
-            statement.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void saveAdminReply(String title, String reply) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "UPDATE communication_board SET admin_reply = ?, admin_reply_date = NOW() WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, reply);
-            statement.setString(2, title);
-            statement.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String getAdminReply(String title) {
-        String reply = "";
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT admin_reply FROM communication_board WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, title);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                reply = rs.getString("admin_reply");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return reply;
-    }
-
-    private JTextArea getPostDetails(String title) {
-        JTextArea textArea = new JTextArea(10, 40);
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT content FROM communication_board WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, title);
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                String content = rs.getString("content");
-                textArea.setText(content);
-                textArea.setWrapStyleWord(true);
-                textArea.setLineWrap(true);
-                textArea.setCaretPosition(0);
-                textArea.setEditable(false);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }   
-        return textArea;
-    }
-
+    } 
     class PostDialog extends JDialog {
         private JTextField titleField;
         private JTextField authorField;
@@ -379,7 +231,6 @@ public class UnivHope extends JPanel {
             setTitle("게시물 작성");
             setSize(400, 400);
             setLayout(new BorderLayout());
-
             JPanel topPanel = new JPanel(new GridLayout(3, 2));
             titleField = new JTextField();
             authorField = new JTextField(displayAuthor);
@@ -397,13 +248,11 @@ public class UnivHope extends JPanel {
                     }
                 }
             });
-
             topPanel.add(new JLabel("제목:"));
             topPanel.add(titleField);
             topPanel.add(new JLabel("작성자:"));
             topPanel.add(authorField);
             topPanel.add(anonymousCheckBox);
-
             contentArea = new JTextArea(10, 30);
             JScrollPane scrollPane = new JScrollPane(contentArea);
             postButton = new JButton("게시");
@@ -455,6 +304,6 @@ public class UnivHope extends JPanel {
                 JOptionPane.showMessageDialog(this, "데이터 저장 중 오류가 발생했습니다.");
             }
             return displayName; 
+        	}
         }
-    }
 }
