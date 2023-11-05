@@ -87,7 +87,6 @@ public class AdminFrame extends javax.swing.JFrame {
         tabbedPane.addTab("학교에 바란다", new UnivHope(currentLoggedInName));
         tabbedPane.addTab("학과 공지사항", new LoginNoticePanel(currentLoggedInUserMajor));
         tabbedPane.addTab("분실물찾기", new LostThings(currentLoggedInName));
-        tabbedPane.addTab("사용자 목록", new UsersPanel());
 
         getContentPane().add(tabbedPane, java.awt.BorderLayout.CENTER);
         getAccessibleContext().setAccessibleName("");

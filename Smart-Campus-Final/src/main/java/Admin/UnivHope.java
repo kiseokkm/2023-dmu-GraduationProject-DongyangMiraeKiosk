@@ -447,14 +447,14 @@ public class UnivHope extends JPanel {
                 if (rs.next()) {
                     boolean isAnonymous = rs.getBoolean("anonymous");
                     if (!isAnonymous) {
-                        displayName = rs.getString("author"); // 익명이 아니면 실제 이름을 사용
+                        displayName = rs.getString("author");
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "데이터 저장 중 오류가 발생했습니다.");
             }
-            return displayName; // 이 메서드의 결과로 displayName을 반환합니다.
+            return displayName; 
         }
     }
 }
