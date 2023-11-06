@@ -1,11 +1,13 @@
 package kiosk;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.swing.JOptionPane;
 
 public class StartFrame extends javax.swing.JFrame {
 
@@ -24,16 +26,18 @@ public class StartFrame extends javax.swing.JFrame {
 
 
     public StartFrame() {
-        initComponents();
-        app.Global.setAppIcon(this);
-        startDateTimeUpdater();
-        updateWeatherInfo();
-    }
+        getContentPane().setBackground(new Color(96, 140, 255));
+         initComponents();
+         app.Global.setAppIcon(this);
+         startDateTimeUpdater();
+         updateWeatherInfo();
+     }
 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
         pnlContainer = new javax.swing.JPanel();
+        pnlContainer.setBackground(new Color(96, 140, 255));
         lblTitle = new javax.swing.JLabel();
         lblLogo = new javax.swing.JLabel();
         btnStart = new javax.swing.JButton();
@@ -61,10 +65,14 @@ public class StartFrame extends javax.swing.JFrame {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 20;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(60, 60, 60, 60);
+        gridBagConstraints.insets = new java.awt.Insets(100, 100, 100, 100);
         pnlContainer.add(lblLogo, gridBagConstraints);
 
+        btnStart.setFont(btnStart.getFont().deriveFont(btnStart.getFont().getSize()+3f)); // 폰트 크기를 10pt 증가시킵니다.
+        btnStart.setPreferredSize(new Dimension(200, 200)); // 버튼의 크기를 400x100으로 조절합니다.
         btnStart.setText("동양미래대학교 방문을 환영합니다.");
+        btnStart.setBackground(new Color(200, 180, 255)); // 여기에 배경색 설정 추가
+        btnStart.setForeground(Color.WHITE); // 여기에 글자색 설정 추가
         btnStart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnStartActionPerformed(evt);
@@ -72,7 +80,7 @@ public class StartFrame extends javax.swing.JFrame {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 35;
+        gridBagConstraints.gridy = 27;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
         pnlContainer.add(btnStart, gridBagConstraints);
         // Weather components initialization
@@ -181,8 +189,7 @@ public class StartFrame extends javax.swing.JFrame {
             while ((line = reader.readLine()) != null) {
                 response.append(line);
             }
-            reader.close();
-            
+            reader.close();          
             org.json.JSONObject jsonObject = new org.json.JSONObject(response.toString());
             org.json.JSONObject main = jsonObject.getJSONObject("main");
             org.json.JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
@@ -195,21 +202,19 @@ public class StartFrame extends javax.swing.JFrame {
             String weatherMain = weather.getString("main").toLowerCase();
             String iconPath;
             switch (weatherMain) {
-            case "clear":
-                iconPath = "/icons/sunny.png";
-                break;
-            case "clouds":
-                iconPath = "/icons/cloud.png";
-                break;
-            case "rain":
-                iconPath = "/icons/rain.png";
-                break;
-            default:
-                iconPath = "/icons/weather.png";
-                break;
-        }
-            
-            // Resize the image to 300x300
+                case "clear":
+                    iconPath = "/icons/sunny.png";
+                    break;
+                case "clouds":
+                    iconPath = "/icons/cloud.png";
+                    break;
+                case "rain":
+                    iconPath = "/icons/rain.png";
+                    break;
+                default:
+                    iconPath = "/icons/weather.png";
+                    break;
+            }
             java.awt.Image originalImage = new javax.swing.ImageIcon(getClass().getResource(iconPath)).getImage();
             java.awt.Image resizedImage = originalImage.getScaledInstance(50, 50, java.awt.Image.SCALE_DEFAULT);
             
@@ -217,14 +222,16 @@ public class StartFrame extends javax.swing.JFrame {
 
 
            
-            lblCurrentTemp.setText(Math.round(main.getDouble("temp") - 273.15) + "º");
-            lblHumidity.setText("습도: " + main.getInt("humidity") + "%");
-            lblWind.setText("바람: " + wind.getDouble("speed") + " m/s");
-            lblCity.setText("서울");
-            lblCloud.setText("구름: " + clouds.getInt("all") + "%");
-            lblTempMin.setText("최저 온도: " + Math.round(main.getDouble("temp_min") - 273.15) + "º");
-            lblTempMax.setText("최고 온도: " + Math.round(main.getDouble("temp_max") - 273.15) + "º");
+            String weatherInfo = "서울 날씨: " + 
+                    Math.round(main.getDouble("temp") - 273.15) + "º, " +
+                    "습도: " + main.getInt("humidity") + "%, " +
+                    "바람: " + wind.getDouble("speed") + " m/s, " +
+                    "구름: " + clouds.getInt("all") + "%, " +
+                    "최저: " + Math.round(main.getDouble("temp_min") - 273.15) + "º, " +
+                    "최고: " + Math.round(main.getDouble("temp_max") - 273.15) + "º.";
             
+            lblWeatherDescription.setText(weatherInfo);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

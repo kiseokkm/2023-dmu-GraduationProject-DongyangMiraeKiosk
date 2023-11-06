@@ -47,7 +47,7 @@ public class ManagerDashboard extends JFrame {
 
             // 내용 입력 필드와 레이블
             panel.add(new JLabel("공지 내용을 입력하세요:"), gbc);
-            JTextArea contentArea = new JTextArea(5, 20);
+            JTextArea contentArea = new JTextArea(15, 25); 
             contentArea.setLineWrap(true);
             contentArea.setWrapStyleWord(true);
             JScrollPane contentScrollPane = new JScrollPane(contentArea);
@@ -72,7 +72,10 @@ public class ManagerDashboard extends JFrame {
                 String selectedType = (String) typeComboBox.getSelectedItem();
 
                 int rowIndex = noticeTable.getSelectedRow();
-                boolean pinned = rowIndex != -1 && (boolean) noticeTableModel.getValueAt(rowIndex, 2);
+                boolean pinned = rowIndex != -1 && ((Boolean) noticeTableModel.getValueAt(rowIndex, 4)).booleanValue();
+                
+                
+
 
                 // 입력 값 검증 및 공지 추가 함수 호출
                 if (!title.isEmpty() && !content.isEmpty() && !author.isEmpty() && selectedType != null) {
@@ -107,7 +110,7 @@ public class ManagerDashboard extends JFrame {
             int dialogResult = JOptionPane.showConfirmDialog(null, "선택한 글들을 삭제하시겠습니까?", "Delete Confirmation", dialogButton);
             if (dialogResult == JOptionPane.YES_OPTION) {
                 for (int row = 0; row < noticeTableModel.getRowCount(); row++) {
-                    boolean isSelected = (boolean) noticeTableModel.getValueAt(row, 0);
+                	boolean isSelected = (Boolean) noticeTableModel.getValueAt(row, 0);
                     if (isSelected) {
                         String title = (String) noticeTableModel.getValueAt(row, 1); 
                         deleteNotice(title);

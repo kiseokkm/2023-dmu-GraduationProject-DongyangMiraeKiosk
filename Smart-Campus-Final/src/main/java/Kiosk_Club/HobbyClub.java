@@ -3,6 +3,8 @@ package Kiosk_Club;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.sql.*;
 
@@ -23,6 +25,13 @@ public class HobbyClub extends JPanel {
         // JComboBox와 그 옆의 라벨을 위한 패널
         JPanel comboBoxPanel = new JPanel();
         comboBoxPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        // 먼저 table을 초기화하고 그 다음에 tableHeader를 가져옵니다.
+        table = new JTable();
+        JTableHeader tableHeader = table.getTableHeader();
+        tableHeader.setBackground(Color.YELLOW); // 노란색 배경색
+        tableHeader.setForeground(Color.BLACK); // 글자색은 검정색으로 설정
+        table.setBackground(new Color(255, 228, 196));
 
         // JComboBox 초기화
         clubTypeComboBox = new JComboBox<>(new String[]{"취미동아리", "전공동아리"});
@@ -50,6 +59,7 @@ public class HobbyClub extends JPanel {
     }
 
 
+
     private JPanel createHobbyClubPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -63,7 +73,18 @@ public class HobbyClub extends JPanel {
 
         String[] columnNames = {"연번", "동아리명", "C.Ⅰ. Lab", "소개 및 활동 내용"};
         tableModel = new DefaultTableModel(columnNames, 0);
-        table = new JTable(tableModel);
+        table = new JTable(tableModel) {
+            // 셀의 배경색을 설정하기 위해 prepareRenderer를 오버라이드합니다.
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                if (!isRowSelected(row)) {
+                    c.setBackground(new Color(255, 228, 196)); // 연한 살색
+                }
+                return c;
+            }
+        };
+        
+        
 
         // 데이터베이스 연결 및 데이터 추출
         try {

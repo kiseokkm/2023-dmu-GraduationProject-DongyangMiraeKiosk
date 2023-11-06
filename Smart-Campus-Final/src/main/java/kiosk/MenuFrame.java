@@ -132,8 +132,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     lblTotal = new javax.swing.JLabel();
     lblTotalValue = new javax.swing.JLabel();
     pnlFooter = new javax.swing.JPanel();
-    btnBack = new javax.swing.JButton();
-    btnContinue = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Menu");
@@ -225,24 +223,10 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlFooter.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 20));
     pnlFooter.setLayout(new java.awt.GridBagLayout());
 
-    btnBack.setText("Back");
-    btnBack.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        btnBackActionPerformed(evt);
-      }
-    });
-    pnlFooter.add(btnBack, new java.awt.GridBagConstraints());
 
-    btnContinue.setText("Continue");
-    btnContinue.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        btnContinueActionPerformed(evt);
-      }
-    });
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.weightx = 1.0;
-    pnlFooter.add(btnContinue, gridBagConstraints);
 
     getContentPane().add(pnlFooter, java.awt.BorderLayout.SOUTH);
 
@@ -273,19 +257,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 	      pnlNotice.add(btnItem);
 	    });
 	}
-  private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
-    new StartFrame().setVisible(true);
-    dispose();
-  }
-  private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {
-    java.util.ArrayList<models.OrderDetail> orderedItems = StateManager.getOrderedItems();
-    if (orderedItems != null && orderedItems.size() > 0) {
-      new OrderSummaryFrame().setVisible(true);
-      dispose();
-    } else {
-      javax.swing.JOptionPane.showMessageDialog(null, "오류", "오류", javax.swing.JOptionPane.WARNING_MESSAGE);
-    }
-  } 
   private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {
 	    int tabIndex = tabbedPane.getSelectedIndex();
 
@@ -382,8 +353,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
       new MenuFrame().setVisible(true);
     });
   }
-  private javax.swing.JButton btnBack;
-  private javax.swing.JButton btnContinue;
+
   private javax.swing.JLabel lblOrder;
   private javax.swing.JLabel lblTotal;
   private javax.swing.JLabel lblTotalValue;

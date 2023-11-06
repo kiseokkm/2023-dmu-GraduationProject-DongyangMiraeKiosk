@@ -1,7 +1,10 @@
 package Admin_Login_Notice;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
@@ -21,6 +24,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,6 +35,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 import com.google.cloud.speech.v1.RecognitionAudio;
 import com.google.cloud.speech.v1.RecognitionConfig;
@@ -41,6 +46,8 @@ import com.google.cloud.speech.v1.SpeechRecognitionAlternative;
 import com.google.cloud.speech.v1.SpeechRecognitionResult;
 import com.google.protobuf.ByteString;
 
+
+
 public class NoticeFrame {
     private static boolean isNoticesLoaded = false; // 공지사항이 이미 로드되었는지 확인하는 플래그
     private static final int PAGE_SIZE = 22;
@@ -49,12 +56,24 @@ public class NoticeFrame {
     private static String noticeType = "전체"; // 공지 유형을 '전체'로 기본 설정
     private static JButton searchButton;
     private static JTextField searchField;
+    private static String searchType = "제목";
+    private static JComboBox<String> searchComboBox;
+
+    
+    static Color skyBlue = new Color(211, 211, 211);
+    
+
+    
     public static void resetNoticeLoadedFlag() {
         isNoticesLoaded = false;
     }
     public static JTable getNoticeTable() {
         DefaultTableModel noticeTableModel = new DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
         JTable noticeTable = new JTable(noticeTableModel);
+        JTableHeader header = noticeTable.getTableHeader();
+        header.setBackground(new Color(255, 255, 0));
+       noticeTable.setBackground(new Color(255, 228, 196));
+        
         int offset = (pageNumber - 1) * PAGE_SIZE;
 
         try {
@@ -69,13 +88,32 @@ public class NoticeFrame {
                 statement.setInt(2, PAGE_SIZE);
                 statement.setInt(3, offset);
             } else {
-                sql = "SELECT * FROM notices WHERE (title LIKE ? OR content LIKE ?) AND type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                // 검색 유형에 따라 다른 SQL 쿼리를 준비합니다.
+                if (searchType.equals("제목")) {
+                    sql = "SELECT * FROM notices WHERE title LIKE ? AND type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                } else if (searchType.equals("내용")) {
+                    sql = "SELECT * FROM notices WHERE content LIKE ? AND type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                } else if (searchType.equals("작성자")) {
+                    sql = "SELECT * FROM notices WHERE author LIKE ? AND type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                } else {
+                    // 기본적으로 모든 유형을 포함하도록 설정합니다.
+                    sql = "SELECT * FROM notices WHERE (title LIKE ? OR content LIKE ? OR author LIKE ?) AND type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
+                }
                 statement = connection.prepareStatement(sql);
-                statement.setString(1, "%" + searchQuery + "%");
-                statement.setString(2, "%" + searchQuery + "%");
-                statement.setString(3, noticeType);
-                statement.setInt(4, PAGE_SIZE);
-                statement.setInt(5, offset);
+                // 검색 유형에 맞게 SQL 쿼리 파라미터 설정
+                int paramIndex = 1;
+                if (searchType.equals("제목")) {
+                    statement.setString(paramIndex++, "%" + searchQuery + "%");
+                }
+                if (searchType.equals("내용")) {
+                    statement.setString(paramIndex++, "%" + searchQuery + "%");
+                }
+                if (searchType.equals("작성자")) {
+                    statement.setString(paramIndex++, "%" + searchQuery + "%");
+                }
+                statement.setString(paramIndex++, noticeType);
+                statement.setInt(paramIndex++, PAGE_SIZE);
+                statement.setInt(paramIndex, offset);
             }
 
             ResultSet rs = statement.executeQuery();
@@ -108,6 +146,8 @@ public class NoticeFrame {
         return noticeTable;
     }
 
+    
+    
     
     public static JTextArea getNoticeDetails(String title) {
         JTextArea textArea = new JTextArea(10, 40);
@@ -245,6 +285,17 @@ public class NoticeFrame {
         });
         
         JButton voiceButton = new JButton("음성");
+       voiceButton .setBackground(new Color(135, 206, 235)); // 스카이블루 배경
+      voiceButton .setForeground(Color.BLACK); // 검은 글꼴
+       voiceButton .setOpaque(true);
+      voiceButton .setBorderPainted(false);
+       voiceButton .addActionListener(e -> {
+            searchQuery = searchField.getText().trim(); // 사용자가 입력한 검색어 가져오기
+            searchType = (String) searchComboBox.getSelectedItem(); // 검색 유형 가져오기
+            pageNumber = 1; // 검색 결과의 첫 페이지를 보여주기 위해 pageNumber를 1로 설정
+            isNoticesLoaded = false; // 공지사항을 다시 로드하기 위한 플래그 초기화
+            showNoticeTableOnPanel(panel); // 검색 결과를 반영하여 테이블을 다시 표시
+        });
         voiceButton.addActionListener(e -> {
             try {
                 // 1. 음성 녹음
@@ -310,10 +361,22 @@ public class NoticeFrame {
             }
         });
 
+        JComboBox<String> searchComboBox = new JComboBox<>(new String[]{"제목", "작성자", "내용"});
+        searchComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchType = (String) searchComboBox.getSelectedItem();
+            }
+        });
         searchField = new JTextField(20);
         searchButton = new JButton("검색");
+       searchButton.setBackground(new Color(135, 206, 235)); // 스카이블루 배경
+       searchButton.setForeground(Color.BLACK); // 검은 글꼴
+        searchButton.setOpaque(true);
+       searchButton.setBorderPainted(false);
         searchButton.addActionListener(e -> {
             searchQuery = searchField.getText().trim(); // 사용자가 입력한 검색어 가져오기
+            searchType = (String) searchComboBox.getSelectedItem(); // 검색 유형 가져오기
             pageNumber = 1; // 검색 결과의 첫 페이지를 보여주기 위해 pageNumber를 1로 설정
             isNoticesLoaded = false; // 공지사항을 다시 로드하기 위한 플래그 초기화
             showNoticeTableOnPanel(panel); // 검색 결과를 반영하여 테이블을 다시 표시
@@ -325,9 +388,10 @@ public class NoticeFrame {
         navigationPanel.add(pageInfo); 
         navigationPanel.add(nextButton);
         navigationPanel.add(lastPageButton);  // 마지막 페이지로 이동하는 버튼 추가
-        navigationPanel.add(searchField);
-        navigationPanel.add(voiceButton);
-        navigationPanel.add(searchButton);
+        navigationPanel.add(searchComboBox); // 검색 유형 선택 박스를 네비게이션 패널에 추가
+        navigationPanel.add(searchField); // 검색 필드 추가
+        navigationPanel.add(voiceButton); // 음성 검색 버튼 추가
+        navigationPanel.add(searchButton); //
 
         // 패널을 초기화하고 네비게이션 패널 추가
         panel.removeAll();
@@ -337,34 +401,25 @@ public class NoticeFrame {
         JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
         JTable noticeTable = getNoticeTable();
         
-
-
-
         JButton refreshButton = new JButton("새로고침");
+        refreshButton.setBackground(new Color(135, 206, 235)); // 스카이블루 배경
+       refreshButton.setForeground(Color.BLACK); // 검은 글꼴
+       refreshButton.setOpaque(true);
+       refreshButton.setBorderPainted(false);
         refreshButton.addActionListener(e -> {
-            JTable updatedTable = getNoticeTable();
-            panel.removeAll();
-            panel.setLayout(new BorderLayout());
-            JPanel topPanel = new JPanel(new BorderLayout());
-            topPanel.add(lblTotalNoticeCount, BorderLayout.WEST); // 변경된 부분
-            topPanel.add(toMainButton, BorderLayout.CENTER);
-            topPanel.add(refreshButton, BorderLayout.EAST);
-            panel.add(topPanel, BorderLayout.NORTH);
-            panel.add(new JScrollPane(updatedTable), BorderLayout.CENTER);
-            panel.add(navigationPanel, BorderLayout.SOUTH);
-            panel.revalidate();
-            panel.repaint();
-            showNoticeTableOnPanel(panel);  // 새로고침 이후에도 테이블을 다시 로드하게 합니다.
+            pageNumber = 1; // 페이지 번호를 초기화합니다.
+            isNoticesLoaded = false; // 공지사항을 다시 로드하기 위한 플래그 초기화
+            showNoticeTableOnPanel(panel); // 패널을 새로 고침
         });
-        
 
+        // 테이블에 마우스 리스너를 추가합니다.
         noticeTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int rowIndex = noticeTable.getSelectedRow();
                 String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
                 incrementViewCount(title);
-                JTextArea noticeContent = getNoticeDetails(title);
+                JTextArea noticeContent = NoticeFrameDb.getNoticeDetails(title);
                 JScrollPane scrollPane = new JScrollPane(noticeContent);
 
                 JPanel contentPanel = new JPanel(new BorderLayout());
@@ -409,18 +464,31 @@ public class NoticeFrame {
                 panel.revalidate();
                 panel.repaint();
             }
+            
         });
 
+        firstPageButton.setBackground(skyBlue);
+        prevButton.setBackground(skyBlue);
+        nextButton.setBackground(skyBlue);
+        lastPageButton.setBackground(skyBlue);
+        searchComboBox.setBackground(skyBlue);
+        
+        
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(lblTotalNoticeCount, BorderLayout.WEST);
         topPanel.add(toMainButton, BorderLayout.CENTER);
         topPanel.add(refreshButton, BorderLayout.EAST);
 
+        // 패널에 컴포넌트들을 추가합니다.
+        panel.removeAll();
+        panel.setLayout(new BorderLayout());
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(new JScrollPane(noticeTable), BorderLayout.CENTER);
         panel.add(navigationPanel, BorderLayout.SOUTH);
         panel.revalidate();
         panel.repaint();
         isNoticesLoaded = true;
+        
+        
     }
 }

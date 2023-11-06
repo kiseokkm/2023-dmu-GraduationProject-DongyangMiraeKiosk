@@ -1,5 +1,6 @@
 package Admin_UnivHope;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -34,9 +35,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 
 public class UnivHope extends JPanel {
-
     private JTable table;
     private JTextField searchField;
     private DefaultTableModel tableModel;
@@ -54,28 +56,47 @@ public class UnivHope extends JPanel {
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "dongyang";
     public UnivHope(String loggedInName) {
+       
+       
+       
         this.loggedInUsername = loggedInName; 
         mainPanel = this;
         setLayout(new BorderLayout());
         tableModel = new DefaultTableModel(new Object[]{"번호", "제목", "답변", "작성자", "작성일", "조회수"}, 0);
-        table = new JTable(tableModel);
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int rowIndex = table.getSelectedRow();
-                String title = (String) tableModel.getValueAt(rowIndex, 1);
-                showPostDetails(title);
+        table = new JTable(tableModel) {
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                // Check if the row is selected to avoid overwriting the selection color
+                if (!isRowSelected(row)) {
+                    c.setBackground(new Color(255, 255, 224)); // 크림색 배경 설정
+                }
+                return c;
             }
-        });
+        };
+        
+  
+        JTableHeader tableHeader = table.getTableHeader();
+        tableHeader.setBackground(new Color(173, 216, 230)); // 연한 파랑색으로 설정
+        
+        addTableMouseListener();
+  
+ 
+
+        
         add(new JScrollPane(table), BorderLayout.CENTER);
         postButton = new JButton("새글");
+        postButton .setBackground(new Color(135, 206, 235)); 
         postButton.addActionListener(e -> openPostDialog());
         JButton refreshButton = new JButton("새로고침");
+        refreshButton .setBackground(new Color(135, 206, 235)); 
         refreshButton.addActionListener(e -> loadDataFromDatabase());   
         voiceButton = new JButton("음성");
+        voiceButton .setBackground(new Color(135, 206, 235)); 
         searchField = new JTextField(25);
-        searchComboBox = new JComboBox<>(new String[]{"제목", "답변", "작성자"});      
+        searchComboBox = new JComboBox<>(new String[]{"제목", "답변", "작성자"});    
+        searchComboBox.setBackground(new Color(211, 211, 211)); 
         searchButton = new JButton("검색");
+        searchButton .setBackground(new Color(135, 206, 235)); 
         searchButton.addActionListener(e -> {
             String searchQuery = searchField.getText().trim();
             String selectedField = (String) searchComboBox.getSelectedItem();
@@ -99,6 +120,7 @@ public class UnivHope extends JPanel {
                 loadDataFromDatabase();
             }
         });
+        
         buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(searchComboBox);
         buttonPanel.add(searchField);
@@ -112,7 +134,29 @@ public class UnivHope extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
 
         loadDataFromDatabase();
+
     }  
+    
+ // UnivHope 클래스 내에 이 메서드를 추가합니다.
+    private void addTableMouseListener() {
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // 더블 클릭 이벤트 확인
+                if (e.getClickCount() == 1) {
+                    int row = table.getSelectedRow();
+                    if (row != -1) {
+                        // 예를 들어, 게시물의 '제목'이 2번째 열에 있다고 가정합니다 (0부터 시작하는 인덱스).
+                        // ID 대신 제목을 사용해 조회할 수도 있습니다.
+                        String title = tableModel.getValueAt(row, 1).toString(); // '제목' 열의 값 가져오기
+                        showPostDetails(title); // 제목을 이용해 세부정보 표시
+                    }
+                }
+            }
+        });
+    }
+
+    
     private void searchInDatabase(String fieldName, String searchQuery) {
         UnivHopeDb.searchInDatabase(tableModel, fieldName, searchQuery);
     }
@@ -269,6 +313,10 @@ public class UnivHope extends JPanel {
 
             pack();
         }
+        
+
+
+        
         private void prefillAuthor() {
             authorField.setText(displayAuthor); // 사용자 이름으로 작성자 필드를 미리 채움
             authorField.setEditable(!"익명".equals(displayAuthor)); // If the name is "익명", make it non-editable
@@ -304,6 +352,6 @@ public class UnivHope extends JPanel {
                 JOptionPane.showMessageDialog(this, "데이터 저장 중 오류가 발생했습니다.");
             }
             return displayName; 
-        	}
+           }
         }
 }

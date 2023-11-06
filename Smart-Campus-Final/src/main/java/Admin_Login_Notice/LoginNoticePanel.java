@@ -1,6 +1,7 @@
 package Admin_Login_Notice;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
@@ -22,6 +23,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 import com.mysql.cj.protocol.x.Notice;
 
@@ -34,6 +36,11 @@ public class LoginNoticePanel extends JPanel {
     private static String userMajor; 
     private static String searchType = "제목";
 
+    static Color skyBlue = new Color(211, 211, 211);
+    
+    static Color creamyColor = new Color(255, 253, 208); // This is a creamy color.
+    
+    
     public LoginNoticePanel(String major) {
         this.userMajor = major;
         setLayout(new BorderLayout());
@@ -42,6 +49,10 @@ public class LoginNoticePanel extends JPanel {
     public static JTable getNoticeTable(String userMajor) {
         DefaultTableModel noticeTableModel = new DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
         JTable noticeTable = new JTable(noticeTableModel);
+        JTableHeader header = noticeTable.getTableHeader();
+        header.setBackground(new Color(255, 255, 0));
+       noticeTable.setBackground(new Color(255, 228, 196));
+
         int offset = (pageNumber - 1) * PAGE_SIZE;
 
         try {
@@ -216,10 +227,10 @@ public class LoginNoticePanel extends JPanel {
 
 
     public static void showNoticeTableOnPanel(JPanel panel) {
-    	
-    	int noticeCount = getNoticeCount(userMajor);
-    	JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
-    	JTable noticeTable = getNoticeTable(userMajor);
+       
+       int noticeCount = getNoticeCount(userMajor);
+       JLabel lblNoticeCount = new JLabel("총 " + noticeCount + " 개의 게시물이 있습니다.");
+       JTable noticeTable = getNoticeTable(userMajor);
         if (isNoticesLoaded) return;
         
         
@@ -271,10 +282,13 @@ public class LoginNoticePanel extends JPanel {
                 pageInfo.setText(pageNumber + " / " + totalPages);
             }
         });
+        JButton voiceButton = new JButton("음성");
+        voiceButton.setBackground(new Color(135, 206, 235));
 
         JComboBox<String> searchComboBox = new JComboBox<>(new String[]{"제목", "작성자", "내용"});
         JTextField searchField = new JTextField(20);
         JButton searchButton = new JButton("검색");
+        searchButton.setBackground(new Color(135, 206, 235));
         searchButton.addActionListener(e -> {
             String selectedOption = (String) searchComboBox.getSelectedItem();
             searchQuery = searchField.getText().trim();
@@ -292,6 +306,7 @@ public class LoginNoticePanel extends JPanel {
         navigationPanel.add(lastPageButton);
         navigationPanel.add(searchComboBox);
         navigationPanel.add(searchField);
+        navigationPanel.add(voiceButton);
         navigationPanel.add(searchButton);
 
         // 패널을 초기화하고 네비게이션 패널 추가
@@ -299,6 +314,7 @@ public class LoginNoticePanel extends JPanel {
         panel.setLayout(new BorderLayout());
         
         JButton refreshButton = new JButton("새로고침");
+        refreshButton.setBackground(new Color(135, 206, 235));
         refreshButton.addActionListener(e -> {
             isNoticesLoaded = false;  // 이 부분을 추가하여 새로고침 이후에도 테이블이 다시 로드될 수 있게 합니다.
             JTable updatedTable = getNoticeTable(userMajor);
@@ -330,7 +346,7 @@ public class LoginNoticePanel extends JPanel {
                 int rowIndex = noticeTable.getSelectedRow();
                 String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
                 incrementViewCount(title);
-                JTextArea noticeContent = getNoticeDetails(title);
+                JTextArea noticeContent = NoticeFrameDb.getNoticeDetails(title);
                 JScrollPane scrollPane = new JScrollPane(noticeContent);
 
                 JPanel contentPanel = new JPanel(new BorderLayout());
@@ -377,6 +393,13 @@ public class LoginNoticePanel extends JPanel {
             }
         });
 
+        firstPageButton.setBackground(skyBlue);
+        prevButton.setBackground(skyBlue);
+        nextButton.setBackground(skyBlue);
+        lastPageButton.setBackground(skyBlue);
+        searchComboBox.setBackground(skyBlue);
+        
+        
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(lblNoticeCount, BorderLayout.WEST);
         topPanel.add(toMainButton, BorderLayout.CENTER);
@@ -389,8 +412,6 @@ public class LoginNoticePanel extends JPanel {
         panel.repaint();
         isNoticesLoaded = true;
     }
-
-
     public static int getNoticeCount(String major) {
         int count = 0;
         try {
@@ -412,8 +433,7 @@ public class LoginNoticePanel extends JPanel {
         }
         return count;
     }
-
-	public static void resetNoticeLoadedFlag() {
+   public static void resetNoticeLoadedFlag() {
         isNoticesLoaded = false;
     }
     

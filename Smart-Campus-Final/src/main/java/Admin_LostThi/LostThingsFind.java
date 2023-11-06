@@ -6,6 +6,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import com.google.cloud.speech.v1.RecognitionAudio;
@@ -85,6 +86,38 @@ public class LostThingsFind extends JPanel {
         // 테이블 모델을 초기화하고 JTable을 생성합니다.
         tableModel = new DefaultTableModel(new Object[]{"번호", "제목", "내용", "작성자", "작성일", "조회수"}, 0);
         table = new JTable(tableModel);
+        
+        
+        table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value,
+                                                                            isSelected, hasFocus, row, column);
+                label.setBackground(Color.YELLOW); // 헤더의 배경색을 노란색으로 설정
+                label.setHorizontalAlignment(JLabel.CENTER);
+                return label;
+            }
+        });
+
+        // 셀의 배경색을 변경합니다.
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value,
+                                                                  isSelected, hasFocus, row, column);
+                if (!isSelected) {
+                    c.setBackground(row % 2 == 0 ? new Color(255, 240, 245) : Color.WHITE); // 셀의 배경색을 번갈아 가며 설정
+                } else {
+                    c.setBackground(table.getSelectionBackground()); // 선택된 셀의 배경색은 디폴트 유지
+                }
+                return c;
+            }
+        });
+        
         // 컬럼 너비를 설정합니다.
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.getColumnModel().getColumn(2).setPreferredWidth(400);
@@ -225,7 +258,7 @@ public class LostThingsFind extends JPanel {
     public void incrementViewCount(int postId, String category) {
         String url = "jdbc:mysql://localhost:3306/self_order_kiosk?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
         String user = "root";
-        String password = "1234";
+        String password = "dongyang";
 
         String sql = "UPDATE " + category + " SET views = views + 1 WHERE id = ?";
 
@@ -271,8 +304,5 @@ public class LostThingsFind extends JPanel {
                 mainPanel.repaint();
             }
         });
-    }
-
-
-	
+    }	
 }

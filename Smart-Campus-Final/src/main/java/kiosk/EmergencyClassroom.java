@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -18,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class EmergencyClassroom extends JPanel {
@@ -43,16 +45,36 @@ public class EmergencyClassroom extends JPanel {
 
         staffTableModel = new DefaultTableModel(new Object[]{"소속", "성명", "담당업무", "전화번호"}, 0);
         JTable staffTable = new JTable(staffTableModel);
+        setUpTableAppearance(staffTable); // 테이블 렌더러 설정을 위한 메소드 호출
         resultScrollPane = new JScrollPane(staffTable);
         add(resultScrollPane, BorderLayout.SOUTH);
         resultScrollPane.setVisible(false);
+    }
+    
+    private void setUpTableAppearance(JTable table) {
+        // 테이블 헤더에 대한 커스텀 렌더러를 생성합니다.
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+        headerRenderer.setBackground(new Color(255, 255, 224)); // 연한 노란색
+        headerRenderer.setHorizontalAlignment(JLabel.CENTER);
+
+        // 모든 헤더 셀에 대한 렌더러를 설정합니다.
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+        }
+
+        // 테이블 본문에 대한 커스텀 렌더러를 생성합니다.
+        DefaultTableCellRenderer bodyRenderer = new DefaultTableCellRenderer();
+        bodyRenderer.setBackground(new Color(255, 228, 196)); // 연한 살색
+        bodyRenderer.setHorizontalAlignment(JLabel.CENTER);
+
+        // 모든 본문 셀에 대한 렌더러를 설정합니다.
+        table.setDefaultRenderer(Object.class, bodyRenderer);
     }
 
     private void initStaticPanel(JPanel centerPanel) {
         staticPanel = new JPanel();
         staticPanel.setLayout(new BoxLayout(staticPanel, BoxLayout.Y_AXIS));
-        staticPanel.setBackground(Color.WHITE);
-        staticPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        staticPanel.setBackground(new Color(255, 228, 196)); // 연한 살색으로 배경 설정
 
         addPanel("학생서비스센터", new String[]{"센터", "전화번호"}, new Object[][]{
             {"학적 (휴 ·복학, 제증명발급, 전과, 학점 · 학기포기)", "02) 2610-1707"},
@@ -110,29 +132,45 @@ public class EmergencyClassroom extends JPanel {
 
     private JPanel createTablePanel(String title, String[] columnNames, Object[][] data) {
         JPanel panel = new JPanel(new BorderLayout());
-        JTable table = new JTable(new DefaultTableModel(data, columnNames));
+        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // 모든 셀 수정 불가능
+                return false;
+            }
+        };
+        JTable table = new JTable(model);
 
-        // 테이블의 행 높이를 조절
+        // 테이블 본문의 배경색을 연한 살색으로 설정
+        table.setBackground(new Color(255, 228, 196));
+
+        // 테이블의 행 높이를 조절, 특정 테이블에 대해서만 높이를 변경
         if (title.equals("사무처") || title.equals("종합정보지원실")) {
-            table.setRowHeight(80); // 이 부분의 행 높이를 더 높게 설정
+            table.setRowHeight(40); // "사무처"와 "종합정보지원실"의 행 높이를 60으로 설정
         } else {
-            table.setRowHeight(80); // 다른 테이블들의 행 높이도 조금 높게 설정
+            table.setRowHeight(40); // 나머지 테이블들의 행 높이를 80으로 설정
         }
+
+        // 테이블 헤더의 배경색을 노란색으로 설정
+        table.getTableHeader().setBackground(Color.YELLOW);
 
         Dimension tableSize = table.getPreferredSize();
         tableSize.height = table.getRowHeight() * table.getRowCount();
         table.setPreferredScrollableViewportSize(tableSize);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        // JScrollPane의 크기를 테이블의 크기에 맞게 조절
-        scrollPane.setPreferredSize(new Dimension(tableSize.width + 25, tableSize.height));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
+        // scrollPane의 크기를 테이블의 크기에 맞게 조절
+        scrollPane.setPreferredSize(new Dimension(tableSize.width, tableSize.height + 25));
+        
+       
         JLabel titleLabel = new JLabel(title);
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
         panel.add(titleLabel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
+        
         return panel;
     }
 

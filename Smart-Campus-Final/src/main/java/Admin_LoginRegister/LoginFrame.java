@@ -35,7 +35,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
-
+        
         pnlContainer = new javax.swing.JPanel();
         lblTitle = new javax.swing.JLabel();
         lblUsername = new javax.swing.JLabel();
@@ -44,14 +44,28 @@ public class LoginFrame extends javax.swing.JFrame {
         txtPassword = new javax.swing.JPasswordField();
         btnLogin = new javax.swing.JButton();
         btnRegister = new javax.swing.JButton();
+        btnFindId = new javax.swing.JButton();
+        btnFindPassword = new javax.swing.JButton();
+
+        // 버튼 색상을 설정하기 전에 색상 객체를 먼저 정의
+        Color buttonColor = new Color(173, 216, 230); // 연한 파란색
+
+        // 버튼 색상 설정
+        btnLogin.setBackground(buttonColor);
+        btnRegister.setBackground(buttonColor);
+        btnFindId.setBackground(buttonColor);
+        btnFindPassword.setBackground(buttonColor);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Login");
         setName(""); // NOI18N
         setPreferredSize(new java.awt.Dimension(720, 600));
         getContentPane().setLayout(new java.awt.GridBagLayout());
-
+        
+        this.getContentPane().setBackground(new Color(96, 140, 255));
+        // 패널 배경색 설정 (패널 초기화 이후에 배경색을 설정해야 합니다)
         pnlContainer.setPreferredSize(new java.awt.Dimension(400, 200));
+        pnlContainer.setBackground(new Color(96, 140, 255));
         java.awt.GridBagLayout pnlFormLayout = new java.awt.GridBagLayout();
         pnlFormLayout.columnWidths = new int[]{100, 150};
         pnlFormLayout.rowHeights = new int[]{50, 0, 60, 40};
@@ -99,11 +113,15 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.gridx = 0; // 첫 번째 열
+        gridBagConstraints.gridy = 3; // 네 번째 행
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; // 가로로 채우기
+        gridBagConstraints.insets = new Insets(10, 0, 10, 5); // 상하 좌우 여백 (위, 왼쪽, 아래, 오른쪽으로 10, 오른쪽으로 5 추가)
+        gridBagConstraints.weightx = 0.5; // 추가 공간 분배 비율
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END; // 오른쪽 정렬
         pnlContainer.add(btnLogin, gridBagConstraints);
 
+        // Register 버튼
         btnRegister.setText("Register");
         btnRegister.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -111,9 +129,12 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.gridx = 1; // 두 번째 열
+        gridBagConstraints.gridy = 3; // 네 번째 행
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; // 가로로 채우기
+        gridBagConstraints.insets = new Insets(10, 5, 10, 0); // 상하 좌우 여백 (위, 오른쪽으로 10, 왼쪽으로 5 추가)
+        gridBagConstraints.weightx = 0.5; // 추가 공간 분배 비율
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; // 왼쪽 정렬
         pnlContainer.add(btnRegister, gridBagConstraints);
 
         getContentPane().add(pnlContainer, new java.awt.GridBagConstraints());
@@ -124,7 +145,7 @@ public class LoginFrame extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         
         //아이디 찾기 버튼 ~
-        btnFindId = new javax.swing.JButton("아이디 찾기");
+        btnFindId.setText("아이디 찾기");
         btnFindId.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -133,13 +154,17 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.gridx = 0; // 첫 번째 열
+        gridBagConstraints.gridy = 4; // 다섯 번째 행
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; // 가로로 채우기
+        gridBagConstraints.insets = new Insets(10, 0, 10, 0); // 상하 좌우 여백 (위, 왼쪽, 아래, 오른쪽)
+        gridBagConstraints.weightx = 1.0; // 추가 공간 분배 비율
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; // 왼쪽 정렬
         pnlContainer.add(btnFindId, gridBagConstraints);
 
+
         //비밀번호 찾기 버튼 ~
-        btnFindPassword = new javax.swing.JButton("비밀번호 찾기");
+        btnFindPassword.setText("비밀번호 찾기");
         btnFindPassword.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -149,14 +174,14 @@ public class LoginFrame extends javax.swing.JFrame {
         });
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.gridx = 1; // 두 번째 열
+        gridBagConstraints.gridy = 4; // 다섯 번째 행
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; // 가로로 채우기
+        gridBagConstraints.insets = new Insets(10, 0, 10, 0); // 상하 좌우 여백
+        gridBagConstraints.weightx = 1.0; // 추가 공간 분배 비율
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; // 왼쪽 정렬
         pnlContainer.add(btnFindPassword, gridBagConstraints);
     }
-    
-    
-
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {
         if (getValidFields()) {
             String username = txtUsername.getText();
