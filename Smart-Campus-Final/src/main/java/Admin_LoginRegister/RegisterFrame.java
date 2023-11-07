@@ -32,7 +32,7 @@ public class RegisterFrame extends JFrame {
         initComponents();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("회원가입");
-        setSize(500, 500);
+        setSize(700, 600);
         setLocationRelativeTo(null);
         btnRegister.setEnabled(false);
     }
@@ -40,7 +40,7 @@ public class RegisterFrame extends JFrame {
     private void initComponents() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(10, 3, 5, 5));
-
+        panel.setBackground(new Color(96, 140, 255));
         JLabel lblUsername = new JLabel("아이디:(ID 중복확인 필수!)");
         JLabel lblPassword = new JLabel("비밀번호:");
         JLabel lblConfirmPassword = new JLabel("비밀번호 확인:");

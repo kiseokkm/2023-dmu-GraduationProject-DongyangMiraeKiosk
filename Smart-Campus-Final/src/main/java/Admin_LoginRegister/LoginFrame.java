@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 public class LoginFrame extends javax.swing.JFrame {
 	
@@ -46,11 +47,9 @@ public class LoginFrame extends javax.swing.JFrame {
         btnRegister = new javax.swing.JButton();
         btnFindId = new javax.swing.JButton();
         btnFindPassword = new javax.swing.JButton();
+        
+        Color buttonColor = new Color(255,255,255);
 
-        // 버튼 색상을 설정하기 전에 색상 객체를 먼저 정의
-        Color buttonColor = new Color(173, 216, 230); // 연한 파란색
-
-        // 버튼 색상 설정
         btnLogin.setBackground(buttonColor);
         btnRegister.setBackground(buttonColor);
         btnFindId.setBackground(buttonColor);
@@ -63,7 +62,6 @@ public class LoginFrame extends javax.swing.JFrame {
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         this.getContentPane().setBackground(new Color(96, 140, 255));
-        // 패널 배경색 설정 (패널 초기화 이후에 배경색을 설정해야 합니다)
         pnlContainer.setPreferredSize(new java.awt.Dimension(400, 200));
         pnlContainer.setBackground(new Color(96, 140, 255));
         java.awt.GridBagLayout pnlFormLayout = new java.awt.GridBagLayout();
@@ -81,7 +79,7 @@ public class LoginFrame extends javax.swing.JFrame {
         pnlContainer.add(lblTitle, gridBagConstraints);
 
         lblUsername.setLabelFor(txtUsername);
-        lblUsername.setText("Username");
+        lblUsername.setText("ID");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -121,7 +119,6 @@ public class LoginFrame extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END; // 오른쪽 정렬
         pnlContainer.add(btnLogin, gridBagConstraints);
 
-        // Register 버튼
         btnRegister.setText("Register");
         btnRegister.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -132,7 +129,7 @@ public class LoginFrame extends javax.swing.JFrame {
         gridBagConstraints.gridx = 1; // 두 번째 열
         gridBagConstraints.gridy = 3; // 네 번째 행
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; // 가로로 채우기
-        gridBagConstraints.insets = new Insets(10, 5, 10, 0); // 상하 좌우 여백 (위, 오른쪽으로 10, 왼쪽으로 5 추가)
+        gridBagConstraints.insets = new Insets(10, 0, 10, 5); // 상하 좌우 여백 (위, 오른쪽으로 10, 왼쪽으로 5 추가)
         gridBagConstraints.weightx = 0.5; // 추가 공간 분배 비율
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; // 왼쪽 정렬
         pnlContainer.add(btnRegister, gridBagConstraints);
@@ -157,13 +154,10 @@ public class LoginFrame extends javax.swing.JFrame {
         gridBagConstraints.gridx = 0; // 첫 번째 열
         gridBagConstraints.gridy = 4; // 다섯 번째 행
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; // 가로로 채우기
-        gridBagConstraints.insets = new Insets(10, 0, 10, 0); // 상하 좌우 여백 (위, 왼쪽, 아래, 오른쪽)
+        gridBagConstraints.insets = new Insets(10, 0, 10, 5); // 상하 좌우 여백 (위, 왼쪽, 아래, 오른쪽)
         gridBagConstraints.weightx = 1.0; // 추가 공간 분배 비율
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; // 왼쪽 정렬
         pnlContainer.add(btnFindId, gridBagConstraints);
-
-
-        //비밀번호 찾기 버튼 ~
         btnFindPassword.setText("비밀번호 찾기");
         btnFindPassword.addActionListener(new ActionListener() {
             @Override
@@ -172,67 +166,65 @@ public class LoginFrame extends javax.swing.JFrame {
                 findPasswordFrame.setVisible(true);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1; // 두 번째 열
-        gridBagConstraints.gridy = 4; // 다섯 번째 행
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; // 가로로 채우기
-        gridBagConstraints.insets = new Insets(10, 0, 10, 0); // 상하 좌우 여백
-        gridBagConstraints.weightx = 1.0; // 추가 공간 분배 비율
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; // 왼쪽 정렬
+        gridBagConstraints.gridx = 1; 
+        gridBagConstraints.gridy = 4; 
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; 
+        gridBagConstraints.insets = new Insets(10, 0, 10, 5); 
+        gridBagConstraints.weightx = 1.0; 
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; 
         pnlContainer.add(btnFindPassword, gridBagConstraints);
+        
+        btnLogin.setForeground(Color.BLACK); // 텍스트 색상을 검은색으로 설정
+        btnRegister.setForeground(Color.BLACK);
+        btnFindId.setForeground(Color.BLACK);
+        btnFindPassword.setForeground(Color.BLACK);
     }
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {
         if (getValidFields()) {
             String username = txtUsername.getText();
             String password = new String(txtPassword.getPassword());
-
-            // Check if the credentials match the manager's credentials
             if (MANAGER_USERNAME.equals(username) && MANAGER_PASSWORD.equals(password)) {
-                // Open manager's Home or screen
-                new ManagerHome().setVisible(true);  // Assuming you have a ManagerDashboard class for the manager
+                new ManagerHome().setVisible(true); 
                 dispose();
                 return;
             }
 
-            // 기존 사용자 인증 확인 코드
             if (authenticateUser(username, password)) {
-                // 로그인 성공 시, 현재 로그인한 사용자의 아이디를 AdminFrame에 전달
                 new AdminFrame(username).setVisible(true);
                 dispose();
             } else {
-                javax.swing.JOptionPane.showMessageDialog(null, "로그인 실패!!", "Login alert", javax.swing.JOptionPane.ERROR_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(null, "로그인 실패", "Login alert", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
         }
     }
-
-
     private boolean authenticateUser(String username, String password) {
         try {
-            // 데이터베이스 연결
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-
-            // 사용자 인증 쿼리 실행
+            Connection connection = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", 
+                "root", 
+                "dongyang"
+            );
             String sql = "SELECT * FROM user1 WHERE username = ? AND password = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, username);
             statement.setString(2, password);
 
             ResultSet resultSet = statement.executeQuery();
-
-            // 적절한 예외 처리 및 반환 값 결정
             if (resultSet.next()) {
-                // 일치하는 사용자가 존재함
                 return true;
             } else {
-                // 일치하는 사용자가 없음
                 return false;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // 예외 발생 시 인증 실패 처리
             return false;
         }
+    }
+    private Properties loadDatabaseProperties() {
+        Properties properties = new Properties();
+        // TODO: 여기에 파일에서 설정을 읽어오는 로직 구현
+        return properties;
     }
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {
@@ -243,10 +235,10 @@ public class LoginFrame extends javax.swing.JFrame {
 
     private boolean getValidFields() {
         if (txtUsername.getText().isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Username is required", "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(null, "ID를 입력하세요", "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
             return false;
         } else if (new String(txtPassword.getPassword()).isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Password is required", "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(null, "비밀번호를 입력하세요", "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
             return false;
         } else {
             return true;
@@ -274,23 +266,12 @@ public class LoginFrame extends javax.swing.JFrame {
         }
         return major;
     }
-
-    
-
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
-        /* Set default theme */
         app.Global.setDefaultTheme();
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             new LoginFrame().setVisible(true);
         });
     }
-
-    // Variables declaration - do not modify
     private javax.swing.JButton btnLogin;
     private javax.swing.JButton btnRegister;
     private javax.swing.JLabel lblPassword;
@@ -301,6 +282,4 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JTextField txtUsername;
     private javax.swing.JButton btnFindId;
     private javax.swing.JButton btnFindPassword;
-
-    // End of variables declaration
 }
