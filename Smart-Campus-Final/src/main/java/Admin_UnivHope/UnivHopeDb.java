@@ -26,7 +26,7 @@ public class UnivHopeDb {
                 Vector<Object> row = new Vector<>();
                 row.add(rs.getInt("id"));
                 row.add(rs.getString("title"));
-                row.add(rs.getString("status").isEmpty() ? "답변 대기" : "답변 완료");
+                row.add(rs.getString("admin_reply").isEmpty() ? "답변 대기" : "답변 완료");
                 row.add(rs.getString("author"));
                 row.add(rs.getTimestamp("post_date"));
                 row.add(rs.getInt("views"));

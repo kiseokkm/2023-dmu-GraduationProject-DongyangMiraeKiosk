@@ -56,9 +56,7 @@ public class UnivHope extends JPanel {
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "dongyang";
     public UnivHope(String loggedInName) {
-       
-       
-       
+    
         this.loggedInUsername = loggedInName; 
         mainPanel = this;
         setLayout(new BorderLayout());
@@ -73,16 +71,11 @@ public class UnivHope extends JPanel {
                 return c;
             }
         };
-        
-  
         JTableHeader tableHeader = table.getTableHeader();
         tableHeader.setBackground(new Color(173, 216, 230)); // 연한 파랑색으로 설정
         
         addTableMouseListener();
-  
- 
-
-        
+         
         add(new JScrollPane(table), BorderLayout.CENTER);
         postButton = new JButton("새글");
         postButton .setBackground(new Color(135, 206, 235)); 
@@ -119,8 +112,7 @@ public class UnivHope extends JPanel {
             } else {
                 loadDataFromDatabase();
             }
-        });
-        
+        });   
         buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(searchComboBox);
         buttonPanel.add(searchField);
@@ -136,8 +128,6 @@ public class UnivHope extends JPanel {
         loadDataFromDatabase();
 
     }  
-    
- // UnivHope 클래스 내에 이 메서드를 추가합니다.
     private void addTableMouseListener() {
         table.addMouseListener(new MouseAdapter() {
             @Override
@@ -146,22 +136,18 @@ public class UnivHope extends JPanel {
                 if (e.getClickCount() == 1) {
                     int row = table.getSelectedRow();
                     if (row != -1) {
-                        // 예를 들어, 게시물의 '제목'이 2번째 열에 있다고 가정합니다 (0부터 시작하는 인덱스).
-                        // ID 대신 제목을 사용해 조회할 수도 있습니다.
-                        String title = tableModel.getValueAt(row, 1).toString(); // '제목' 열의 값 가져오기
-                        showPostDetails(title); // 제목을 이용해 세부정보 표시
+                        String title = tableModel.getValueAt(row, 1).toString();
+                        showPostDetails(title); 
                     }
                 }
             }
         });
     }
-
-    
     private void searchInDatabase(String fieldName, String searchQuery) {
         UnivHopeDb.searchInDatabase(tableModel, fieldName, searchQuery);
     }
     private void openPostDialog() {
-        PostDialog postDialog = new PostDialog(loggedInUsername); // Pass the logged-in user's name
+        PostDialog postDialog = new PostDialog(loggedInUsername); 
         postDialog.setVisible(true);
     }
     private void setupSearchButton() {
@@ -201,10 +187,8 @@ public class UnivHope extends JPanel {
         UnivHopeDb.loadDataFromDatabase(tableModel);
     }
     private void showPostDetails(String title) {
-        // Call the static method from UnivHopeDb class
         UnivHopeDb.increasePostViews(title);
 
-        // Retrieve the content and admin reply using UnivHopeDb static methods
         String postContentText = UnivHopeDb.getPostContent(title);
         String replyText = UnivHopeDb.getAdminReply(title);
         String replyDate = UnivHopeDb.getAdminReplyDate(title);
@@ -268,7 +252,7 @@ public class UnivHope extends JPanel {
         private String displayAuthor; 
 
         public PostDialog(String loggedInname) {
-            this.displayAuthor = loggedInname; // 로그인한 사용자의 이름을 멤버 변수에 할당
+            this.displayAuthor = loggedInname; 
             initializeDialog();
         }
         private void initializeDialog() {
@@ -278,7 +262,7 @@ public class UnivHope extends JPanel {
             JPanel topPanel = new JPanel(new GridLayout(3, 2));
             titleField = new JTextField();
             authorField = new JTextField(displayAuthor);
-            authorField.setEditable(false); // 기본적으로 작성자 필드는 편집 불가능하게 설정
+            authorField.setEditable(false); 
             anonymousCheckBox = new JCheckBox("익명으로 게시");
             anonymousCheckBox.addActionListener(new ActionListener() {
                 @Override
@@ -288,7 +272,7 @@ public class UnivHope extends JPanel {
                         authorField.setEditable(false);
                     } else {
                         authorField.setText(displayAuthor);
-                        authorField.setEditable(false); // 여기도 편집 불가능하게 유지
+                        authorField.setEditable(false); 
                     }
                 }
             });
@@ -312,23 +296,19 @@ public class UnivHope extends JPanel {
             add(postButton, BorderLayout.SOUTH);
 
             pack();
-        }
-        
-
-
-        
+        }        
         private void prefillAuthor() {
-            authorField.setText(displayAuthor); // 사용자 이름으로 작성자 필드를 미리 채움
-            authorField.setEditable(!"익명".equals(displayAuthor)); // If the name is "익명", make it non-editable
+            authorField.setText(displayAuthor); 
+            authorField.setEditable(!"익명".equals(displayAuthor)); 
         }
         private void savePostToDatabase(String title, String author, String content, boolean isAnonymous) {
             try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                 PreparedStatement stmt = conn.prepareStatement("INSERT INTO communication_board (title, author, content, anonymous, admin_reply) VALUES (?, ?, ?, ?, ?)")) {
                 stmt.setString(1, title);
-                stmt.setString(2, author); // 여기에 실제 작성자 이름을 저장합니다.
+                stmt.setString(2, author); 
                 stmt.setString(3, content);
-                stmt.setBoolean(4, isAnonymous); // 익명 여부를 저장합니다. 사용자가 익명을 선택한 경우 true
-                stmt.setString(5, ""); // 관리자 답변은 초기에는 비어 있음
+                stmt.setBoolean(4, isAnonymous); 
+                stmt.setString(5, ""); 
                 stmt.executeUpdate();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -336,7 +316,7 @@ public class UnivHope extends JPanel {
             }
         }
         private String getDisplayName(int postId) {
-            String displayName = "익명"; // 기본값으로 익명 설정
+            String displayName = "익명"; 
             try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                  PreparedStatement stmt = conn.prepareStatement("SELECT author, anonymous FROM communication_board WHERE id = ?")) {
                 stmt.setInt(1, postId);
