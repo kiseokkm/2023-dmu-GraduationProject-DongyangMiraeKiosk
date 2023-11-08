@@ -19,7 +19,7 @@ public class ProfileUpdateDelete {
         profileFrame.setLocationRelativeTo(null);
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(10, 2, 5, 5));
-        panel.setBackground(new Color(96, 140, 255));
+        panel.setBackground(new Color(180, 210, 255));
         JLabel lblUsername = new JLabel("Username:");
         JTextField txtUsername = new JTextField();
         txtUsername.setEditable(false);

@@ -24,8 +24,8 @@ public class LostThingsReport extends JPanel {
         setLayout(new BorderLayout());
         initializeComponents();
         prefillAuthor();
+        this.setBackground(Color.WHITE);
     }
-
     private void initializeComponents() {
         JLabel headline = new JLabel("분실물 신고하기", SwingConstants.CENTER);
         headline.setFont(new Font("Malgun Gothic", Font.BOLD, 30));
@@ -88,16 +88,14 @@ public class LostThingsReport extends JPanel {
                 saveToDatabase(title, content, loggedInUsername, category, isAnonymous);
             }
         });
-
+        postPanel.setBackground(new Color(180, 210, 255));
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(postButton);
         add(buttonPanel, BorderLayout.SOUTH);
     }
-
     private void prefillAuthor() {
         authorField.setText(displayAuthor); // 사용자 이름으로 작성자 필드를 미리 채움
     }
-
     private void saveToDatabase(String title, String content, String author, String category, boolean isAnonymous) {
         String url = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8";
         String user = "root";

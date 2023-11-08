@@ -61,11 +61,8 @@ public class NoticeFrame {
     private static JTextField searchField;
     private static String searchType = "제목";
     private static JComboBox<String> searchComboBox;
-
-    
+ 
     static Color skyBlue = new Color(211, 211, 211);
-    
-
     
     public static void resetNoticeLoadedFlag() {
         isNoticesLoaded = false;

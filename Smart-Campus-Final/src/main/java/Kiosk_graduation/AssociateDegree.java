@@ -21,12 +21,6 @@ public class AssociateDegree extends JPanel {
         setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        // Title "전문학사"
-        JLabel lblTitle = new JLabel("ㅡ 전문학사 ㅡ");
-        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 30)); 
-        lblTitle.setHorizontalAlignment(SwingConstants.CENTER); 
-        lblTitle.setAlignmentX(CENTER_ALIGNMENT);
-        mainPanel.add(lblTitle);
         addTextPaneSection(mainPanel);
         addDegreeSection(mainPanel);
         JLabel lblGraduationCredits = new JLabel(">> 졸업이수 학점");

@@ -22,11 +22,6 @@ public class College extends JPanel {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         // Title "전문학사"
-        JLabel lblTitle = new JLabel("ㅡ 학사 ㅡ");
-        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 30)); 
-        lblTitle.setHorizontalAlignment(SwingConstants.CENTER); 
-        lblTitle.setAlignmentX(CENTER_ALIGNMENT);
-        mainPanel.add(lblTitle);
         addTextPaneSection(mainPanel);
         JLabel lblMajorMinimumCredits = new JLabel(" 학위종별 ");
         lblMajorMinimumCredits.setFont(new Font("SansSerif", Font.BOLD, 20));

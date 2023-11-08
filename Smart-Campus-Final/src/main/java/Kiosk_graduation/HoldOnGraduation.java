@@ -18,12 +18,7 @@ public class HoldOnGraduation extends JPanel {
     private void initUI() {
         setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        JLabel lblTitle = new JLabel("ㅡ 졸업보류  ㅡ");
-        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 30)); 
-        lblTitle.setHorizontalAlignment(SwingConstants.CENTER); 
-        lblTitle.setAlignmentX(CENTER_ALIGNMENT);
-        mainPanel.add(lblTitle);
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));;
         addTextPaneSection(mainPanel);
         JLabel lblGraduationCredits = new JLabel("수강신청 학점에 따른 등록금 산정");
         lblGraduationCredits.setFont(new Font("SansSerif", Font.BOLD, 20));

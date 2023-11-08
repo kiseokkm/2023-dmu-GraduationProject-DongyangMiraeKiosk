@@ -3,6 +3,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -64,15 +65,14 @@ public class UnivHope extends JPanel {
         table = new JTable(tableModel) {
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
-                // Check if the row is selected to avoid overwriting the selection color
                 if (!isRowSelected(row)) {
-                    c.setBackground(new Color(255, 255, 224)); // 크림색 배경 설정
+                    c.setBackground(new Color(255, 255, 224)); 
                 }
                 return c;
             }
         };
         JTableHeader tableHeader = table.getTableHeader();
-        tableHeader.setBackground(new Color(173, 216, 230)); // 연한 파랑색으로 설정
+        tableHeader.setBackground(new Color(173, 216, 230));//테이블 헤더 백그라운드 색깔
         
         addTableMouseListener();
          
@@ -126,7 +126,6 @@ public class UnivHope extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
 
         loadDataFromDatabase();
-
     }  
     private void addTableMouseListener() {
         table.addMouseListener(new MouseAdapter() {
@@ -195,22 +194,40 @@ public class UnivHope extends JPanel {
         if (replyDate != null && !replyDate.isEmpty()) {
             replyText += "\n\n답변 작성일: " + replyDate;
         }
-        JTextArea postContent = new JTextArea(postContentText, 10, 40);
-        JTextArea adminReply = new JTextArea(replyText);
+ 
 
+        JTextArea postContent = new JTextArea();
+        postContent.setText(postContentText);
         postContent.setWrapStyleWord(true);
         postContent.setLineWrap(true);
         postContent.setEditable(false);
         postContent.setCaretPosition(0);
         postContent.setBorder(BorderFactory.createTitledBorder("게시물 내용"));
+
+        JTextArea adminReply = new JTextArea();
+        adminReply.setText(replyText);
+        adminReply.setWrapStyleWord(true);
+        adminReply.setLineWrap(true);
         adminReply.setEditable(false);
         adminReply.setBorder(BorderFactory.createTitledBorder("관리자 답변"));
+
+        // Set background color to white for the text areas
+        postContent.setBackground(Color.WHITE);
+        adminReply.setBackground(Color.WHITE);
 
         JButton backButton = new JButton("목록");
         JLabel titleLabel = new JLabel("제목: " + title);
         JLabel dateLabel = new JLabel("날짜: " + UnivHopeDb.getPostDate(title));
         JLabel authorLabel = new JLabel("작성자: " + UnivHopeDb.getPostAuthor(title));
         JLabel viewsLabel = new JLabel("조회수: " + UnivHopeDb.getPostViews(title));
+        
+        Font infoFont = new Font("SansSerif", Font.BOLD, 16);
+        postContent.setFont(infoFont);
+        adminReply.setFont(infoFont);
+        titleLabel.setFont(infoFont);
+        dateLabel.setFont(infoFont);
+        authorLabel.setFont(infoFont);
+        viewsLabel.setFont(infoFont);
 
         JPanel infoPanel = new JPanel(new GridLayout(4, 1));
         infoPanel.add(titleLabel);
@@ -218,14 +235,23 @@ public class UnivHope extends JPanel {
         infoPanel.add(authorLabel);
         infoPanel.add(viewsLabel);
 
+        infoPanel.setBackground(Color.WHITE);
+        
+        JScrollPane postContentScrollPane = new JScrollPane(postContent);
+        JScrollPane adminReplyScrollPane = new JScrollPane(adminReply);
+
         JPanel contentPanel = new JPanel(new GridLayout(2, 1));
-        contentPanel.add(new JScrollPane(postContent));
-        contentPanel.add(new JScrollPane(adminReply));
+        contentPanel.add(postContentScrollPane);
+        contentPanel.add(adminReplyScrollPane);
+
+        contentPanel.setBackground(Color.WHITE);
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(infoPanel, BorderLayout.NORTH);
         topPanel.add(contentPanel, BorderLayout.CENTER);
         topPanel.add(backButton, BorderLayout.SOUTH);
+
+        topPanel.setBackground(Color.WHITE);
 
         mainPanel.removeAll();
         mainPanel.setLayout(new BorderLayout());
@@ -243,7 +269,8 @@ public class UnivHope extends JPanel {
             mainPanel.revalidate();
             mainPanel.repaint();
         });
-    } 
+    }
+
     class PostDialog extends JDialog {
         private JTextField titleField;
         private JTextField authorField;
