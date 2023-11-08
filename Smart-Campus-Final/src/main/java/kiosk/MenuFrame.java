@@ -59,7 +59,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   private void initAllTabs() {
 	    // 공지사항 패널 초기화
 	    NoticeFrame.showNoticeTableOnPanel(pnlNotice);
-
+	    
 	    // 취미동아리 패널 초기화
 	    initHobbyClubPanel();
 
@@ -68,7 +68,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 
 	    // 교직원 검색 패널 초기화
 	    initClassPanel();
-
+	   
 	    // 학사 일정 패널 초기화
 	    initAcademicSchedulePanel();
 
@@ -117,6 +117,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   private javax.swing.JPanel pnlLostThings;
   private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
+    
 
     pnlContent = new javax.swing.JPanel();
     tabbedPane = new javax.swing.JTabbedPane();
@@ -231,7 +232,7 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     getContentPane().add(pnlFooter, java.awt.BorderLayout.SOUTH);
 
     getAccessibleContext().setAccessibleName("");
-
+    
     pack();
     setLocationRelativeTo(null);  
   }

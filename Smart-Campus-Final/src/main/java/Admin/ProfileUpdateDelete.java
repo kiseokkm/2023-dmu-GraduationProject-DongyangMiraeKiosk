@@ -1,9 +1,6 @@
 package Admin;
-//@버튼 
 import javax.swing.*;
-
 import models.User1;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,25 +8,21 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
 public class ProfileUpdateDelete {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "dongyang";
-
     public static void ShowProfile(String username)  {
         JFrame profileFrame = new JFrame("Profile");
         profileFrame.setSize(300, 400);
         profileFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         profileFrame.setLocationRelativeTo(null);
-
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(10, 2, 5, 5));
-
+        panel.setBackground(new Color(96, 140, 255));
         JLabel lblUsername = new JLabel("Username:");
         JTextField txtUsername = new JTextField();
         txtUsername.setEditable(false);
-
         JLabel lblMajor = new JLabel("Major:");
         JComboBox<String> comboMajor = new JComboBox<String>();
         comboMajor.addItem("기계공학과");
@@ -58,18 +51,11 @@ public class ProfileUpdateDelete {
 
         JLabel lblStudentId = new JLabel("Student ID:");
         JTextField txtStudentId = new JTextField();
-
         JLabel lblName = new JLabel("Name:");
         JTextField txtName = new JTextField();
-
         JLabel lblPhoneNumber = new JLabel("Phone Number:");
         JTextField txtPhoneNumber = new JTextField();
-
-        //  사용자의 정보를 DB에서 가져와서 화면 컴포넌트에 설정합니다.
         getUserInfo(username, txtUsername, comboMajor, txtStudentId, txtName, txtPhoneNumber);
-
-        
-        
 
         JButton btnUpdate = new JButton("수정");
         btnUpdate.addActionListener(new ActionListener() {
@@ -80,8 +66,7 @@ public class ProfileUpdateDelete {
                     String major = (String) comboMajor.getSelectedItem();
                     String studentId = txtStudentId.getText();
                     String name = txtName.getText();
-                    String phoneNumber = txtPhoneNumber.getText();
-                    
+                    String phoneNumber = txtPhoneNumber.getText();                  
                     updateUserInDatabase(username, major, studentId, name, phoneNumber);
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -89,8 +74,6 @@ public class ProfileUpdateDelete {
                 }
             }
         });
-
-     // Delete (탈퇴) 버튼
         JButton btnDelete = new JButton("탈퇴");
         btnDelete.addActionListener(new ActionListener() {
             @Override
@@ -104,15 +87,13 @@ public class ProfileUpdateDelete {
                 }
             }
         });
-     // Confirm (확인) 버튼
         JButton btnConfirm = new JButton("확인");
         btnConfirm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                profileFrame.dispose(); // 현재 창을 닫습니다.
+                profileFrame.dispose(); 
             }
         });
-
         panel.add(lblUsername);
         panel.add(txtUsername);
         panel.add(lblMajor);
@@ -126,19 +107,16 @@ public class ProfileUpdateDelete {
         panel.add(btnUpdate);
         panel.add(btnConfirm);
         panel.add(btnDelete);
-
         profileFrame.add(panel);
         profileFrame.setVisible(true);
     }
     private static void getUserInfo(String username, JTextField txtUsername, JComboBox<String> comboMajor, JTextField txtStudentId, JTextField txtName, JTextField txtPhoneNumber) {
-        // DB에서 username에 해당하는 사용자 정보를 가져와서 화면에 표시하는 로직 추가
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
             String sql = "SELECT * FROM user1 WHERE username = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, username);
             ResultSet result = statement.executeQuery();
-
             if (result.next()) {
                 txtUsername.setText(result.getString("username"));
                 comboMajor.setSelectedItem(result.getString("major")); // 학과 정보를 콤보박스에서 선택되게 함
@@ -150,7 +128,6 @@ public class ProfileUpdateDelete {
             e.printStackTrace();
         }
     }
-
     private static void updateUserInDatabase(String username, String major, String studentId, String name, String phoneNumber) {
         try {
             Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
@@ -162,7 +139,6 @@ public class ProfileUpdateDelete {
             statement.setString(4, phoneNumber);
             statement.setString(5, username);
             int rowsUpdated = statement.executeUpdate();
-
             if (rowsUpdated > 0) {
                 JOptionPane.showMessageDialog(null, "사용자 정보가 업데이트되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -172,7 +148,6 @@ public class ProfileUpdateDelete {
             e.printStackTrace();
         }
     }
-
     private static void deleteUserFromDatabase(String username) {
         try {
             Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);

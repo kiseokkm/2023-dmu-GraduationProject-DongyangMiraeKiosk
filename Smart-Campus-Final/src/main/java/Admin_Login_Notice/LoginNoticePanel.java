@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -60,7 +61,6 @@ public class LoginNoticePanel extends JPanel {
             String sql;
             PreparedStatement statement;
 
-            // 검색어가 있으면 검색어와 일치하는 공지사항을, 없으면 전공과 일치하거나 전체 공지사항을 가져옴
             if (searchQuery.isEmpty()) {
                 sql = "SELECT * FROM notices WHERE type = ? ORDER BY pinned DESC, id DESC LIMIT ? OFFSET ?";
                 statement = connection.prepareStatement(sql);
@@ -102,7 +102,6 @@ public class LoginNoticePanel extends JPanel {
                         break;
                 }
             }
-
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
@@ -123,7 +122,6 @@ public class LoginNoticePanel extends JPanel {
                 };
                 noticeTableModel.addRow(row);
             }
-
             rs.close();
             statement.close();
             connection.close();
@@ -132,9 +130,7 @@ public class LoginNoticePanel extends JPanel {
         }
 
         return noticeTable;
-    }
-
-    
+    }  
     public static JTextArea getNoticeDetails(String title) {
         JTextArea textArea = new JTextArea(10, 40);
         try {
@@ -347,6 +343,7 @@ public class LoginNoticePanel extends JPanel {
                 String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
                 incrementViewCount(title);
                 JTextArea noticeContent = NoticeFrameDb.getNoticeDetails(title);
+                noticeContent.setFont(new Font("Serif", Font.PLAIN, 25)); 
                 JScrollPane scrollPane = new JScrollPane(noticeContent);
 
                 JPanel contentPanel = new JPanel(new BorderLayout());
@@ -359,6 +356,15 @@ public class LoginNoticePanel extends JPanel {
                         String additionalInfo = String.format("번호: %d | 제목: %s | 작성자: %s | 작성일: %s | 조회수: %d",
                                 rs.getInt("id"), rs.getString("title"), rs.getString("author"), rs.getString("date"), rs.getInt("viewCount"));
                         JLabel additionalLabel = new JLabel(additionalInfo);
+                        additionalLabel.setFont(new Font("Serif", Font.BOLD, 20));
+                                              
+                        Color backgroundColor = Color.WHITE;
+                        noticeContent.setBackground(backgroundColor);
+                        additionalLabel.setBackground(backgroundColor);                      
+                        contentPanel.setBackground(backgroundColor);
+                        scrollPane.getViewport().setBackground(backgroundColor);                       
+                        additionalLabel.setOpaque(true);
+
                         contentPanel.add(additionalLabel, BorderLayout.NORTH);
                         contentPanel.add(scrollPane, BorderLayout.CENTER);
                     }

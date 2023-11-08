@@ -30,13 +30,12 @@ public class RegisterFrame extends JFrame {
 
     public RegisterFrame() {
         initComponents();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle("회원가입");
         setSize(700, 600);
         setLocationRelativeTo(null);
         btnRegister.setEnabled(false);
     }
-
     private void initComponents() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(10, 3, 5, 5));
@@ -52,7 +51,6 @@ public class RegisterFrame extends JFrame {
         comboMostPreciousThing.addItem("당신의 가장 소중한것은?");
         comboMostPreciousThing.addItem("당신이 나온 초등학교는?");
         comboMostPreciousThing.addItem("당신이 나온 중학교는?");
-
 
         txtUsername = new JTextField(20);
         txtPassword = new JPasswordField(20);

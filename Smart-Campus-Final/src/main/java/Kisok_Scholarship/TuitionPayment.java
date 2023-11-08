@@ -14,18 +14,19 @@ public class TuitionPayment extends JPanel {
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         add(titleLabel, BorderLayout.NORTH);
+        titleLabel.setOpaque(true); // 배경색이 보이도록 설정
+        titleLabel.setBackground(Color.WHITE);
 
         initStaticPanel();
         JScrollPane mainScrollPane = new JScrollPane(staticPanel);
+        mainScrollPane.getViewport().setBackground(Color.WHITE);
         add(mainScrollPane, BorderLayout.CENTER);
     }
 
     private void initStaticPanel() {
         staticPanel = new JPanel();
         staticPanel.setLayout(new BoxLayout(staticPanel, BoxLayout.Y_AXIS));
-        // Remove or comment out the next line to make the background transparent
-        // staticPanel.setBackground(Color.WHITE);
-        staticPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        staticPanel.setBackground(Color.WHITE);  // 배경색을 흰색으로 설정
 
         // 시기 Section
         addPeriodSection();
@@ -45,6 +46,7 @@ public class TuitionPayment extends JPanel {
 
     private void addPeriodSection() {
         JPanel periodPanel = new JPanel(new BorderLayout());
+        periodPanel.setBackground(Color.WHITE);
         periodPanel.setOpaque(false); // Make the panel transparent
 
         JLabel periodLabel = new JLabel("시기");
@@ -76,11 +78,13 @@ public class TuitionPayment extends JPanel {
         addBarGraphSection("절차", new String[]{
             "등록금 고지서를 e-서비스에서 출력",
             "은행 납부"
+            
         });
     }
 
     private void addIssuanceSection() {
         JPanel issuancePanel = new JPanel();
+        issuancePanel.setBackground(Color.WHITE);
         issuancePanel.setLayout(new BorderLayout());
         issuancePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -100,6 +104,7 @@ public class TuitionPayment extends JPanel {
 
     private void addAdditionalInfoSection() {
         JPanel additionalInfoPanel = new JPanel();
+        additionalInfoPanel.setBackground(Color.WHITE);
         additionalInfoPanel.setLayout(new BorderLayout());
         additionalInfoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -122,14 +127,18 @@ public class TuitionPayment extends JPanel {
         notesTitle.setHorizontalAlignment(JLabel.LEFT);
         notesTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
         notesTitle.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
+        notesTitle.setOpaque(true);
+        notesTitle.setBackground(Color.WHITE);
+
         JPanel notesTitlePanel = new JPanel(new BorderLayout());
+        notesTitlePanel.setBackground(Color.WHITE);
         notesTitlePanel.add(notesTitle, BorderLayout.WEST);
         staticPanel.add(notesTitlePanel);
 
         // 신입생과 재학생을 같은 열에 정렬
         JPanel studentsPanel = new JPanel(new GridLayout(1, 2));
-        
+        studentsPanel.setBackground(Color.WHITE); // 배경색을 흰색으로 설정
+
         JTextArea freshmanArea = createNoteArea("신입생", "입학이 허가된 자는 지정된 장소와 기일 내에 등록을 하여야 하며, 지정된 기일 내에 등록을 하지 않을 때는 입학이 자동 취소됨.");
         JTextArea currentStudentArea = createNoteArea("재학생", "지정한 등록기간 내에 등록을 하여야 하며, 정당한 이유 없이 기일 내에 등록을 하지 않을 때는 미등록 제적 처리됨.");
         
@@ -151,10 +160,9 @@ public class TuitionPayment extends JPanel {
 
         staticPanel.add(returningStudentArea);
     }
-
-
     private JTextArea createNoteArea(String title, String content) {
         JTextArea area = new JTextArea(title + ":\n" + content);
+        area.setBackground(Color.WHITE);
         area.setFont(new Font("SansSerif", Font.PLAIN, 16));
         area.setEditable(false);
         area.setWrapStyleWord(true);
@@ -176,11 +184,12 @@ public class TuitionPayment extends JPanel {
     
     private JPanel createTablePanel(String title, String[] columnNames, Object[][] data, int rowHeight) {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
         JTable table = new JTable(data, columnNames);
         
         table.setShowGrid(false);  
         table.setRowHeight(rowHeight);
-        table.setBackground(new Color(220, 220, 220)); 
+        table.setBackground(Color.WHITE);
         table.setPreferredScrollableViewportSize(table.getPreferredSize());
         table.setFillsViewportHeight(true);
         table.getTableHeader().setBackground(Color.GRAY);  
@@ -213,16 +222,19 @@ public class TuitionPayment extends JPanel {
     private void addBarGraphSection(String title, String[] items) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
+        panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JLabel titleLabel = new JLabel(title);
         titleLabel.setHorizontalAlignment(JLabel.LEFT);  // Change alignment to left
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        titleLabel.setBackground(Color.WHITE);
         panel.add(titleLabel, BorderLayout.NORTH);
 
         JPanel barContainer = new JPanel();
         barContainer.setLayout(new BoxLayout(barContainer, BoxLayout.X_AXIS));
+        barContainer.setBackground(Color.WHITE);
         Color barPanelColor = new Color(100, 149, 237);  // RoyalBlue color
         for (int i = 0; i < items.length; i++) {
             JPanel barPanel = new JPanel();
@@ -255,6 +267,7 @@ public class TuitionPayment extends JPanel {
         JPanel container = new JPanel();
         container.setLayout(new GridLayout(1, 2, 10, 0));
         Color barPanelColor = new Color(200, 200, 200);
+        container.setBackground(Color.WHITE);
 
         for (String text : texts) {
             JPanel boxPanel = new JPanel(new BorderLayout());

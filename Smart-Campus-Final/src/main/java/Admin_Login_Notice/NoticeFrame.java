@@ -2,7 +2,9 @@ package Admin_Login_Notice;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -36,6 +38,7 @@ import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
 import com.google.cloud.speech.v1.RecognitionAudio;
 import com.google.cloud.speech.v1.RecognitionConfig;
@@ -70,12 +73,40 @@ public class NoticeFrame {
     public static JTable getNoticeTable() {
         DefaultTableModel noticeTableModel = new DefaultTableModel(new Object[]{"번호", "제목", "작성자", "작성일", "조회수"}, 0);
         JTable noticeTable = new JTable(noticeTableModel);
+        TableColumn c1 = noticeTable.getColumnModel().getColumn(0);
+        c1.setPreferredWidth(20);
+        TableColumn c2 = noticeTable.getColumnModel().getColumn(1);
+        c2.setPreferredWidth(80);
+        TableColumn c3 = noticeTable.getColumnModel().getColumn(2);
+        c3.setPreferredWidth(40);
+        TableColumn c4 = noticeTable.getColumnModel().getColumn(3);
+        c4.setPreferredWidth(40);
+        TableColumn c5 = noticeTable.getColumnModel().getColumn(4);
+        c5.setPreferredWidth(20);
+        
+        System.out.println(c1.getPreferredWidth());
+        System.out.println(noticeTable.getColumnModel().getColumn(0).getPreferredWidth());
+        System.out.println(c2.getPreferredWidth());
+        System.out.println(noticeTable.getColumnModel().getColumn(1).getPreferredWidth());
+        System.out.println(noticeTable.getColumnModel().getColumn(1).getHeaderValue());
+        
+        
         JTableHeader header = noticeTable.getTableHeader();
-        header.setBackground(new Color(255, 255, 0));
-       noticeTable.setBackground(new Color(255, 228, 196));
+        Dimension headerSize = header.getPreferredSize();
+        headerSize.height = 30; // 원하는 높이로 설정
+        
+        header.setPreferredSize(headerSize);
+        header.setBackground(new Color(96, 140, 255));
+        header.setForeground(Color.white);
+        header.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        
+        noticeTable.setBackground(Color.white);
+        noticeTable.setFont(new Font("맑은 고딕", Font.PLAIN, 14));
+        int rowHeight = 30; // 원하는 행 높이를 지정
+        noticeTable.setRowHeight(rowHeight);
         
         int offset = (pageNumber - 1) * PAGE_SIZE;
-
+        
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
             String sql;
@@ -145,8 +176,15 @@ public class NoticeFrame {
 
         return noticeTable;
     }
-
-    
+    // 열의 길이를 조정하는 함수
+    private static void setColumnWidth(JTable table, int columnIndex, int width) {
+       int tableWidth = table.getWidth();
+       int columnWidth = (tableWidth * width) / 100;
+        TableColumn column = table.getColumnModel().getColumn(columnIndex);
+        column.setPreferredWidth(width);
+        column.setMinWidth(width);
+        column.setMaxWidth(width);
+    }
     
     
     public static JTextArea getNoticeDetails(String title) {
@@ -285,10 +323,10 @@ public class NoticeFrame {
         });
         
         JButton voiceButton = new JButton("음성");
-       voiceButton .setBackground(new Color(135, 206, 235)); // 스카이블루 배경
-      voiceButton .setForeground(Color.BLACK); // 검은 글꼴
+       voiceButton .setBackground(new Color(96, 140, 255)); // 스카이블루 배경
+       voiceButton .setForeground(Color.white); // 검은 글꼴
        voiceButton .setOpaque(true);
-      voiceButton .setBorderPainted(false);
+       voiceButton .setBorderPainted(false);
        voiceButton .addActionListener(e -> {
             searchQuery = searchField.getText().trim(); // 사용자가 입력한 검색어 가져오기
             searchType = (String) searchComboBox.getSelectedItem(); // 검색 유형 가져오기
@@ -370,10 +408,10 @@ public class NoticeFrame {
         });
         searchField = new JTextField(20);
         searchButton = new JButton("검색");
-       searchButton.setBackground(new Color(135, 206, 235)); // 스카이블루 배경
-       searchButton.setForeground(Color.BLACK); // 검은 글꼴
+        searchButton.setBackground(new Color(96, 140, 255)); // 스카이블루 배경
+        searchButton.setForeground(Color.white); // 검은 글꼴
         searchButton.setOpaque(true);
-       searchButton.setBorderPainted(false);
+        searchButton.setBorderPainted(false);
         searchButton.addActionListener(e -> {
             searchQuery = searchField.getText().trim(); // 사용자가 입력한 검색어 가져오기
             searchType = (String) searchComboBox.getSelectedItem(); // 검색 유형 가져오기
@@ -402,10 +440,10 @@ public class NoticeFrame {
         JTable noticeTable = getNoticeTable();
         
         JButton refreshButton = new JButton("새로고침");
-        refreshButton.setBackground(new Color(135, 206, 235)); // 스카이블루 배경
-       refreshButton.setForeground(Color.BLACK); // 검은 글꼴
-       refreshButton.setOpaque(true);
-       refreshButton.setBorderPainted(false);
+        refreshButton.setBackground(new Color(96, 140, 255)); // 스카이블루 배경
+        refreshButton.setForeground(Color.white); // 검은 글꼴
+        refreshButton.setOpaque(true);
+        refreshButton.setBorderPainted(false);
         refreshButton.addActionListener(e -> {
             pageNumber = 1; // 페이지 번호를 초기화합니다.
             isNoticesLoaded = false; // 공지사항을 다시 로드하기 위한 플래그 초기화
@@ -420,7 +458,11 @@ public class NoticeFrame {
                 String title = (String) noticeTable.getModel().getValueAt(rowIndex, 1);
                 incrementViewCount(title);
                 JTextArea noticeContent = NoticeFrameDb.getNoticeDetails(title);
+                noticeContent.setBackground(Color.white);
+                noticeContent.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+                
                 JScrollPane scrollPane = new JScrollPane(noticeContent);
+                scrollPane.setBackground(Color.white);
 
                 JPanel contentPanel = new JPanel(new BorderLayout());
                 try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang")) {
@@ -429,10 +471,20 @@ public class NoticeFrame {
                     statement.setString(1, title);
                     ResultSet rs = statement.executeQuery();
                     if (rs.next()) {
-                        String additionalInfo = String.format("번호: %d | 제목: %s | 작성자: %s | 작성일: %s | 조회수: %d",
-                                rs.getInt("id"), rs.getString("title"), rs.getString("author"), rs.getString("date"), rs.getInt("viewCount"));
+                       JPanel titleContainer = new JPanel(); 
+                       titleContainer.setLayout(new BorderLayout());
+                       
+                        String additionalInfo = String.format("번호 : %d   제목 : %s   작성자 : %s   작성일 : %s   조회수 : %d",
+                              rs.getInt("id"), rs.getString("title"), rs.getString("author"), rs.getString("date"), rs.getInt("viewCount"));
                         JLabel additionalLabel = new JLabel(additionalInfo);
-                        contentPanel.add(additionalLabel, BorderLayout.NORTH);
+                        additionalLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
+                        additionalLabel.setForeground(new Color(60,60,60));
+                        additionalLabel.setBackground(new Color(96,140,255));
+                        
+                        JPanel addtionalLabelContainer = new JPanel(new BorderLayout());
+                        addtionalLabelContainer.add(additionalLabel, BorderLayout.EAST);
+                        
+                        contentPanel.add(addtionalLabelContainer, BorderLayout.NORTH);
                         contentPanel.add(scrollPane, BorderLayout.CENTER);
                     }
                 } catch (Exception ex) {
