@@ -30,6 +30,8 @@ public class LostThingsReport extends JPanel {
         JLabel headline = new JLabel("분실물 신고하기", SwingConstants.CENTER);
         headline.setFont(new Font("Malgun Gothic", Font.BOLD, 30));
         headline.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        headline.setOpaque(true);
+        headline.setBackground(new Color(180, 210, 255));
         add(headline, BorderLayout.NORTH);
 
         JPanel postPanel = new JPanel();
@@ -90,6 +92,7 @@ public class LostThingsReport extends JPanel {
         });
         postPanel.setBackground(new Color(180, 210, 255));
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(new Color(180, 210, 255));
         buttonPanel.add(postButton);
         add(buttonPanel, BorderLayout.SOUTH);
     }

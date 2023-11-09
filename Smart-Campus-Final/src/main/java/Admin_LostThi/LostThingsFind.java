@@ -33,6 +33,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class LostThingsFind extends JPanel {
     private JTable table;
@@ -43,8 +45,7 @@ public class LostThingsFind extends JPanel {
     private JButton seButton;
     private JPanel categoryPanel;
     private JPanel searchPanel;
-
-    // 생성자 메소드입니다.
+    
     public LostThingsFind() {
         mainPanel = this;
         setLayout(new BorderLayout());
@@ -59,6 +60,11 @@ public class LostThingsFind extends JPanel {
         String[] searchOptions = {"제목", "내용", "작성자"};
         JComboBox<String> searchComboBox = new JComboBox<>(searchOptions);
         searchField = new JTextField(20);
+        
+        JButton voiceSearchButton = new JButton("음성 인식");
+        voiceSearchButton.addActionListener(e -> startSpeechRecognition());
+        searchPanel.add(voiceSearchButton, 0);
+        
         seButton = new JButton("검색");
         seButton.addActionListener(e -> {
             String selectedOption = (String) searchComboBox.getSelectedItem();
@@ -75,66 +81,66 @@ public class LostThingsFind extends JPanel {
         });
         JButton refreshButton = new JButton("새로고침");
         refreshButton.addActionListener(e -> loadDataFromDatabase1(currentCategory));
+        
+        voiceSearchButton.setBackground(new Color(180, 210, 255));
+        voiceSearchButton.setOpaque(true);
+        voiceSearchButton.setBorderPainted(false); 
+
+        seButton.setBackground(new Color(180, 210, 255));
+        seButton.setOpaque(true);
+        seButton.setBorderPainted(false); 
+
+        refreshButton.setBackground(new Color(180, 210, 255));
+        refreshButton.setOpaque(true);
+        refreshButton.setBorderPainted(false);
+        
         searchPanel.add(searchComboBox);
         searchPanel.add(searchField);
+        searchPanel.add(voiceSearchButton);
         searchPanel.add(seButton);
         searchPanel.add(refreshButton);
 
         add(categoryPanel, BorderLayout.NORTH);
         add(searchPanel, BorderLayout.SOUTH);
 
-        // 테이블 모델을 초기화하고 JTable을 생성합니다.
         tableModel = new DefaultTableModel(new Object[]{"번호", "제목", "내용", "작성자", "작성일", "조회수"}, 0);
         table = new JTable(tableModel);
-        
-        
+              
         table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
-                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value,
-                                                                            isSelected, hasFocus, row, column);
-                label.setBackground(Color.YELLOW); // 헤더의 배경색을 노란색으로 설정
+            public Component getTableCellRendererComponent(JTable table, Object value,boolean isSelected, boolean hasFocus,int row, int column)
+            {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value,isSelected, hasFocus, row, column);
+                label.setBackground(new Color(180, 210, 255));
                 label.setHorizontalAlignment(JLabel.CENTER);
                 return label;
             }
         });
-
-        // 셀의 배경색을 변경합니다.
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value,
-                                                                  isSelected, hasFocus, row, column);
+                boolean isSelected, boolean hasFocus,int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value,isSelected, hasFocus, row, column);
                 if (!isSelected) {
-                    c.setBackground(row % 2 == 0 ? new Color(255, 240, 245) : Color.WHITE); // 셀의 배경색을 번갈아 가며 설정
+                    c.setBackground(row % 2 == 0 ? new Color(255, 240, 245) : Color.WHITE); 
                 } else {
-                    c.setBackground(table.getSelectionBackground()); // 선택된 셀의 배경색은 디폴트 유지
+                    c.setBackground(table.getSelectionBackground());
                 }
                 return c;
             }
         });
-        
-        // 컬럼 너비를 설정합니다.
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        table.getColumnModel().getColumn(2).setPreferredWidth(400);
-        table.getColumnModel().getColumn(3).setPreferredWidth(200);
-        table.getColumnModel().getColumn(4).setPreferredWidth(217);
-        table.getColumnModel().getColumn(5).setPreferredWidth(50);
-        // 테이블에 마우스 리스너를 추가합니다.
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int rowIndex = table.getSelectedRow();
-                int postId = (int) tableModel.getValueAt(rowIndex, 0);
-                String content = (String) tableModel.getValueAt(rowIndex, 2);
-                showContentInPanel(content);
+                if (e.getClickCount() == 1) { 
+                    int rowIndex = table.getSelectedRow();
+                    int postId = (int) tableModel.getValueAt(rowIndex, 0);
+                    incrementViewCount(postId, currentCategory); 
+                    showContentInPanel(postId);
+                }
             }
         });
-        // 테이블을 스크롤 패인에 추가하고 메인 패널에 추가합니다.
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
     private void startSpeechRecognition() {
@@ -159,20 +165,17 @@ public class LostThingsFind extends JPanel {
             final JOptionPane pane = new JOptionPane("음성을 입력해주세요.", JOptionPane.INFORMATION_MESSAGE);
             final JDialog dialog = pane.createDialog(null, "알림");
 
-            // Timer를 사용하여 1~2초 후에 JOptionPane을 자동으로 닫습니다.
             new Timer(1000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     dialog.dispose();
                 }
-            }) {{
+              }) 
+            {{
                 setRepeats(false); // Timer가 한 번만 실행되도록 설정
                 start(); // Timer 시작
             }};
-
-            dialog.setVisible(true); // 알림창 표시
-            
-            // TODO: 녹음 시간 설정 (여기서는 5초로 설정)
+            dialog.setVisible(true); // 알림창 표시          
             long end = System.currentTimeMillis() + 5000;  
             while (System.currentTimeMillis() < end) {
                 numBytesRead = microphone.read(data, 0, data.length);
@@ -185,9 +188,7 @@ public class LostThingsFind extends JPanel {
 
             File wavFile1 = new File("recoding/recording.wav");  // 저장할 파일 경로 지정
             AudioSystem.write(ais, javax.sound.sampled.AudioFileFormat.Type.WAVE, wavFile);
-
             microphone.close();
-            
             SpeechClient speech = SpeechClient.create();
             byte[] audioBytes = Files.readAllBytes(Paths.get("recoding/recoding.wav"));
             RecognitionConfig config = RecognitionConfig.newBuilder()
@@ -223,7 +224,6 @@ public class LostThingsFind extends JPanel {
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
              Statement stmt = conn.createStatement()) {
-            // 검색 조건이 있는 경우 SQL 쿼리 수정
             String query = "SELECT * FROM " + tableName;
             if (searchColumn != null && !searchColumn.isEmpty() && searchText != null && !searchText.isEmpty()) {
                 query += " WHERE " + searchColumn + " LIKE '%" + searchText + "%'";
@@ -263,46 +263,82 @@ public class LostThingsFind extends JPanel {
         String sql = "UPDATE " + category + " SET views = views + 1 WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(url, user, password);
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-               pstmt.setInt(1, postId);
-               int updatedRows = pstmt.executeUpdate();
-               
-               if (updatedRows == 0) {
-                   System.out.println("No rows updated. Check if the post with ID " + postId + " exists.");
-               }
-           } catch (Exception e) {
-               e.printStackTrace();
-           }
-       }
-    private void showContentInPanel(String content) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, postId);
+            int updatedRows = pstmt.executeUpdate();
+            
+            if (updatedRows == 0) {
+                System.out.println("No rows updated. Check if the post with ID " + postId + " exists.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void showContentInPanel(int postId) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JTextArea textArea = new JTextArea(10, 40);
-                textArea.setText(content);
-                textArea.setWrapStyleWord(true);
-                textArea.setLineWrap(true);
-                textArea.setCaretPosition(0);
-                textArea.setEditable(false);
-                JScrollPane scrollPane = new JScrollPane(textArea);
+                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang")) {
+                    String sql = "SELECT * FROM " + currentCategory + " WHERE id = ?";
+                    PreparedStatement statement = connection.prepareStatement(sql);
+                    statement.setInt(1, postId);
+                    ResultSet rs = statement.executeQuery();
 
-                JButton backButton = new JButton("뒤로 가기");
-                backButton.addActionListener(event -> {
-                    mainPanel.removeAll();
-                    mainPanel.setLayout(new BorderLayout());
-                    mainPanel.add(categoryPanel, BorderLayout.NORTH);
-                    mainPanel.add(new JScrollPane(table), BorderLayout.CENTER);
-                    mainPanel.add(searchPanel, BorderLayout.SOUTH);
-                    mainPanel.revalidate();
-                    mainPanel.repaint();
-                });
-                mainPanel.setLayout(new BorderLayout());
-                mainPanel.removeAll(); // 이전에 추가된 모든 컴포넌트를 제거합니다.
-                mainPanel.add(scrollPane, BorderLayout.CENTER);
-                mainPanel.add(backButton, BorderLayout.SOUTH);
-                mainPanel.revalidate();
-                mainPanel.repaint();
+                    if (rs.next()) {
+                        String content = rs.getString("content");
+                        String title = rs.getString("title");
+                        String author = rs.getString("author");
+                        Timestamp postDate = rs.getTimestamp("post_date");
+                        int views = rs.getInt("views");
+
+                        JTextArea textArea = new JTextArea(10, 40);
+                        textArea.setText(content);
+                        textArea.setWrapStyleWord(true);
+                        textArea.setLineWrap(true);
+                        textArea.setCaretPosition(0);
+                        textArea.setEditable(false);
+                        textArea.setBackground(Color.WHITE);
+
+                        JScrollPane scrollPane = new JScrollPane(textArea);
+                        scrollPane.getViewport().setBackground(Color.WHITE);
+
+                        String additionalInfo = String.format("번호: %d | 제목: %s | 작성자: %s | 작성일: %s | 조회수: %d",
+                                postId, title, author, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(postDate), views);
+                        JLabel additionalLabel = new JLabel(additionalInfo);
+                        additionalLabel.setFont(new Font("Serif", Font.BOLD, 20));
+                        additionalLabel.setOpaque(true); 
+                        additionalLabel.setBackground(new Color(180, 210, 255));
+                        additionalLabel.setForeground(Color.black); 
+
+                        JPanel contentPanel = new JPanel(new BorderLayout());
+                        contentPanel.setBackground(Color.WHITE);
+                        contentPanel.add(additionalLabel, BorderLayout.NORTH);
+                        contentPanel.add(scrollPane, BorderLayout.CENTER);
+
+                        JButton backButton = new JButton("뒤로 가기");
+                        backButton.addActionListener(event -> {
+                            mainPanel.removeAll();
+                            mainPanel.setLayout(new BorderLayout());
+                            mainPanel.add(categoryPanel, BorderLayout.NORTH);
+                            mainPanel.add(new JScrollPane(table), BorderLayout.CENTER);
+                            mainPanel.add(searchPanel, BorderLayout.SOUTH);
+                            mainPanel.revalidate();
+                            mainPanel.repaint();
+                        });
+
+                        contentPanel.add(backButton, BorderLayout.SOUTH);
+                        mainPanel.removeAll();
+                        mainPanel.add(contentPanel, BorderLayout.CENTER);
+                        mainPanel.revalidate();
+                        mainPanel.repaint();
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "상세 정보를 가져오는 중 오류가 발생했습니다.");
+                }
             }
         });
-    }	
+    }
+
+
 }
