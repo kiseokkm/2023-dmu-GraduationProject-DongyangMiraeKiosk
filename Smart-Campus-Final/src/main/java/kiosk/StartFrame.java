@@ -103,11 +103,10 @@ public class StartFrame extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(0, 40, 5, 0);
         pnlContainer.add(lblTitle, gridBagConstraints);
-        
-        
+      
         // 동미대환영 Text
         lblWelcomeText.setFont(new Font("맑은 고딕", Font.BOLD, 32));
-        lblWelcomeText.setText("동양미래대학교 방문을 환영합니다");
+        lblWelcomeText.setText("안녕하세요 동양미래대학교입니다.");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;

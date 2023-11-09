@@ -142,6 +142,7 @@ public class LostThingsFind extends JPanel {
             }
         });
         add(new JScrollPane(table), BorderLayout.CENTER);
+        loadDataFromDatabase1("found_items");
     }
     private void startSpeechRecognition() {
         try {
@@ -259,9 +260,7 @@ public class LostThingsFind extends JPanel {
         String url = "jdbc:mysql://localhost:3306/self_order_kiosk?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
         String user = "root";
         String password = "dongyang";
-
         String sql = "UPDATE " + category + " SET views = views + 1 WHERE id = ?";
-
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, postId);
@@ -298,6 +297,7 @@ public class LostThingsFind extends JPanel {
                         textArea.setCaretPosition(0);
                         textArea.setEditable(false);
                         textArea.setBackground(Color.WHITE);
+                        textArea.setFont(new Font("Serif", Font.PLAIN, 20));
 
                         JScrollPane scrollPane = new JScrollPane(textArea);
                         scrollPane.getViewport().setBackground(Color.WHITE);
@@ -339,6 +339,4 @@ public class LostThingsFind extends JPanel {
             }
         });
     }
-
-
 }
