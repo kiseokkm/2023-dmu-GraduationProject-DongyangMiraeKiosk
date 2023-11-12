@@ -1,6 +1,7 @@
 package kiosk;
 
 import java.awt.BorderLayout;
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,7 +31,7 @@ import Kiosk_AcademicSchedule.AcademicScheduleFrame;
 import Kiosk_Club.HobbyClub;
 import Kiosk_graduation.GraduationMain;
 import Kisok_Scholarship.ScholarshipMain;
-
+import Kiosk_Metro.*;
 import java.awt.FlowLayout;
 
 public class MenuFrame extends javax.swing.JFrame implements StateObserver {
@@ -41,84 +42,89 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   java.util.ArrayList<models.Item> itemsClass;
   java.util.ArrayList<models.Item> itemsFood;
   java.util.ArrayList<models.Item> itemsMap;
-
+  private javax.swing.JPanel pnlMetro;
+  
   public MenuFrame() {
-	    try {
-	        app.Global.setAppIcon(this);
-	        initModels();
-	        initComponents();
-
-	        // 모든 탭들을 초기화
-	        initAllTabs();
-	        initState();
-	    } catch (Exception e) {
-	        e.printStackTrace(); // 오류 메세지 출력
-	        JOptionPane.showMessageDialog(this, "오류발생" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-	    }
-	}
+       try {
+           app.Global.setAppIcon(this);
+           initModels();
+           initComponents();
+           
+           // 모든 탭들을 초기화
+           initAllTabs();
+           initState();
+       } catch (Exception e) {
+           e.printStackTrace(); // 오류 메세지 출력
+           JOptionPane.showMessageDialog(this, "오류발생" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+       }
+   }
   private void initAllTabs() {
-	    // 공지사항 패널 초기화
-	    NoticeFrame.showNoticeTableOnPanel(pnlNotice);
-	    
-	    // 취미동아리 패널 초기화
-	    initHobbyClubPanel();
+       // 공지사항 패널 초기화
+       NoticeFrame.showNoticeTableOnPanel(pnlNotice);
+       
+       // 취미동아리 패널 초기화
+       initHobbyClubPanel();
 
-	    // 장학/등록 패널 초기화
-	    initScholarshipPanel();
+       // 장학/등록 패널 초기화
+       initScholarshipPanel();
 
-	    // 교직원 검색 패널 초기화
-	    initClassPanel();
-	   
-	    // 학사 일정 패널 초기화
-	    initAcademicSchedulePanel();
+       // 교직원 검색 패널 초기화
+       initClassPanel();
+      
+       // 학사 일정 패널 초기화
+       initAcademicSchedulePanel();
 
-	    // 졸업정보 패널 초기화
-	    initGraduationPanel();
-	}
+       // 졸업정보 패널 초기화
+       initGraduationPanel();
+       
+       // 대중교통 패널 초기화
+       initMetroPanel();
+   }
   private void initHobbyClubPanel() {
-	    HobbyClub hobbyClubPanel = new HobbyClub();
-	    pnlHobbyClub.setLayout(new BorderLayout());
-	    pnlHobbyClub.add(hobbyClubPanel, BorderLayout.CENTER);
-	}
+       HobbyClub hobbyClubPanel = new HobbyClub();
+       pnlHobbyClub.setLayout(new BorderLayout());
+       pnlHobbyClub.add(hobbyClubPanel, BorderLayout.CENTER);
+   }
   
   private void initScholarshipPanel() {
-	    ScholarshipMain scholarshipPanel = new ScholarshipMain();
-	    pnlScholarship.setLayout(new BorderLayout());
-	    pnlScholarship.add(scholarshipPanel, BorderLayout.CENTER);
-	}
+       ScholarshipMain scholarshipPanel = new ScholarshipMain();
+       pnlScholarship.setLayout(new BorderLayout());
+       pnlScholarship.add(scholarshipPanel, BorderLayout.CENTER);
+   }
   private void initClassPanel() {
-	    EmergencyClassroom emergencyClassroom = new EmergencyClassroom();
-	    pnlClass.removeAll();
-	    pnlClass.setLayout(new BorderLayout());
-	    pnlClass.add(emergencyClassroom, BorderLayout.CENTER);
-	    pnlClass.revalidate();
-	    pnlClass.repaint();
-	}
-
-	private void initAcademicSchedulePanel() {
-	    AcademicScheduleFrame academicScheduleFrame = new AcademicScheduleFrame();         
-	    pnlAcademicSchedule.removeAll();
-	    pnlAcademicSchedule.setLayout(new BorderLayout());
-	    pnlAcademicSchedule.add(academicScheduleFrame, BorderLayout.CENTER);
-	    pnlAcademicSchedule.revalidate();
-	    pnlAcademicSchedule.repaint();
-	}
-	
-	private void initGraduationPanel() {
-	    GraduationMain graduationMainPanel = new GraduationMain();
-	    pnlGraduation.removeAll();
-	    pnlGraduation.setLayout(new BorderLayout());
-	    pnlGraduation.add(graduationMainPanel, BorderLayout.CENTER);
-	    pnlGraduation.revalidate();
-	    pnlGraduation.repaint();
-	}
-
+       EmergencyClassroom emergencyClassroom = new EmergencyClassroom();
+       pnlClass.removeAll();
+       pnlClass.setLayout(new BorderLayout());
+       pnlClass.add(emergencyClassroom, BorderLayout.CENTER);
+       pnlClass.revalidate();
+       pnlClass.repaint();
+   }
+   private void initAcademicSchedulePanel() {
+       AcademicScheduleFrame academicScheduleFrame = new AcademicScheduleFrame();         
+       pnlAcademicSchedule.removeAll();
+       pnlAcademicSchedule.setLayout(new BorderLayout());
+       pnlAcademicSchedule.add(academicScheduleFrame, BorderLayout.CENTER);
+       pnlAcademicSchedule.revalidate();
+       pnlAcademicSchedule.repaint();
+   }
+   private void initGraduationPanel() {
+       GraduationMain graduationMainPanel = new GraduationMain();
+       pnlGraduation.removeAll();
+       pnlGraduation.setLayout(new BorderLayout());
+       pnlGraduation.add(graduationMainPanel, BorderLayout.CENTER);
+       pnlGraduation.revalidate();
+       pnlGraduation.repaint();
+   }
+   private void initMetroPanel() {
+       Kiosk_Metro.MainMain metroMain = new Kiosk_Metro.MainMain(); // MainMain 인스턴스 생성
+       pnlMetro.setLayout(new BorderLayout()); // pnlMetro에 BorderLayout 레이아웃 설정
+       pnlMetro.add(metroMain.getMainPanel(), BorderLayout.CENTER); // MainMain의 탭 패널을 pnlMetro에 추가
+   }
   @SuppressWarnings("unchecked")
   private javax.swing.JPanel pnlLostThings;
   private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
     
-
     pnlContent = new javax.swing.JPanel();
     tabbedPane = new javax.swing.JTabbedPane();
     pnlNotice = new javax.swing.JPanel();
@@ -133,6 +139,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     lblTotal = new javax.swing.JLabel();
     lblTotalValue = new javax.swing.JLabel();
     pnlFooter = new javax.swing.JPanel();
+    pnlMetro = new javax.swing.JPanel();
+    
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Menu");
@@ -156,7 +164,33 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlNotice.setPreferredSize(new java.awt.Dimension(560, 500));
     pnlNotice.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("공지사항", pnlNotice);
+       
+    pnlMetro = new javax.swing.JPanel();
+    pnlMetro.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
+    pnlMetro.setLayout(new java.awt.BorderLayout());
+
+    // MainMain 클래스의 인스턴스를 생성합니다.
+    Kiosk_Metro.MainMain metroMain = new Kiosk_Metro.MainMain();
+
+    // MainMain 클래스에서 탭 패널을 가져와 pnlMetro에 추가합니다.
+    pnlMetro.add(metroMain.getMainPanel(), BorderLayout.CENTER);
+
+    // 탭 패널에 "대중교통" 탭을 추가합니다.    
+    pnlAcademicSchedule = new javax.swing.JPanel();
+    pnlAcademicSchedule.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
+    pnlAcademicSchedule.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
+    tabbedPane.addTab("학사 일정", pnlAcademicSchedule);
     
+    tabbedPane.addTab("대중교통", pnlMetro);
+    
+    // Campus Map Tab using JavaFX WebView
+    CampusMapFXFrame campusMapFXFrame = new CampusMapFXFrame();
+    tabbedPane.addTab("캠퍼스 지도", campusMapFXFrame);
+    
+    pnlFood.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
+    pnlFood.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
+    tabbedPane.addTab("학식 정보", pnlFood);
+ 
     pnlScholarship = new javax.swing.JPanel();
     pnlScholarship.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlScholarship.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
@@ -171,19 +205,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlClass.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("교직원 검색", pnlClass);
 
-    pnlFood.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
-    pnlFood.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
-    tabbedPane.addTab("학식 정보", pnlFood);
 
-    pnlMap.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
-    pnlMap.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
-    tabbedPane.addTab("캠퍼스 지도", pnlMap);
-    
-    pnlAcademicSchedule = new javax.swing.JPanel();
-    pnlAcademicSchedule.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
-    pnlAcademicSchedule.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
-    tabbedPane.addTab("학사 일정", pnlAcademicSchedule);
-    
+
     pnlGraduation = new javax.swing.JPanel();
     pnlGraduation.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlGraduation.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
@@ -252,89 +275,53 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     getAllOrderedItems();
   }
   private void initCustomComponents() {
-	    itemsNoticeFrame.forEach((item) -> {
-	      BtnItem btnItem = new BtnItem(item);
-	      btnItem.addActionListener((java.awt.event.ActionEvent evt) -> itemActionPeformed(item));
-	      pnlNotice.add(btnItem);
-	    });
-	}
+       itemsNoticeFrame.forEach((item) -> {
+         BtnItem btnItem = new BtnItem(item);
+         btnItem.addActionListener((java.awt.event.ActionEvent evt) -> itemActionPeformed(item));
+         pnlNotice.add(btnItem);
+       });
+   }
   private void tabbedPaneStateChanged(javax.swing.event.ChangeEvent evt) {
-	    int tabIndex = tabbedPane.getSelectedIndex();
+       int tabIndex = tabbedPane.getSelectedIndex();
 
-	    if (tabIndex == 0) {
-	        NoticeFrame.resetNoticeLoadedFlag();
-	        NoticeFrame.showNoticeTableOnPanel(pnlNotice);
-	    }
+       if (tabIndex == 0) {
+           NoticeFrame.resetNoticeLoadedFlag();
+           NoticeFrame.showNoticeTableOnPanel(pnlNotice);
+       }
       
       if (tabIndex == 1) {
-    	    ScholarshipMain scholarshipPanel = new ScholarshipMain();
-    	    pnlScholarship.removeAll();
-    	    pnlScholarship.setLayout(new BorderLayout());
-    	    pnlScholarship.add(scholarshipPanel, BorderLayout.CENTER);
-    	    pnlScholarship.revalidate();
-    	    pnlScholarship.repaint();
-    	}
-
-
-      if (tabIndex == 2) { // "교직원 검색" 탭이 선택되었을 때
-    	    if (pnlClass.getComponentCount() == 0) { // 패널에 아무 컴포넌트도 없는 경우만 추가
-    	        EmergencyClassroom emergencyClassroom = new EmergencyClassroom();
-    	        pnlClass.setLayout(new BorderLayout());
-    	        pnlClass.add(emergencyClassroom, BorderLayout.CENTER);
-    	        pnlClass.revalidate();
-    	        pnlClass.repaint();
-    	    }
-    	}
-
-	       if (tabIndex == 3) { // "취미동아리 / C.Ⅰ. Lab" 탭이 선택되었을 때
-	    	    HobbyClub hobbyClubPanel = new HobbyClub();
-	    	    pnlHobbyClub.removeAll();
-	    	    pnlHobbyClub.setLayout(new BorderLayout());
-	    	    pnlHobbyClub.add(hobbyClubPanel, BorderLayout.CENTER);
-	    	    pnlHobbyClub.revalidate();
-	    	    pnlHobbyClub.repaint();
-	    	}
-       
-	       if (tabIndex == 4) {
-	    	    // "학사 일정" 탭이 선택되었을 때
-	    	    AcademicScheduleFrame academicScheduleFrame = new AcademicScheduleFrame();         
-	    	    pnlAcademicSchedule.removeAll();
-	    	    pnlAcademicSchedule.setLayout(new BorderLayout());
-	    	    pnlAcademicSchedule.add(academicScheduleFrame, BorderLayout.CENTER);
-	    	    pnlAcademicSchedule.revalidate();
-	    	    pnlAcademicSchedule.repaint();
-	    	}
-
-	    	if (tabIndex == 5 && itemsMap == null) {
-	    	    java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-	    	    try {
-	    	        java.net.URI uri = new java.net.URI("file:///C:/jolspring/Smart%20Campus_Map.html");
-	    	        desktop.browse(uri);
-	    	    } catch (java.net.URISyntaxException | java.io.IOException ex) {
-	    	        ex.printStackTrace();
-	    	    }
-	    	}       
-       if (tabIndex == 6) { 
-           GraduationMain graduationMainPanel = new GraduationMain();
-           pnlGraduation.removeAll();
-           pnlGraduation.setLayout(new BorderLayout());
-           pnlGraduation.add(graduationMainPanel, BorderLayout.CENTER);
-           pnlGraduation.revalidate();
-           pnlGraduation.repaint();
+           ScholarshipMain scholarshipPanel = new ScholarshipMain();
+           pnlScholarship.removeAll();
+           pnlScholarship.setLayout(new BorderLayout());
+           pnlScholarship.add(scholarshipPanel, BorderLayout.CENTER);
+           pnlScholarship.revalidate();
+           pnlScholarship.repaint();
        }
 
 
-   }  
-  
-  		
-  
-  
+      if (tabIndex == 2) { // "교직원 검색" 탭이 선택되었을 때
+           if (pnlClass.getComponentCount() == 0) { // 패널에 아무 컴포넌트도 없는 경우만 추가
+               EmergencyClassroom emergencyClassroom = new EmergencyClassroom();
+               pnlClass.setLayout(new BorderLayout());
+               pnlClass.add(emergencyClassroom, BorderLayout.CENTER);
+               pnlClass.revalidate();
+               pnlClass.repaint();
+           }
+       }
+          if (tabIndex == 4) { // "학식 정보" 탭이 선택되었을 때
+              pnlFood.removeAll(); // 기존 내용을 제거
+              JPanel webPanel = CafeTeria.createWebPanel(); // CafeTeria 웹 패널을 생성
+              pnlFood.setLayout(new BorderLayout()); // pnlFood에 BorderLayout을 설정
+              pnlFood.add(webPanel, BorderLayout.CENTER); // 생성된 웹 패널을 pnlFood에 추가
+              pnlFood.revalidate();
+              pnlFood.repaint();
+          }
+  }
   private void itemActionPeformed(models.Item item) {
     CustomizeDialog customizeDialog = new CustomizeDialog(item);
     customizeDialog.addObserver(this);
     customizeDialog.setVisible(true);
   }
-
   private void getAllOrderedItems() {
     java.util.ArrayList<models.OrderDetail> orderedItems = StateManager.getOrderedItems();
     if (orderedItems != null) {
@@ -372,9 +359,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   private javax.swing.JPanel pnlAcademicSchedule;
   private javax.swing.JPanel pnlHobbyClub;
   private javax.swing.JPanel pnlGraduation;
-
+  private javax.swing.JPanel pnlmetro;
 }
-
 class BtnItem extends javax.swing.JButton {
 
   BtnItem(models.Item item) {

@@ -27,7 +27,7 @@ public class FindIdFrame extends JFrame {
     private void initComponents() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4, 2, 5, 5));
-        panel.setBackground(new Color(96, 140, 255)); 
+        panel.setBackground(new Color(180, 210, 255)); 
 
         JLabel lblStudentId = new JLabel("학번:");
         JLabel lblName = new JLabel("이름:");

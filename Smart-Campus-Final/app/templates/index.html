@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="upgrade-insecure-requests" http-equiv="Content-Security-Policy"/>
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/variables.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/intro.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/map.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/menu-bars.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/tag-filter.css') }}" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='css/top-bars.css') }}" rel="stylesheet"/>
+<script src="{{ url_for('static', filename='js/filter.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/menuBtn.js') }}"></script>
+<script src="{{ url_for('static', filename='js/backToTop.js') }}"></script>
+<title>동양미래대학교 학식 및 맛집추천</title>
+<meta content="동양미래대학교주변 식당 찾아보기" name="description"/>
+<script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=kMMvX1z2Zv4xi7UVK9LvPndts9fFC7FG7KFc7gFb" type="text/javascript"></script>
+<script src="https://openapi.map.naver.com/openapi/v3/maps-geocoder.js" type="text/javascript"></script>
+<script crossorigin="anonymous" src="https://kit.fontawesome.com/b7f69e0a07.js"></script>
+<script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+<style>
+        /* 추가한 스타일링 */
+        .table-bordered th,
+        .table-bordered td {
+            border: 8px solid #dee2e6;
+        }
+
+        /* 표를 가운데 정렬 */
+        .table-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 25vh;
+        }
+
+        /* 제목 스타일링 */
+        .table-title {
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        body {
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 90px;
+            margin-bottom: 15px;
+            /* Adjust this value to control how far down the text is */
+            font-size: 35px;
+            /* Adjust this value to change the font size */
+        }
+    </style>
+<style>
+.main-box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.restaurant-lists {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 40px;
+    opacity: 1;
+    margin-top:20px;
+    transition: all ease-out 0.3s;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.restaurant-lists.anim-out {
+    opacity: 0;
+    transform: scale(0) translateY(23px);
+}
+
+.restaurant-list {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 80px;
+    transform: scale(1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.restaurant-list.invisible {
+    display: none;
+}
+
+.restaurant-list__tags {
+    display: flex;
+    position: absolute;
+    width: 98%;
+    top:0;
+    left:0;
+    margin: 10px;
+}
+
+.restaurant-list__tag {
+    font-size: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 30px;
+    background-color: var(--tag-color);
+    opacity: 0.8;
+    border-radius: 30px;
+    margin-right: 10px;
+}
+
+.restaurant-list__tag .new {
+    width: 35px;
+    height: 15px;
+    font-size: 10px;
+    border-radius: 20px;
+    background-color: rgba(255, 0, 0, 0.9);
+    color: white;
+    position: absolute;
+    right: 0;
+  }
+
+  .restaurant-list:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .restaurant-list__imgBox {
+    width: 100%;
+    height: 230px;
+    border-radius: var(--list-border-radius);
+    overflow: hidden;
+  }
+
+  .restaurant-list__img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .restaurant-list__textBox {
+    position: absolute;
+    bottom: -50px;
+    text-align: center;
+    width: 90%;
+    height: 100px;
+    background-color: white;
+    border-radius: var(--list-border-radius);
+    box-shadow: 2px 4px 50px rgba(0, 0, 0, 0.3);
+  }
+
+  .restaurant-list__textBox__name {
+    display: block;
+    margin: 15px 0px;
+    font-size: 30px;
+  }
+
+  .restaurant-list__textBox__sub {
+    display: block;
+    margin-bottom: 25px;
+    opacity: 0.6;
+  }
+
+  @media screen and (max-width: 530px) {
+    .restaurant-list {
+        max-width: 100%;
+    }
+  }
+
+  @media screen and (min-width:530px) {
+    .restaurant-list {
+        max-width: 370px;
+    }
+  }
+
+  .visitor {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+  }
+.intro__title {
+    font-size: 25px;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 70px;
+}
+
+.intro__sub {
+    margin: 30px 0 50px;
+    font-size: 18px;
+    text-align: center;
+    opacity: 0.6;
+}
+
+.intro__icons {
+    display: flex;
+    justify-content: center;
+}
+
+.intro__icons span {
+    margin-right: 20px;
+}
+
+.intro__icons a {
+    color: black;
+    text-decoration: none;
+}
+
+.intro__email {
+    margin-top: -45px;
+    text-align: center;
+}
+
+.intro__email a {
+    color: black;
+}
+.main-box {
+    position: relative;
+}
+
+#map-container {
+    position: fixed;
+    z-index : 2;
+    width: 100%;
+    left: 0;
+    height: 100vh;
+}
+
+#map-container.invisible {
+    display: none;
+}
+
+#map-box {
+    width:100%;
+    height: 100%;
+}
+
+#map {
+    width:100%;
+    height: 100%;
+    z-index: 4;
+}
+
+#map-quit {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color:white;
+    font-weight: 800;
+    font-size: 20px;
+    position: relative;
+    width:30px;
+    height: 30px;
+    top:70px;
+    left:10px;
+    border-radius: 50%;
+    background-color: red;
+    z-index:6;
+}
+
+
+.menu-bars__container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    width:100%;
+    height: 100vh;
+    z-index: 6;
+    background-color: var(--main-color);
+}
+
+.menu-bars__container.invisible {
+    display: none;
+}
+
+.menu-bars {
+    width:90%;
+    color: white;
+}
+
+.menu-bars a {
+    color: white;
+    text-decoration: none;
+}
+
+.menu-bars__btn__close {
+    color: white;
+    position: absolute;
+    top:25px;
+    right:25px;
+    cursor: pointer;
+}
+
+.menu-bar {
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    cursor:pointer;
+}
+
+.menu-bar a {
+    color: white;
+    text-decoration: none;
+}
+
+.menu-bar span {
+    position: relative;
+}
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+/* screens */
+@import "screen/home.css";
+
+/* components */
+@import "components/top-bars.css";
+@import "components/menu-bars.css";
+@import "components/intro.css";
+@import "components/tag-filter.css";
+@import "components/map.css";
+
+/* basic options */
+@import "reset.css";
+@import "variables.css";
+
+@font-face {
+    font-family: 'TTTtangsbudaejjigaeB';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2212@1.0/TTTtangsbudaejjigaeB.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body, .title-logo {
+    background-color: var(--body-color);
+    padding: 0px var(--body-padding);
+    font-family: 'TTTtangsbudaejjigaeB';
+}
+
+a {
+    text-decoration: none;
+}
+
+#logo-img {
+    width: 90px;
+    height: 70px;
+}
+
+.wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.wrapper.invisible {
+    display: none;
+}
+
+#back-to-top {
+    display: inline-block;
+    background-color: #FF9800;
+    width:50px;
+    height: 50px;
+    text-align: center;
+    border-radius: 5px;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    transition: background-color .3s,
+        opacity .5s, visibility .5s;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1000;
+}
+
+#back-to-top::after {
+    content: "077";
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 2em;
+    line-height: 50px;
+    color: #fff;
+}
+
+#back-to-top:hover {
+    cursor: pointer;
+    background-color: #333;
+}
+
+#back-to-top:active {
+    background-color: #555;
+}
+
+#back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+.tag-filter {
+    text-align: center;
+    margin-bottom:50px;
+}
+
+.tag-filter__title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.tag-filter__tags {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.tag-filter__tag {
+    cursor: pointer;
+    background-color: var(--tag-color);
+    padding: 7px 18px;
+    border-radius: 30px;
+    font-weight: 500;
+    opacity: 0.8;
+}
+.top-bars {
+    display: fixed;
+    width:100%;
+    background-color: var(--body-color);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    padding: 20px 20px 10px;
+    z-index: 5;
+    left: 0;
+}
+
+.top-bars__title {
+    width: 50%;
+    display: flex;
+    align-items: center;
+}
+
+.top-bars__menus {
+    width: 50%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.top-bars__menus span {
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.title-logo {
+    font-family: "Black Han Sans", sans-serif;
+    font-size: 27px;
+    font-weight: bold;
+}
+
+.title-logo a {
+    color : var(--main-color);
+    text-decoration: none;
+}
+:root {
+    --body-color: #fefefe;
+    --body-padding: 20px;
+    --main-color: rgba(109, 8, 109);
+    --tag-color: #ecedf0;
+    --list-border-radius: 10px;
+}
+</style>
+</head>
+<body><div id="week-buttons"></div>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/backToTop.js') }}"></script>
+<script src="{{ url_for('static', filename='js/filter.js') }}"></script>
+<script src="{{ url_for('static', filename='js/menuBtn.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mobileCheck.js') }}"></script>
+<h1> 동양미래대학교 학식 및 맛집추천</h1>
+<body>
+<!-- 네이버 지도 API 전용 MAP-->
+<div class="invisible" id="map-container">
+<div id="map-quit">x</div>
+<div id="map-box">
+<div id="map"></div>
+</div>
+</div>
+<div class="wrapper">
+<!-- 상단 바 -->
+<header class="top-bars">
+<span class="top-bars__title title-logo">
+</span>
+<nav class="top-bars__menus">
+<span class="top-bars__menu"><i class="fa-solid fa-bars fa-lg"></i></span>
+</nav>
+</header>
+<!-- 상단 바(메뉴 버튼 눌렀을 때)-->
+<nav class="menu-bars__container invisible">
+<span class="menu-bars__btn__close"><i class="fa-solid fa-x fa-lg"></i></span>
+<ul class="menu-bars">
+<a href="index.html"><li class="menu-bar"><span>맛집 리스트</span></li></a>
+<a href="notice.html"><li class="menu-bar"><span>문의</span></li></a>
+</ul>
+</nav>
+<div class="container mt-5">
+<div class="table-container">
+<div class="text-center">
+<div class="table-title">동양미래대학교 학식표</div>
+<table class="table table-bordered" id="menuTable">
+<tr>
+<th>{{ dates[0] }}</th>
+<th>{{ dates[1] }}</th>
+<th>{{ dates[2] }}</th>
+<th>{{ dates[3] }}</th>
+<th>{{ dates[4] }}</th>
+</tr>
+<tr>
+<td><ul>{% for item in menu[dates[0]] %}<li>{{ item }}</li>{% endfor %}</ul></td>
+<td><ul>{% for item in menu[dates[1]] %}<li>{{ item }}</li>{% endfor %}</ul></td>
+<td><ul>{% for item in menu[dates[2]] %}<li>{{ item }}</li>{% endfor %}</ul></td>
+<td><ul>{% for item in menu[dates[3]] %}<li>{{ item }}</li>{% endfor %}</ul></td>
+<td><ul>{% for item in menu[dates[4]] %}<li>{{ item }}</li>{% endfor %}</ul></td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<script>
+    function showRandomRestaurant() {
+        // List of restaurant links
+        const restaurantLinks = ['https://map.naver.com/p/entry/place/1592042223?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/1204208785?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/32625679?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/20694422?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/32585090?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/1504947710?c=14.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/13555896?c=19.55,0,0,0,dh', 'https://map.naver.com/p/entry/place/20860632?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/937764506?c=19.64,0,0,0,dh', 'https://map.naver.com/p/entry/place/1843755678?c=19.64,0,0,0,dh'];
+        
+        // Selecting a random link
+        const randomLink = restaurantLinks[Math.floor(Math.random() * restaurantLinks.length)];
+        
+        // Redirecting to the selected link
+        window.location.href = randomLink;
+    }
+</script>
+<script>
+$(function(){
+    $('#back-to-top').on('click',function(e){
+        e.preventDefault();
+        $('html,body').animate({scrollTop:0},600);
+    });
+    
+    $(window).scroll(function() {
+      if ($(document).scrollTop() > 100) {
+        $('#back-to-top').addClass('show');
+      } else {
+        $('#back-to-top').removeClass('show');
+      }
+    });
+});
+const tagBtnContainer = document.querySelector('.tag-filter__tags');
+const restaurantContainer = document.querySelector('.restaurant-lists');
+const restaurants = document.querySelectorAll('.restaurant-list');
+
+
+tagBtnContainer.addEventListener('click', (event) => {
+    const filter = event.target.dataset.filter || event.target.parentNode.dataset.filter;
+    if(filter == null) {
+        return;
+    }
+
+    restaurantContainer.classList.add('anim-out');
+    setTimeout(() => {
+        restaurants.forEach((restaurant) => {
+            if(filter === '*' || filter === restaurant.dataset.type) {
+                restaurant.classList.remove('invisible');
+            } else {
+                restaurant.classList.add('invisible');
+            }
+        });
+        restaurantContainer.classList.remove('anim-out');
+    }, 300);
+});
+const buttons = document.querySelectorAll(".restaurant-list");
+const queryMap = document.querySelector("#map-container");
+const mapQuitBtn = document.querySelector("#map-quit");
+const mainContainer = document.querySelector(".wrapper");
+
+
+for(const button of buttons) {
+    button.addEventListener("click", function(event) {
+        let restaurantPath = event.target.offsetParent;
+        if(restaurantPath.classList.value !== "restaurant-list") {
+            restaurantPath = restaurantPath.offsetParent;
+        }
+
+        const restaurantName = restaurantPath.childNodes[5].childNodes[1].innerText;
+        const restaurantAddress = restaurantPath.attributes[1].value;
+        document.body.style.overflow = "hidden";
+        queryMap.classList.remove("invisible");
+        mainContainer.classList.add("invisible");
+        geocoding(restaurantName, restaurantAddress);
+    })
+}
+
+function geocoding(name, address) {
+    var addrVal = address;
+
+    // 도로명 주소 -> 좌표 값 변환 
+    naver.maps.Service.geocode({
+        query: addrVal
+    }, function(status, response) {
+        if(status !== naver.maps.Service.Status.OK) {
+            return alert("잘못된 접근입니다.");
+        }
+
+        var result = response.v2, // 검색 결과 컨테이너
+            items = result.addresses; // 검색 결과 배열
+
+        // 좌표 값 변수에 저장
+        let x = parseFloat(items[0].x);
+        let y = parseFloat(items[0].y);
+        mapGenerator(name, String(y), String(x));
+    })
+}
+
+// 위도, 경도 기반으로 맵 생성
+function mapGenerator(name, la, lo) {
+    var location = new naver.maps.LatLng(la, lo),
+        map = new naver.maps.Map('map', {
+            center: location,
+            zoom: 19
+        }),
+        marker = new naver.maps.Marker({
+            map: map,
+            position: location
+        });
+    if(isMobile()) {
+        var contentString = [
+            '<div>',
+            '   <h5>'+name+'</h5>',
+            '</div>'
+        ].join('');
+    } else {
+        var contentString = [
+            '<div>',
+            '   <h5>'+name+'</h5><br>',
+            '   <a target="_blank" href="http://map.naver.com/search/양산동'+name+'">네이버 지도 바로 가기</a>',
+            '</div>'
+        ].join('');
+    }
+
+    var infoWindow = new naver.maps.InfoWindow({
+        content: contentString,
+        backgroundColor: "#eee",
+        borderColor: "#A4A4A4",
+        borderWidth: 2,
+        disableAnchor:true,
+        pixelOffset: new naver.maps.Point(0, -10)
+    });
+
+    naver.maps.Event.addListener(marker, "click", function() {
+        if(infoWindow.getMap()) {
+            infoWindow.close();
+        } else {
+            infoWindow.open(map, marker);
+        }
+    });
+
+    mapQuitBtn.addEventListener("click", function() {
+        if(infoWindow.getMap()) {
+            infoWindow.close();
+        }
+        queryMap.classList.add("invisible");
+        mainContainer.classList.remove("invisible");
+        document.body.style.overflow = "visible";
+    });
+}
+
+const menuBtn = document.querySelector(".top-bars__menu");
+const menuBar = document.querySelector(".menu-bars__container");
+const menuCloseBtn = document.querySelector(".menu-bars__btn__close");
+
+function openMenu() {
+    document.body.style.overflow = "hidden";
+    menuBar.classList.toggle("invisible");
+    menuCloseBtn.addEventListener("click", closeMenu);
+}
+
+function closeMenu() {
+    document.body.style.overflow = "visible";
+    menuBar.classList.toggle("invisible");
+}
+
+menuBtn.addEventListener("click", openMenu);
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent);
+}
+</script>
+</body>
+<script>
+function loadNextWeek() {
+    document.getElementById('menuTable').innerHTML = "<table><caption>일주일간의 식단을 요일, 식단구분, 식단제목, 식단내용, 기타정보에 따라 안내합니다.</caption><colgroup><col class=\"dDate\"/><col class=\"dSep\"/><col class=\"dTitle\"/><col class=\"dContent\"/><col class=\"dInfor\"/></colgroup><thead><tr><th scope=\"col\">요일</th><th scope=\"col\">식당구분</th><th scope=\"col\">식단구분</th><th scope=\"col\">식단내용</th><th scope=\"col\">기타정보</th></tr></thead><tbody><tr><th rowspan=\"2\">2023.09.18 <br/> ( 월 )</th><td>동양미래푸드</td><td colspan=\"3\">-</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr><tr><th rowspan=\"2\">2023.09.19 <br/> ( 화 )</th><td>동양미래푸드</td><td colspan=\"3\">-</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr><tr><th rowspan=\"2\">2023.09.20 <br/> ( 수 )</th><td>동양미래푸드</td><td colspan=\"3\">-</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr><tr><th rowspan=\"2\">2023.09.21 <br/> ( 목 )</th><td>동양미래푸드</td><td colspan=\"3\">-</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr><tr><th rowspan=\"2\">2023.09.22 <br/> ( 금 )</th><td>동양미래푸드</td><td colspan=\"3\">-</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr></tbody></table>";
+}
+
+function loadPreviousWeek() {
+    document.getElementById('menuTable').innerHTML = "<table><caption>일주일간의 식단을 요일, 식단구분, 식단제목, 식단내용, 기타정보에 따라 안내합니다.</caption><colgroup><col class=\"dDate\"/><col class=\"dSep\"/><col class=\"dTitle\"/><col class=\"dContent\"/><col class=\"dInfor\"/></colgroup><thead><tr><th scope=\"col\">요일</th><th scope=\"col\">식당구분</th><th scope=\"col\">식단구분</th><th scope=\"col\">식단내용</th><th scope=\"col\">기타정보</th></tr></thead><tbody><tr><th rowspan=\"2\">2023.09.11 <br/> ( 월 )</th><td rowspan=\"1\">동양미래푸드</td><td>코리안푸드</td><td>백미밥, 닭강정, 비엔나케이크 ,청포김가루무침, 배추김치, 어묵국, 오렌지주스</td><td>																										-																								</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr><tr><th rowspan=\"2\">2023.09.12 <br/> ( 화 )</th><td rowspan=\"1\">동양미래푸드</td><td>코리안푸드</td><td>백미밥, 계란후라이함박스테이크&amp;스테이크소스, 들깨새송이볶음, 양상추샐러드, 배추김치, 부대찌개</td><td>																										-																								</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr><tr><th rowspan=\"2\">2023.09.13 <br/> ( 수 )</th><td rowspan=\"1\">동양미래푸드</td><td>코리안푸드</td><td>백미밥, 훈제오리채소볶음, 계란찜, 야채춘권, 배추김치, 고추장찌개</td><td>																										-																								</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr><tr><th rowspan=\"2\">2023.09.14 <br/> ( 목 )</th><td rowspan=\"1\">동양미래푸드</td><td>코리안푸드</td><td>백미밥, 돼지고기버섯간장볶음, 탕수육, 도라지오이무침, 배추김치, 미역국</td><td>																										-																								</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr><tr><th rowspan=\"2\">2023.09.15 <br/> ( 금 )</th><td rowspan=\"1\">동양미래푸드</td><td>코리안푸드</td><td>백미밥, 돈육짜장, 군만두, 매콤두부조림, 배추김치, 계란국</td><td>																										-																								</td></tr><tr><td>교직원식당</td><td colspan=\"3\">-</td></tr></tbody></table>";
+}
+</script>
+<script>
+    function showRandomRestaurant() {
+        // List of restaurant links
+        const restaurantLinks = ['https://map.naver.com/p/entry/place/1592042223?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/1204208785?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/32625679?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/20694422?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/32585090?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/1504947710?c=14.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/13555896?c=19.55,0,0,0,dh', 'https://map.naver.com/p/entry/place/20860632?c=15.00,0,0,0,dh', 'https://map.naver.com/p/entry/place/937764506?c=19.64,0,0,0,dh', 'https://map.naver.com/p/entry/place/1843755678?c=19.64,0,0,0,dh'];
+        
+        // Selecting a random link
+        const randomLink = restaurantLinks[Math.floor(Math.random() * restaurantLinks.length)];
+        
+        // Redirecting to the selected link
+        window.location.href = randomLink;
+    }
+</script>
+<script>
+$(function(){
+    $('#back-to-top').on('click',function(e){
+        e.preventDefault();
+        $('html,body').animate({scrollTop:0},600);
+    });
+    
+    $(window).scroll(function() {
+      if ($(document).scrollTop() > 100) {
+        $('#back-to-top').addClass('show');
+      } else {
+        $('#back-to-top').removeClass('show');
+      }
+    });
+});
+const tagBtnContainer = document.querySelector('.tag-filter__tags');
+const restaurantContainer = document.querySelector('.restaurant-lists');
+const restaurants = document.querySelectorAll('.restaurant-list');
+
+
+tagBtnContainer.addEventListener('click', (event) => {
+    const filter = event.target.dataset.filter || event.target.parentNode.dataset.filter;
+    if(filter == null) {
+        return;
+    }
+
+    restaurantContainer.classList.add('anim-out');
+    setTimeout(() => {
+        restaurants.forEach((restaurant) => {
+            if(filter === '*' || filter === restaurant.dataset.type) {
+                restaurant.classList.remove('invisible');
+            } else {
+                restaurant.classList.add('invisible');
+            }
+        });
+        restaurantContainer.classList.remove('anim-out');
+    }, 300);
+});
+const buttons = document.querySelectorAll(".restaurant-list");
+const queryMap = document.querySelector("#map-container");
+const mapQuitBtn = document.querySelector("#map-quit");
+const mainContainer = document.querySelector(".wrapper");
+
+
+for(const button of buttons) {
+    button.addEventListener("click", function(event) {
+        let restaurantPath = event.target.offsetParent;
+        if(restaurantPath.classList.value !== "restaurant-list") {
+            restaurantPath = restaurantPath.offsetParent;
+        }
+
+        const restaurantName = restaurantPath.childNodes[5].childNodes[1].innerText;
+        const restaurantAddress = restaurantPath.attributes[1].value;
+        document.body.style.overflow = "hidden";
+        queryMap.classList.remove("invisible");
+        mainContainer.classList.add("invisible");
+        geocoding(restaurantName, restaurantAddress);
+    })
+}
+
+function geocoding(name, address) {
+    var addrVal = address;
+
+    // 도로명 주소 -> 좌표 값 변환 
+    naver.maps.Service.geocode({
+        query: addrVal
+    }, function(status, response) {
+        if(status !== naver.maps.Service.Status.OK) {
+            return alert("잘못된 접근입니다.");
+        }
+
+        var result = response.v2, // 검색 결과 컨테이너
+            items = result.addresses; // 검색 결과 배열
+
+        // 좌표 값 변수에 저장
+        let x = parseFloat(items[0].x);
+        let y = parseFloat(items[0].y);
+        mapGenerator(name, String(y), String(x));
+    })
+}
+
+// 위도, 경도 기반으로 맵 생성
+function mapGenerator(name, la, lo) {
+    var location = new naver.maps.LatLng(la, lo),
+        map = new naver.maps.Map('map', {
+            center: location,
+            zoom: 19
+        }),
+        marker = new naver.maps.Marker({
+            map: map,
+            position: location
+        });
+    if(isMobile()) {
+        var contentString = [
+            '<div>',
+            '   <h5>'+name+'</h5>',
+            '</div>'
+        ].join('');
+    } else {
+        var contentString = [
+            '<div>',
+            '   <h5>'+name+'</h5><br>',
+            '   <a target="_blank" href="http://map.naver.com/search/양산동'+name+'">네이버 지도 바로 가기</a>',
+            '</div>'
+        ].join('');
+    }
+
+    var infoWindow = new naver.maps.InfoWindow({
+        content: contentString,
+        backgroundColor: "#eee",
+        borderColor: "#A4A4A4",
+        borderWidth: 2,
+        disableAnchor:true,
+        pixelOffset: new naver.maps.Point(0, -10)
+    });
+
+    naver.maps.Event.addListener(marker, "click", function() {
+        if(infoWindow.getMap()) {
+            infoWindow.close();
+        } else {
+            infoWindow.open(map, marker);
+        }
+    });
+
+    mapQuitBtn.addEventListener("click", function() {
+        if(infoWindow.getMap()) {
+            infoWindow.close();
+        }
+        queryMap.classList.add("invisible");
+        mainContainer.classList.remove("invisible");
+        document.body.style.overflow = "visible";
+    });
+}
+
+const menuBtn = document.querySelector(".top-bars__menu");
+const menuBar = document.querySelector(".menu-bars__container");
+const menuCloseBtn = document.querySelector(".menu-bars__btn__close");
+
+function openMenu() {
+    document.body.style.overflow = "hidden";
+    menuBar.classList.toggle("invisible");
+    menuCloseBtn.addEventListener("click", closeMenu);
+}
+
+function closeMenu() {
+    document.body.style.overflow = "visible";
+    menuBar.classList.toggle("invisible");
+}
+
+menuBtn.addEventListener("click", openMenu);
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(window.navigator.userAgent);
+}
+</script>
+</body></html>
+<main class="main-box">
+<!-- 상단 소개글 -->
+<div class="intro">
+<h1 class="intro__title">오늘 뭐 먹지?</h1>
+<h2 class="intro__sub">동양미래대학교 인근 맛집들을 소개합니다.</h2>
+</div>
+<!-- 태그 필터 -->
+<div class="tag-filters">
+<div class="tag-filter">
+<h3 class="tag-filter__title">오늘은 어떤 음식을 먹을까?</h3>
+<div class="tag-filter__tags"><button id="random-restaurant-btn" class="tag-filter__tag" onclick="showRandomRestaurant()">랜덤 음식 선택!</button>
+</div>
+</div>
+</div>
+<!-- 음식 종류 리스트 -->
+<div class="restaurant-lists">
+<div address="양산동 444-1" class="restaurant-list" data-type="한식">
+<div class="restaurant-list__tags">
+<span class="restaurant-list__tag">#우동</span>
+<span class="restaurant-list__tag">#소바</span>
+<span class="restaurant-list__tag">#후문</span>
+</div>
+<div class="restaurant-list__imgBox">
+<img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA5MTNfNDAg%2FMDAxNjk0NTkyNzUzNzA4.6sBKoadMyTkijG_DA1q4ZZG4TBSsLVq0tu3qG9SqbSgg.ZlP2IQoICFAFIYuH0zNEAwcM3J3zGtUyylk20S9gBMYg.JPEG.kimjhe03%2FIMG_0845.jpg&type=a340
+                        "/>
+</div>
+<div class="restaurant-list__textBox">
+<span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/1061845774?lng=126.8663076&lat=37.500578299999994&placePath=%2Fhome&c=15.00,0,0,0,dh" target="_blank">역전우동0410 동양미래대점</a></span>
+<span class="restaurant-list__textBox__sub"> mz세대가 선택한 역전우동</span>
+</div>
+</div>
+<div address="양산동 441" class="restaurant-list" data-type="한식">
+<div class="restaurant-list__tags">
+<span class="restaurant-list__tag">#중식</span>
+<span class="restaurant-list__tag">#후문</span>
+</div>
+<div class="restaurant-list__imgBox">
+<img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTA5MjVfMjI3%2FMDAxNjMyNTc3Njc2MjY2.eKkD1bV8RG1Q6f-e10eOp9j6IzGyaEtkR8Nt2qXDDT8g.TZT-SRUErMAxe5gqlpITa_joyeLEYAmKI22ZemAmxzUg.JPEG.eav48%2FIMG_7637.jpg&type=a340"/>
+</div>
+<div class="restaurant-list__textBox">
+<span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/1886190299?lng=126.86640259999999&lat=37.50039059999999&placePath=%2Fhome&entry=plt&c=15.00,0,0,0,dh" target="_blank">홍콩반점0410 고척동양대점</a></span>
+<span class="restaurant-list__textBox__sub">짜장면 짬뽕 맛집</span>
+</div>
+</div>
+<div address="양산동 441" class="restaurant-list" data-type="한식">
+    <div class="restaurant-list__tags">
+    <span class="restaurant-list__tag">#샌드위치</span>
+    <span class="restaurant-list__tag">#8호관</span>
+    </div>
+    <div class="restaurant-list__imgBox">
+    <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxOTA3MDNfMjU2%2FMDAxNTYyMTUyOTUzMDE3.xArh2UTlF3P7s8dErrPM_Xpdck0XCWaP6q0SPuwWKKAg.samZHJn0oSpIFbYFqctUkQaVRiYBJsn4M91lAc96i34g.JPEG.hanmangyu24%2F1562151841184.jpg&type=a340"/>
+    </div>
+    <div class="restaurant-list__textBox">
+    <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/1188801760?lng=126.866524&lat=37.5010691&placePath=%2Fhome&entry=plt&c=15.00,0,0,0,dh" target="_blank">써브웨이 동양미래대점</a></span>
+    <span class="restaurant-list__textBox__sub">건강하고 담백한 나만의 샌드위치</span>
+    </div>
+    </div>
+<div address="양산동 441" class="restaurant-list" data-type="한식">
+<div class="restaurant-list__tags">
+<span class="restaurant-list__tag">#토스트</span>
+<span class="restaurant-list__tag">#후문</span>
+</div>
+<div class="restaurant-list__imgBox">
+<img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA3MDlfMjg0%2FMDAxNjg4OTEzNjg2NDMw.tb8jXu9bgzbUuI4W54qZYo_obowLtLVlAocJSkM1qGYg.IfffTcxyFsr5gGJLOMTLkA0mYe6jQzI86pfw3NibFeIg.JPEG.qoqjffo%2Foutput_697433231.jpg&type=sc960_832"/>
+</div>
+<div class="restaurant-list__textBox">
+<span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/1950714302?lng=126.86660567558799&lat=37.5006005743754&placePath=%2Fhome&entry=plt&c=15.00,0,0,0,dh" target="_blank">이삭토스트 동양미래대점</a></span>
+<span class="restaurant-list__textBox__sub">다양한 맛이 담긴 토스트</span>
+</div>
+</div>
+<div address="양산동 441" class="restaurant-list" data-type="한식">
+    <div class="restaurant-list__tags">
+    <span class="restaurant-list__tag">#칼국수</span>
+    <span class="restaurant-list__tag">#후문</span>
+    </div>
+    <div class="restaurant-list__imgBox">
+    <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20211109_9%2F1636450871819Wb2nH_PNG%2FlJCSmqEYrWlTAn_tuZow1Cqu.png"/>
+    </div>
+    <div class="restaurant-list__textBox">
+    <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/1592042223?c=15.00,0,0,0,dh" target="_blank">고척칼국수</a></span>
+    <span class="restaurant-list__textBox__sub">푸짐하고 싸고 맛있는 칼국수 맛집</span>
+    </div>
+    </div>
+<div address="양산동 441" class="restaurant-list" data-type="한식">
+<div class="restaurant-list__tags">
+<span class="restaurant-list__tag">#돈까스</span>
+<span class="restaurant-list__tag">#후문</span>
+</div>
+<div class="restaurant-list__imgBox">
+<img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjAzMTBfMzAg%2FMDAxNjQ2ODQwNzc1ODk3.InneDnUZ-rmYyRcnaPZtDKd7zjpf9uo1v9dLIIRIknMg.GFPXGMhpWTczSKdu4gfpWaG7FfipdwkUjvvg36MJljIg.JPEG.j1011200%2FKakaoTalk_20220309_220424616.jpg&type=a340"/>
+</div>
+<div class="restaurant-list__textBox">
+<span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/1519223900?lng=126.86566889631297&lat=37.5012606320417&placePath=%2Fhome&entry=plt&c=15.00,0,0,0,dh" target="_blank">최고당돈가스 고척돔점</a></span>
+<span class="restaurant-list__textBox__sub">매일매일 신선한 돈까스 제조</span>
+</div>
+</div>
+<div address="양산동 441" class="restaurant-list" data-type="한식">
+    <div class="restaurant-list__tags">
+    <span class="restaurant-list__tag">#국밥</span>
+    <span class="restaurant-list__tag">#후문</span>
+    </div>
+    <div class="restaurant-list__imgBox">
+    <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20200811_115%2F1597100539105hGGos_JPEG%2FUj-0mXkATBuvz4E0LX_Nd7iv.jpeg.jpg"/>
+    </div>
+    <div class="restaurant-list__textBox">
+    <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/1204208785?c=15.00,0,0,0,dh" target="_blank">만포순대국 돼지국밥</a></span>
+    <span class="restaurant-list__textBox__sub">뜨끈하고 든든한 국밥</span>
+    </div>
+    </div>
+<div address="양산동 441" class="restaurant-list" data-type="한식">
+<div class="restaurant-list__tags">
+<span class="restaurant-list__tag">#한식</span>
+<span class="restaurant-list__tag">#후문</span>
+</div>
+<div class="restaurant-list__imgBox">
+<img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20200813_3%2F1597272743930bvGAX_JPEG%2FZ4wcy7-016G_yvTQKKoaw0fu.jpeg.jpg"/>
+</div>
+<div class="restaurant-list__textBox">
+<span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/13150404?c=15.00,0,0,0,dh " target="_blank">전주식당</a></span>
+<span class="restaurant-list__textBox__sub">맛있는 한식집</span>
+</div>
+</div>
+
+<div address="양산동 441" class="restaurant-list" data-type="한식">
+    <div class="restaurant-list__tags">
+    <span class="restaurant-list__tag">#부대찌개</span>
+    <span class="restaurant-list__tag">#후문</span>
+    </div>
+    <div class="restaurant-list__imgBox">
+    <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20200323_242%2F15849400911682hMej_PNG%2F%25B0%25ED%25C3%25B41.png"/>
+    </div>
+    <div class="restaurant-list__textBox">
+    <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/32625679?c=15.00,0,0,0,dh" target="_blank">놀부부대찌개 고척점</a></span>
+    <span class="restaurant-list__textBox__sub">24시간 우린 사골육수와 프리미엄햄의 진한 부대찌개</span>
+    </div>
+    </div>
+
+    <div address="양산동 441" class="restaurant-list" data-type="한식">
+        <div class="restaurant-list__tags">
+        <span class="restaurant-list__tag">#컵밥</span>
+        <span class="restaurant-list__tag">#후문</span>
+        </div>
+        <div class="restaurant-list__imgBox">
+        <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20210506_243%2F1620231098784JjKLD_JPEG%2Fu2tW_FHmt9_zNou4pfFbxemj.jpg"/>
+        </div>
+        <div class="restaurant-list__textBox">
+        <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/20694422?c=15.00,0,0,0,dh" target="_blank">지지고 동양미래대점</a></span>
+        <span class="restaurant-list__textBox__sub">가성비 좋고 맛있는 컵밥집</span>
+        </div>
+        </div>
+
+        <div address="양산동 441" class="restaurant-list" data-type="한식">
+            <div class="restaurant-list__tags">
+            <span class="restaurant-list__tag">#떡볶이</span>
+            <span class="restaurant-list__tag">#후문</span>
+            </div>
+            <div class="restaurant-list__imgBox">
+            <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA0MTRfMTc3%2FMDAxNjgxNDMxMDIwNTEz.S11dg-b0JHqikEm2FwWkbQX8MIHBQUz-1qVGEQQUrUEg.JsaUTAOYvFwep5CwQh4d1lv1rVTrZfTOo8JfGu9eqi8g.JPEG.sinhyunarr%2F20230327%25A3%25DF133256.jpg"/>
+            </div>
+            <div class="restaurant-list__textBox">
+            <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/32585090?c=15.00,0,0,0,dh" target="_blank">죠스떡볶이 동양미래대학점</a></span>
+            <span class="restaurant-list__textBox__sub">쫀득하고 맛있는 떡볶이</span>
+            </div>
+            </div>
+
+            <div address="양산동 441" class="restaurant-list" data-type="한식">
+                <div class="restaurant-list__tags">
+                <span class="restaurant-list__tag">#치킨</span>
+                <span class="restaurant-list__tag">#닭강정</span>
+                <span class="restaurant-list__tag">#후문</span>
+                </div>
+                <div class="restaurant-list__imgBox">
+                <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20191112_173%2F1573539266748wayEQ_JPEG%2FgwuD9Eb5Fl-9U4nQo4q-LA38.jpg"/>
+                </div>
+                <div class="restaurant-list__textBox">
+                <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/1504947710?c=14.00,0,0,0,dh" target="_blank">맛닭꼬 동양미래대학점</a></span>
+                <span class="restaurant-list__textBox__sub">착한 가격 맛있는 치킨</span>
+                </div>
+                </div>
+    
+                <div address="양산동 441" class="restaurant-list" data-type="한식">
+                    <div class="restaurant-list__tags">
+                    <span class="restaurant-list__tag">#도시락</span>
+                    <span class="restaurant-list__tag">#후문</span>
+                    </div>
+                    <div class="restaurant-list__imgBox">
+                    <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20150901_97%2F1441054821313lb5UN_JPEG%2FSUBMIT_1292393506108_13555896.jpg"/>
+                    </div>
+                    <div class="restaurant-list__textBox">
+                    <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/13555896?c=19.55,0,0,0,dh" target="_blank">한솥도시락 동양미래대점</a></span>
+                    <span class="restaurant-list__textBox__sub">가성비  좋은 도시락 맛집!</span>
+                    </div>
+                    </div>
+
+                    
+                <div address="양산동 441" class="restaurant-list" data-type="한식">
+                    <div class="restaurant-list__tags">
+                    <span class="restaurant-list__tag">#삼겹살</span>
+                    <span class="restaurant-list__tag">#후문</span>
+                    </div>
+                    <div class="restaurant-list__imgBox">
+                    <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20230710_237%2F1688997933082gfS12_JPEG%2FIMG_4985.jpeg"/>
+                    </div>
+                    <div class="restaurant-list__textBox">
+                    <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/20860632?c=15.00,0,0,0,dh" target="_blank">고척동 삼겹살</a></span>
+                    <span class="restaurant-list__textBox__sub">무한으로 즐기는 삼겹살!</span>
+                    </div>
+                    </div>
+                            
+                <div address="양산동 441" class="restaurant-list" data-type="한식">
+                    <div class="restaurant-list__tags">
+                    <span class="restaurant-list__tag">#족발</span>
+                    <span class="restaurant-list__tag">#후문</span>
+                    </div>
+                    <div class="restaurant-list__imgBox">
+                    <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20200604_247%2F1591248439639UY6iC_JPEG%2FqURv0AMXre7UmdjlVdYh2mDh.jpg"/>
+                    </div>
+                    <div class="restaurant-list__textBox">
+                    <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/937764506?c=19.64,0,0,0,dh" target="_blank">발발이추억 고척점</a></span>
+                    <span class="restaurant-list__textBox__sub">야들야들 쫄깃쫄깃한 족발 맛집~</span>
+                    </div>
+                    </div>
+
+                            
+                <div address="양산동 441" class="restaurant-list" data-type="한식">
+                    <div class="restaurant-list__tags">
+                    <span class="restaurant-list__tag">#참치</span>
+                    <span class="restaurant-list__tag">#회</span>
+                    <span class="restaurant-list__tag">#후문</span>
+                    </div>
+                    <div class="restaurant-list__imgBox">
+                    <img alt="" class="restaurant-list__img" src="https://search.pstatic.net/common/?src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20210111_253%2F1610357688334oF848_JPEG%2FH-UOxxsyUWT6ZIDdUFaQIHud.jpg"/>
+                    </div>
+                    <div class="restaurant-list__textBox">
+                    <span class="restaurant-list__textBox__name"><a href="https://map.naver.com/p/entry/place/1843755678?c=19.64,0,0,0,dh" target="_blank">한라참치</a></span>
+                    <span class="restaurant-list__textBox__sub">싱싱한 참치회 맛집!</span>
+                    </div>
+                    </div>
+
+
+
+<!-- 맨 위로 버튼 추가-->
+<a id="back-to-top"></a>
+<script src="js/menuBtn.js"></script>
+<script src="js/filter.js"></script>
+<script src="js/map.js"></script>
+<script src="js/mobileCheck.js"></script>
+<script src="js/backToTop.js"></script>

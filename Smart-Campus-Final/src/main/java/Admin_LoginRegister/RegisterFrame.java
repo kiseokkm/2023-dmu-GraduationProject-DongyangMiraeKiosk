@@ -39,7 +39,7 @@ public class RegisterFrame extends JFrame {
     private void initComponents() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(10, 3, 5, 5));
-        panel.setBackground(new Color(96, 140, 255));
+        panel.setBackground(new Color(180, 210, 255));
         JLabel lblUsername = new JLabel("아이디:(ID 중복확인 필수!)");
         JLabel lblPassword = new JLabel("비밀번호:");
         JLabel lblConfirmPassword = new JLabel("비밀번호 확인:");
@@ -76,7 +76,6 @@ public class RegisterFrame extends JFrame {
                 }
             }
         });
-
         JPanel passwordPanel = new JPanel(new BorderLayout());
         passwordPanel.add(txtPassword, BorderLayout.CENTER);
         JButton btnTogglePassword = new JButton("👁️");

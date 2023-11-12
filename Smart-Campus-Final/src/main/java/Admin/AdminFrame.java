@@ -22,10 +22,8 @@ public class AdminFrame extends javax.swing.JFrame {
     private JButton profileButton;
     private String currentLoggedInUsername; 
     private String currentLoggedInUserMajor = "전체"; // default value
-    private String currentLoggedInName; // 멤버 변수로 선언하기
-    
-    
-
+    private String currentLoggedInName; // 멤버 변수로 선언
+   
     public AdminFrame(String loggedInUsername) {
         String[] userInfo = getUserInfo(loggedInUsername);
         this.currentLoggedInUsername = loggedInUsername; // 현재 로그인한 사용자의 username

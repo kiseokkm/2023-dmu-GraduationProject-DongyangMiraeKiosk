@@ -17,6 +17,8 @@ import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
+import java.io.InputStream;
+
 import javax.swing.Action;
 import java.awt.Button;
 import java.awt.Label;
@@ -26,6 +28,7 @@ import java.awt.Font;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import javazoom.jl.player.Player;
 
 public class LaunchFrame extends JFrame {
 
@@ -39,8 +42,6 @@ public class LaunchFrame extends JFrame {
        lblAppName.setText("SMART CAMPUS");
        setSystemTray();
      }
-
-
      @SuppressWarnings("unchecked")
      private void initComponents() {
        java.awt.GridBagConstraints gridBagConstraints;
@@ -124,6 +125,11 @@ public class LaunchFrame extends JFrame {
            btnLaunchKioskActionPerformed(evt);
          }
        });
+       btnLaunchKiosk.addActionListener(new java.awt.event.ActionListener() {
+           public void actionPerformed(java.awt.event.ActionEvent evt) {
+               launchKioskActionPerformed(evt);
+           }
+       });
        pnlActions.add(btnLaunchKiosk);
 
        btnLaunchAdmin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/online-test.png"))); // NOI18N
@@ -137,6 +143,11 @@ public class LaunchFrame extends JFrame {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
            btnLaunchAdminActionPerformed(evt);
          }
+       });
+       btnLaunchAdmin.addActionListener(new java.awt.event.ActionListener() {
+           public void actionPerformed(java.awt.event.ActionEvent evt) {
+               launchKioskActionPerformedtwo(evt);
+           }
        });
        pnlActions.add(btnLaunchAdmin);
 
@@ -287,6 +298,26 @@ public class LaunchFrame extends JFrame {
          System.exit(0);
        });
      }
+     
+     private void launchKioskActionPerformedtwo(java.awt.event.ActionEvent evt) {
+    	 playMP3("/한국어.mp3");
+     }
+     
+     private void launchKioskActionPerformed(java.awt.event.ActionEvent evt) {
+    	    playMP3("/한국어.mp3");
+    	}
+
+     private void playMP3(String filePath) {
+    	    new Thread(() -> {
+    	        try {
+    	            InputStream is = getClass().getResourceAsStream(filePath);
+    	            Player playMP3 = new Player(is);
+    	            playMP3.play();
+    	        } catch (Exception e) {
+    	            e.printStackTrace();
+    	        }
+    	    }).start();
+    	}
 
      public static void main(String args[]) {
        app.Global.setDefaultTheme();
