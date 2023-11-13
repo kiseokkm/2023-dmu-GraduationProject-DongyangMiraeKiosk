@@ -45,14 +45,12 @@ public class TrainPanel extends JPanel implements ActionListener {
 		if(!str_line.equals("1065")) {
 			this.i_num = Integer.parseInt(str_num);
 		}
-
 		//��, �ϼ� ����
 		if (updown.equals("0")) {
 			this.str_updown = "1";
 		} else {
 			this.str_updown = "2";
 		}
-
 		//�뼱���� ���� �¿츦 �����Ͽ� ����ö�� �̵��ϴ� �������� ���
 		btn_train = new JButton();
 		if (updown.equals("0")) {
@@ -207,7 +205,6 @@ public class TrainPanel extends JPanel implements ActionListener {
 			td.setVisible(true);
 		}
 	}
-
 	private String SetTrainNo(String s) {
 		String str_return = "";
 
@@ -240,10 +237,8 @@ public class TrainPanel extends JPanel implements ActionListener {
 			str_return = i_num + "";
 			break;
 		}
-
 		return str_return;
 	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -264,5 +259,4 @@ public class TrainPanel extends JPanel implements ActionListener {
 					"열차번호: " + SetTrainNo(str_line) + "\t행선지: " + str_det + "행\t열차 상태: " + str_state + "\t열차 방향: " + str_updown);*/
 		}
 	}
-
 }

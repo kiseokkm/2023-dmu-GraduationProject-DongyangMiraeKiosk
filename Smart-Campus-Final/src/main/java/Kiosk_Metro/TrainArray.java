@@ -16,7 +16,6 @@ public class TrainArray {
 		this.train_state = train_state;
 		this.train_express = train_express;
 	}
-	
 	public String getStationNum() {
 		return this.sta_no;
 	}

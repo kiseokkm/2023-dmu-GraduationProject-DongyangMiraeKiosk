@@ -12,7 +12,6 @@ import org.json.simple.parser.JSONParser;
 public class DataTest {
     String str_line_table;
     ArrayList<StationList> arr = new ArrayList<>();
-    
     public DataTest(String str) {
         this.str_line_table = str;
         String url = "https://raw.githubusercontent.com/LDK511/mydata/main/";
@@ -20,7 +19,6 @@ public class DataTest {
         BufferedReader in = null;
         
         try {
-            // URL encoding
             String url_encode = URLEncoder.encode(str, "UTF-8");
             try {
                 URL obj = new URL(url + url_encode + ".json");
@@ -40,11 +38,9 @@ public class DataTest {
                 }
                 in.close();
 
-                // Parsing the JSON data
                 JSONParser js = new JSONParser();
                 JSONArray jsonArr = (JSONArray) js.parse(response.toString());
 
-                // Processing the parsed data
                 for (int i = 0; i < jsonArr.size(); i++) {
                     JSONObject jj = (JSONObject) jsonArr.get(i);
                     arr.add(new StationList(

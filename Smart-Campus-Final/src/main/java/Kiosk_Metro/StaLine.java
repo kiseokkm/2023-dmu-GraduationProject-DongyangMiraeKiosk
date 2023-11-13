@@ -11,9 +11,7 @@ public class StaLine extends JPanel {
 	JLabel lbl;
 	Color color;
 	String str_line = "1001";
-	
-	private void setLine() {
-		
+	private void setLine() {	
 		switch(str_line) {
 		case "1001":
 			color = new Color(34, 62, 146);
@@ -76,7 +74,6 @@ public class StaLine extends JPanel {
 			break;
 		}
 	}
-	
 	@Override
 	protected void paintComponent(Graphics g) {
 	    super.paintComponent(g);
@@ -88,7 +85,6 @@ public class StaLine extends JPanel {
 	    g2.setColor(color);
 	    g2.drawOval(1, 1, 31, 31);
 	}
-	
 	StaLine(String str, int x, int y, int size, String line) {
 		setLayout(null);
 		setBackground(Color.WHITE);
@@ -124,13 +120,11 @@ public class StaLine extends JPanel {
             {
                 
             }
-        });
-		
+        });	
 		lbl = new JLabel(result, SwingConstants.CENTER);
 		Font f = new Font("맑은 고딕", Font.BOLD, size);
 		lbl.setFont(f);
 		lbl.setBounds(0, 0, 34, 34);
-
 		add(lbl);
 		add(btn1);
 		setBounds(x, y, 34, 34);

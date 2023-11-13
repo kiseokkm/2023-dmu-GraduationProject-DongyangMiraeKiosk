@@ -8,7 +8,6 @@ public class TrainDialog extends JDialog {
 	JTextArea jta;
 	
 	String result = "";
-	
 	public TrainDialog(String str, String destination, String trainNo, String status, String station) {
 		setSize(400, 300);
 		setResizable(false);
