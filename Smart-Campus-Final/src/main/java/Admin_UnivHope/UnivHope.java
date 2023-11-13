@@ -19,6 +19,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.TargetDataLine;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -39,6 +45,15 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
+import com.google.cloud.speech.v1.RecognitionAudio;
+import com.google.cloud.speech.v1.RecognitionConfig;
+import com.google.cloud.speech.v1.RecognizeResponse;
+import com.google.cloud.speech.v1.SpeechClient;
+import com.google.cloud.speech.v1.SpeechRecognitionAlternative;
+import com.google.cloud.speech.v1.SpeechRecognitionResult;
+import com.google.cloud.speech.v1.RecognitionConfig.AudioEncoding;
+import com.google.protobuf.ByteString;
+
 public class UnivHope extends JPanel {
     private JTable table;
     private JTextField searchField;
@@ -55,7 +70,7 @@ public class UnivHope extends JPanel {
     private String loggedInUsername; 
     private static final String DB_URL = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "dongyang";
+    private static final String DB_PASSWORD = "1234";
     public UnivHope(String loggedInName) {
     
         this.loggedInUsername = loggedInName; 
@@ -85,6 +100,71 @@ public class UnivHope extends JPanel {
         refreshButton.addActionListener(e -> loadDataFromDatabase());   
         voiceButton = new JButton("음성");
         voiceButton .setBackground(new Color(135, 206, 235)); 
+        voiceButton.addActionListener(e -> {
+            try {
+                 // 1. 음성 녹음
+                 AudioFormat format = new AudioFormat(16000, 16, 1, true, true);
+                 DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+                 TargetDataLine microphone = (TargetDataLine) AudioSystem.getLine(info);
+                 microphone.open(format);
+                 microphone.start();
+
+                 File dir = new File("recoding");
+                 if (!dir.exists()) {
+                     dir.mkdir();
+                 }
+                 File wavFile = new File("recoding/recoding.wav");
+
+                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                 byte[] data = new byte[microphone.getBufferSize() / 5];
+
+                 final JOptionPane pane = new JOptionPane("음성을 입력해주세요.", JOptionPane.INFORMATION_MESSAGE);
+                 final JDialog dialog = pane.createDialog(null, "알림");
+
+                 // Timer를 사용하여 JOptionPane을 자동으로 닫습니다.
+                 new Timer(1000, (actionEvent) -> dialog.dispose()).start();
+                 dialog.setVisible(true); // 알림창 표시
+
+                 // 녹음 시간 설정 (여기서는 5초로 설정)
+                 long end = System.currentTimeMillis() + 5000;  
+                 while (System.currentTimeMillis() < end) {
+                     int numBytesRead = microphone.read(data, 0, data.length);
+                     byteArrayOutputStream.write(data, 0, numBytesRead);
+                 }
+                 byte[] audioData = byteArrayOutputStream.toByteArray();
+                 ByteArrayInputStream bais = new ByteArrayInputStream(audioData);
+                 AudioInputStream ais = new AudioInputStream(bais, format, audioData.length / format.getFrameSize());
+
+                 File wavFile1 = new File("recoding/recording.wav");  // 저장할 파일 경로 지정 오류 수정: wavFile로 바꿔야 합니다.
+                 AudioSystem.write(ais, AudioFileFormat.Type.WAVE, wavFile);
+
+                 microphone.close();
+
+                 // 2. Google Cloud Speech-to-Text API 사용
+                 SpeechClient speechClient = SpeechClient.create();
+                 byte[] audioBytes = Files.readAllBytes(Paths.get("recoding/recoding.wav"));
+                 RecognitionConfig config = RecognitionConfig.newBuilder()
+                     .setEncoding(AudioEncoding.LINEAR16)
+                     .setSampleRateHertz(16000)
+                     .setLanguageCode("ko-KR")
+                     .build();
+                 RecognitionAudio audio = RecognitionAudio.newBuilder()
+                     .setContent(ByteString.copyFrom(audioBytes))
+                     .build();
+                 RecognizeResponse response = speechClient.recognize(config, audio);
+                 for (SpeechRecognitionResult result : response.getResultsList()) {
+                     SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
+                     searchField.setText(alternative.getTranscript());
+                     System.out.println("음성 입력 결과: " + alternative.getTranscript());
+                     searchButton.doClick();
+                 }
+                 speechClient.shutdown(); // 클라이언트를 닫고 모든 자원을 해제합니다.
+
+             } catch (Exception ex) {
+                 ex.printStackTrace();
+             }
+         });
+        
         searchField = new JTextField(25);
         searchComboBox = new JComboBox<>(new String[]{"제목", "답변", "작성자"});    
         searchComboBox.setBackground(new Color(211, 211, 211)); 

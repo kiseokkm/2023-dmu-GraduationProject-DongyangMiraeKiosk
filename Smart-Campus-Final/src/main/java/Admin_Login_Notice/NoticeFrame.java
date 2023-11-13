@@ -49,8 +49,6 @@ import com.google.cloud.speech.v1.SpeechRecognitionAlternative;
 import com.google.cloud.speech.v1.SpeechRecognitionResult;
 import com.google.protobuf.ByteString;
 
-
-
 public class NoticeFrame {
     private static boolean isNoticesLoaded = false; // 공지사항이 이미 로드되었는지 확인하는 플래그
     private static final int PAGE_SIZE = 22;

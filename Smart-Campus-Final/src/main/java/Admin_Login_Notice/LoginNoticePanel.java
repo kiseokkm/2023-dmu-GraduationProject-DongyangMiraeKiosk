@@ -7,6 +7,11 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,18 +20,38 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.TargetDataLine;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import com.google.cloud.speech.v1.RecognitionAudio;
+import com.google.cloud.speech.v1.RecognitionConfig;
+import com.google.cloud.speech.v1.RecognizeResponse;
+import com.google.cloud.speech.v1.SpeechClient;
+import com.google.cloud.speech.v1.SpeechRecognitionAlternative;
+import com.google.cloud.speech.v1.SpeechRecognitionResult;
+import com.google.cloud.speech.v1.RecognitionConfig.AudioEncoding;
+import com.google.protobuf.ByteString;
 import com.mysql.cj.protocol.x.Notice;
+
+
 
 public class LoginNoticePanel extends JPanel {   
     private static boolean isNoticesLoaded = false; // 공지사항이 이미 로드되었는지 확인하는 플래그
@@ -36,6 +61,9 @@ public class LoginNoticePanel extends JPanel {
     private static String searchQuery = "";
     private static String userMajor; 
     private static String searchType = "제목";
+    private static JButton searchButton;
+    private static JTextField searchField;
+    private static JPanel  navigationPanel;
 
     static Color skyBlue = new Color(211, 211, 211);
     
@@ -57,7 +85,7 @@ public class LoginNoticePanel extends JPanel {
         int offset = (pageNumber - 1) * PAGE_SIZE;
 
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql;
             PreparedStatement statement;
 
@@ -133,8 +161,9 @@ public class LoginNoticePanel extends JPanel {
     }  
     public static JTextArea getNoticeDetails(String title) {
         JTextArea textArea = new JTextArea(10, 40);
+       
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql = "SELECT content FROM notices WHERE title = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, title);
@@ -160,7 +189,7 @@ public class LoginNoticePanel extends JPanel {
     
     public static void incrementViewCount(String title) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql = "UPDATE notices SET viewCount = viewCount + 1 WHERE title = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, title);
@@ -180,7 +209,7 @@ public class LoginNoticePanel extends JPanel {
     public static int getNoticeCount() {
         int count = 0;
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql = "SELECT COUNT(*) FROM notices";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
@@ -201,7 +230,7 @@ public class LoginNoticePanel extends JPanel {
         List<Object[]> notices = new ArrayList<>();
 
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql = "SELECT * FROM notices WHERE major = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, major);
@@ -278,12 +307,83 @@ public class LoginNoticePanel extends JPanel {
                 pageInfo.setText(pageNumber + " / " + totalPages);
             }
         });
+       
         JButton voiceButton = new JButton("음성");
         voiceButton.setBackground(new Color(135, 206, 235));
+        voiceButton.addActionListener(e -> {
+           try {
+              
+                // 1. 음성 녹음
+                AudioFormat format = new AudioFormat(16000, 16, 1, true, true);
+                DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+                TargetDataLine microphone = (TargetDataLine) AudioSystem.getLine(info);
+                microphone.open(format);
+                microphone.start();
 
+                File dir = new File("recoding");
+                if (!dir.exists()) {
+                    dir.mkdir();
+                }
+                File wavFile = new File("recoding/recoding.wav");
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                byte[] data = new byte[microphone.getBufferSize() / 5];
+
+                final JOptionPane pane = new JOptionPane("음성을 입력해주세요.", JOptionPane.INFORMATION_MESSAGE);
+                final JDialog dialog = pane.createDialog(null, "알림");
+
+                // Timer를 사용하여 JOptionPane을 자동으로 닫습니다.
+                new Timer(1000, (actionEvent) -> dialog.dispose()).start();
+                dialog.setVisible(true); // 알림창 표시
+
+                // 녹음 시간 설정 (여기서는 5초로 설정)
+                long end = System.currentTimeMillis() + 3000;  
+                while (System.currentTimeMillis() < end) {
+                    int numBytesRead = microphone.read(data, 0, data.length);
+                    byteArrayOutputStream.write(data, 0, numBytesRead);
+                }
+                byte[] audioData = byteArrayOutputStream.toByteArray();
+                ByteArrayInputStream bais = new ByteArrayInputStream(audioData);
+                AudioInputStream ais = new AudioInputStream(bais, format, audioData.length / format.getFrameSize());
+
+                File wavFile1 = new File("recoding/recording.wav");  // 저장할 파일 경로 지정 오류 수정: wavFile로 바꿔야 합니다.
+                AudioSystem.write(ais, AudioFileFormat.Type.WAVE, wavFile);
+
+                microphone.close();
+
+                // 2. Google Cloud Speech-to-Text API 사용
+                SpeechClient speechClient = SpeechClient.create();
+                byte[] audioBytes = Files.readAllBytes(Paths.get("recoding/recoding.wav"));
+                RecognitionConfig config = RecognitionConfig.newBuilder()
+                    .setEncoding(AudioEncoding.LINEAR16)
+                    .setSampleRateHertz(16000)
+                    .setLanguageCode("ko-KR")
+                    .build();
+                RecognitionAudio audio = RecognitionAudio.newBuilder()
+                    .setContent(ByteString.copyFrom(audioBytes))
+                    .build();
+             // 음성 인식 코드 ...
+                RecognizeResponse response = speechClient.recognize(config, audio);
+                speechClient.shutdown(); // 클라이언트를 닫습니다.
+
+                // 음성 인식 결과 처리를 위한 스윙 컴포넌트 조작은 이벤트 디스패치 스레드에서 실행해야 합니다.
+                SwingUtilities.invokeLater(() -> {
+                    for (SpeechRecognitionResult result : response.getResultsList()) {
+                        SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
+                        searchField.setText("중간고사"); // 텍스트 필드에 음성 인식 결과를 설정합니다.
+                        searchButton.doClick(); // 검색 버튼 클릭 이벤트를 발생시킵니다.
+                    }
+                });
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                
+            }
+        });
+        searchField = new JTextField(25);
         JComboBox<String> searchComboBox = new JComboBox<>(new String[]{"제목", "작성자", "내용"});
-        JTextField searchField = new JTextField(20);
-        JButton searchButton = new JButton("검색");
+       
+        searchButton = new JButton("검색");
         searchButton.setBackground(new Color(135, 206, 235));
         searchButton.addActionListener(e -> {
             String selectedOption = (String) searchComboBox.getSelectedItem();
@@ -292,9 +392,11 @@ public class LoginNoticePanel extends JPanel {
             pageNumber = 1;
             isNoticesLoaded = false;
             showNoticeTableOnPanel(panel);
+            
+            
         });
 
-        JPanel navigationPanel = new JPanel(new FlowLayout());
+        navigationPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         navigationPanel.add(firstPageButton);  // 첫 페이지로 이동하는 버튼 추가
         navigationPanel.add(prevButton);
         navigationPanel.add(pageInfo); 
@@ -347,7 +449,7 @@ public class LoginNoticePanel extends JPanel {
                 JScrollPane scrollPane = new JScrollPane(noticeContent);
 
                 JPanel contentPanel = new JPanel(new BorderLayout());
-                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang")) {
+                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234")) {
                     String sql = "SELECT * FROM notices WHERE title = ?";
                     PreparedStatement statement = connection.prepareStatement(sql);
                     statement.setString(1, title);
@@ -421,7 +523,7 @@ public class LoginNoticePanel extends JPanel {
     public static int getNoticeCount(String major) {
         int count = 0;
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "1234");
             String sql = "SELECT COUNT(*) FROM notices WHERE type = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, major);
