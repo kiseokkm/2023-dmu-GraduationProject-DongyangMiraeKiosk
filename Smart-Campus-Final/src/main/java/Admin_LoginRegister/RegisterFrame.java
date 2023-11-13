@@ -14,6 +14,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import services.DatabaseService;
 
 public class RegisterFrame extends JFrame {
     private JTextField txtUsername;
@@ -27,8 +28,10 @@ public class RegisterFrame extends JFrame {
     private JButton btnCancel;
     private JLabel lblConfirmPasswordStatus;
     private JComboBox<String> comboMajor;
+    private DatabaseService dbService;
 
     public RegisterFrame() {
+        dbService = new DatabaseService();
         initComponents();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setTitle("회원가입");
@@ -89,14 +92,12 @@ public class RegisterFrame extends JFrame {
                 txtPassword.setEchoChar(passwordVisible ? '\0' : (char) 0x2022);
             }
         });
-
         JPanel confirmPasswordPanel = new JPanel(new BorderLayout());
         confirmPasswordPanel.add(txtConfirmPassword, BorderLayout.CENTER);
         JButton btnToggleConfirmPassword = new JButton("👁️");
         confirmPasswordPanel.add(btnToggleConfirmPassword, BorderLayout.EAST);
         btnToggleConfirmPassword.addActionListener(new ActionListener() {
             private boolean confirmPasswordVisible = false;
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 confirmPasswordVisible = !confirmPasswordVisible;
@@ -129,24 +130,19 @@ public class RegisterFrame extends JFrame {
                     JOptionPane.showMessageDialog(RegisterFrame.this, "휴대폰 번호 중복입니다.", "오류", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
                 String major = (String) comboMajor.getSelectedItem();
                 String mostPreciousThing = txtMostPreciousThing.getText();
-
                 if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || studentId.isEmpty()
                         || name.isEmpty() || phoneNumber.isEmpty()) {
                     JOptionPane.showMessageDialog(RegisterFrame.this, "모든 정보를 입력해주세요!", "오류", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
                 if (!password.equals(confirmPassword)) {
                     JOptionPane.showMessageDialog(RegisterFrame.this, "비밀번호가 일치하지 않습니다.", "오류", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-
                 User1 user1 = new User1(username, password, major, studentId, name, phoneNumber, mostPreciousThing);
                 boolean isSaved = saveUser1ToDatabase(user1);
-
                 if (isSaved) {
                     dispose();
                     LoginFrame loginFrame = new LoginFrame();
@@ -156,10 +152,6 @@ public class RegisterFrame extends JFrame {
                 }
             }
         });
-        
-        
-
-
         btnCancel = new JButton("취소");
         btnCancel.addActionListener(new ActionListener() {
             @Override
@@ -167,37 +159,11 @@ public class RegisterFrame extends JFrame {
                 dispose();
             }
         });
-
         lblConfirmPasswordStatus = new JLabel();
         lblConfirmPasswordStatus.setForeground(Color.RED);
-
-        comboMajor = new JComboBox<String>();
-        comboMajor.addItem("기계공학과");
-        comboMajor.addItem("기계설계공학과");
-        comboMajor.addItem("로봇공학과");
-        comboMajor.addItem("자동화공학과");
-        comboMajor.addItem("전기공학과");
-        comboMajor.addItem("정보전자공학과");
-        comboMajor.addItem("반도체전자공학과");
-        comboMajor.addItem("정보통신공학과");
-        comboMajor.addItem("소방안전관리과");
-        comboMajor.addItem("컴퓨터소프트웨어공학과");
-        comboMajor.addItem("컴퓨터정보공학과");
-        comboMajor.addItem("인공지능소프트웨어공학과");
-        comboMajor.addItem("생명화학공학과");
-        comboMajor.addItem("바이오융합공학과");
-        comboMajor.addItem("건축과");
-        comboMajor.addItem("실내건축디자인과");
-        comboMajor.addItem("시각디자인과");
-        comboMajor.addItem("경영학과");
-        comboMajor.addItem("세무회계학과");
-        comboMajor.addItem("유통마케팅학과");
-        comboMajor.addItem("호텔관광학과");
-        comboMajor.addItem("경영정보학과");
-        comboMajor.addItem("빅데이터경영과");
         
-        
-
+        setupMajorComboBox();
+          
         panel.add(lblUsername);
         panel.add(txtUsername);
         panel.add(btnCheckDuplicate); 
@@ -255,61 +221,68 @@ public class RegisterFrame extends JFrame {
                 }
             }
         };
-
         txtPassword.getDocument().addDocumentListener(passwordCheckListener);
         txtConfirmPassword.getDocument().addDocumentListener(passwordCheckListener);
-
     }
+    private void setupMajorComboBox() {
+        String[] majors = {
+            "기계공학과", "기계설계공학과", "로봇공학과", "자동화공학과",
+            "전기공학과", "정보전자공학과", "반도체전자공학과", "정보통신공학과",
+            "소방안전관리과", "컴퓨터소프트웨어공학과", "컴퓨터정보공학과",
+            "인공지능소프트웨어공학과", "생명화학공학과", "바이오융합공학과",
+            "건축과", "실내건축디자인과", "시각디자인과", "경영학과",
+            "세무회계학과", "유통마케팅학과", "호텔관광학과", "경영정보학과", "빅데이터경영과"
+        };
 
+        comboMajor = new JComboBox<>();
+        for (String major : majors) {
+            comboMajor.addItem(major);
+        }
+    }
     private boolean checkDuplicate(String username) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT * FROM user1 WHERE username = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, username);
             ResultSet result = statement.executeQuery();
 
-            if (result.next()) {
-                return true;
-            } else {
-                return false;
-            }
+            boolean isDuplicate = result.next();
+            statement.close();
+            return isDuplicate;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            dbService.disconnect(); 
         }
     }
-
     private boolean saveUser1ToDatabase(User1 user1) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-            String sql = "INSERT INTO user1 (username, password, major, studentId, name, phoneNumber,mostPreciousThing) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            dbService.connect(); 
+            String sql = "INSERT INTO user1 (username, password, major, studentId, name, phoneNumber, mostPreciousThing) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, user1.getUsername());
             statement.setString(2, user1.getPassword());
             statement.setString(3, user1.getMajor());
             statement.setString(4, user1.getStudentId());
-            statement.setString(5, user1.getname());
+            statement.setString(5, user1.getname()); 
             statement.setString(6, user1.getPhoneNumber());
             statement.setString(7, user1.getMostPreciousThing());
             int rowsInserted = statement.executeUpdate();
 
-            if (rowsInserted > 0) {
-                return true;
-            } else {
-                return false;
-            }
+            return rowsInserted > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            dbService.disconnect();
         }
     }
-
     public static void main(String[] args) {
         RegisterFrame registerFrame = new RegisterFrame();
         registerFrame.setVisible(true);
-    }    
-    
+    }     
     private boolean isValidStudentId(String studentId) {
         if (studentId.length() != 8) {
             return false;
@@ -334,40 +307,36 @@ public class RegisterFrame extends JFrame {
     }
     private boolean checkDuplicateStudentId(String studentId) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect(); 
             String sql = "SELECT * FROM user1 WHERE studentId = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, studentId);
             ResultSet result = statement.executeQuery();
-
-            if (result.next()) {
-                return true;
-            } else {
-                return false;
-            }
+            boolean hasDuplicate = result.next();
+            statement.close(); 
+            return hasDuplicate;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            dbService.disconnect(); 
         }
     }
     private boolean checkDuplicatePhoneNumber(String phoneNumber) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT * FROM user1 WHERE phoneNumber = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, phoneNumber);
             ResultSet result = statement.executeQuery();
-
-            if (result.next()) {
-                return true;
-            } else {
-                return false;
-            }
+            boolean hasDuplicate = result.next();
+            statement.close(); 
+            return hasDuplicate;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            dbService.disconnect();
         }
     }
-
-
 }
