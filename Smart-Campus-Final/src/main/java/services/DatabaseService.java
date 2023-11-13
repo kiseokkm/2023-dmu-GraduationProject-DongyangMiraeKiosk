@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2020 Self-Order Kiosk
- */
 package services;
 
 import java.sql.Connection;
@@ -14,7 +11,7 @@ public class DatabaseService {
   private final String password = "dongyang";
   public Connection conn;
 
-  DatabaseService() {
+  public DatabaseService() {
   }
 
   public void connect() {
