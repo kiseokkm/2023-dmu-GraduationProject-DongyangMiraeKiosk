@@ -25,12 +25,11 @@ public class LoginFrame extends javax.swing.JFrame {
     private static final String MANAGER_PASSWORD = "password123";
     private DatabaseService dbService;
 
-    private services.AuthService authService;
 
     public LoginFrame() {
+        dbService = new DatabaseService(); 
         initComponents();
         app.Global.setAppIcon(this);
-        authService = new services.AuthService();
     }
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
@@ -212,9 +211,10 @@ public class LoginFrame extends javax.swing.JFrame {
             e.printStackTrace();
             return false;
         } finally {
-            dbService.disconnect();
+            dbService.disconnect(); // 연결 해제
         }
     }
+    
     private Properties loadDatabaseProperties() {
         Properties properties = new Properties();
         return properties;
