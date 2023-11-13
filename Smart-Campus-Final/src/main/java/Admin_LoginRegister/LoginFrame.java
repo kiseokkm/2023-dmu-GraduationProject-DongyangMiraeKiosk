@@ -17,23 +17,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import services.DatabaseService;
 
 public class LoginFrame extends javax.swing.JFrame {
 	
     private static final String MANAGER_USERNAME = "manager";
     private static final String MANAGER_PASSWORD = "password123";
+    private DatabaseService dbService;
 
     private services.AuthService authService;
 
-    /**
-     * Creates new form LoginFrame
-     */
     public LoginFrame() {
         initComponents();
         app.Global.setAppIcon(this);
         authService = new services.AuthService();
     }
-
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
         
@@ -57,7 +55,7 @@ public class LoginFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Login");
-        setName(""); // NOI18N
+        setName("");
         setPreferredSize(new java.awt.Dimension(720, 600));
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
@@ -111,12 +109,12 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0; // 첫 번째 열
-        gridBagConstraints.gridy = 3; // 네 번째 행
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; // 가로로 채우기
-        gridBagConstraints.insets = new Insets(10, 0, 10, 5); // 상하 좌우 여백 (위, 왼쪽, 아래, 오른쪽으로 10, 오른쪽으로 5 추가)
-        gridBagConstraints.weightx = 0.5; // 추가 공간 분배 비율
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END; // 오른쪽 정렬
+        gridBagConstraints.gridx = 0; 
+        gridBagConstraints.gridy = 3; 
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; 
+        gridBagConstraints.insets = new Insets(10, 0, 10, 5); 
+        gridBagConstraints.weightx = 0.5; 
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END; 
         pnlContainer.add(btnLogin, gridBagConstraints);
 
         btnRegister.setText("Register");
@@ -126,12 +124,12 @@ public class LoginFrame extends javax.swing.JFrame {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1; // 두 번째 열
-        gridBagConstraints.gridy = 3; // 네 번째 행
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL; // 가로로 채우기
-        gridBagConstraints.insets = new Insets(10, 0, 10, 5); // 상하 좌우 여백 (위, 오른쪽으로 10, 왼쪽으로 5 추가)
-        gridBagConstraints.weightx = 0.5; // 추가 공간 분배 비율
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; // 왼쪽 정렬
+        gridBagConstraints.gridx = 1; 
+        gridBagConstraints.gridy = 3; 
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(10, 0, 10, 5); 
+        gridBagConstraints.weightx = 0.5; 
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; 
         pnlContainer.add(btnRegister, gridBagConstraints);
 
         getContentPane().add(pnlContainer, new java.awt.GridBagConstraints());
@@ -141,7 +139,6 @@ public class LoginFrame extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
         
-        //아이디 찾기 버튼 ~
         btnFindId.setText("아이디 찾기");
         btnFindId.addActionListener(new ActionListener() {
             @Override
@@ -175,7 +172,7 @@ public class LoginFrame extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START; 
         pnlContainer.add(btnFindPassword, gridBagConstraints);
         
-        btnLogin.setForeground(Color.BLACK); // 텍스트 색상을 검은색으로 설정
+        btnLogin.setForeground(Color.BLACK);
         btnRegister.setForeground(Color.BLACK);
         btnFindId.setForeground(Color.BLACK);
         btnFindPassword.setForeground(Color.BLACK);
@@ -200,39 +197,33 @@ public class LoginFrame extends javax.swing.JFrame {
     }
     private boolean authenticateUser(String username, String password) {
         try {
-            Connection connection = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", 
-                "root", 
-                "dongyang"
-            );
+            dbService.connect();
             String sql = "SELECT * FROM user1 WHERE username = ? AND password = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, username);
             statement.setString(2, password);
 
             ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return true;
-            } else {
-                return false;
-            }
+            boolean isAuthenticated = resultSet.next();
+            resultSet.close();
+            statement.close();
+            return isAuthenticated;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            dbService.disconnect();
         }
     }
     private Properties loadDatabaseProperties() {
         Properties properties = new Properties();
-        // TODO: 여기에 파일에서 설정을 읽어오는 로직 구현
         return properties;
     }
-
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {
         RegisterFrame registerFrame = new RegisterFrame();
         registerFrame.setVisible(true);
         dispose();
     }
-
     private boolean getValidFields() {
         if (txtUsername.getText().isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(null, "ID를 입력하세요", "Warning", javax.swing.JOptionPane.WARNING_MESSAGE);
@@ -245,24 +236,26 @@ public class LoginFrame extends javax.swing.JFrame {
         }
     }
     private void btnFindIdActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO: 아이디 찾기 로직 추가
         JOptionPane.showMessageDialog(this, "아이디 찾기 기능 구현!");
     }
-
     public String getLoggedInUserMajor(String username) {
         String major = "";
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT major FROM user1 WHERE username = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, username);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 major = resultSet.getString("major");
             }
+            resultSet.close();
+            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
         return major;
     }
