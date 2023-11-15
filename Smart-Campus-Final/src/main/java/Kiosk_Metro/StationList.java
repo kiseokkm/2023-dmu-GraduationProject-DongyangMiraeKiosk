@@ -10,7 +10,6 @@ public class StationList {
 	int x;
 	int y;
 	int train;
-	
 	public StationList(String str_code, String str_name, int i_type, int i_express, String str_html, int i_size, int x, int y, int train) {
 		this.str_code = str_code;
 		this.str_name = str_name;

@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 
 public class StaLine extends JPanel {
-	
 	JButton btn1, btn2;
 	JLabel lbl;
 	Color color;
@@ -129,5 +128,4 @@ public class StaLine extends JPanel {
 		add(btn1);
 		setBounds(x, y, 34, 34);
 	}
-
 }

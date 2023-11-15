@@ -66,7 +66,6 @@ public class TrainPanel extends JPanel implements ActionListener {
 				btn_train.setIcon(new ImageIcon("images/train_left.png"));
 			}
 		}
-
 		//����ö�� ��Ȯ�� ��ġ�� �޾� ����, ����, ����� �����ϵ��� ������ �ణ�� �Ÿ��� ��
 		if (state.equals("0")) {
 			str_state = "진입";
@@ -113,7 +112,6 @@ public class TrainPanel extends JPanel implements ActionListener {
 				y += 25;
 			}
 		}
-
 		btn_train.setBorderPainted(false);
 		btn_train.setFocusPainted(false);
 		btn_train.setContentAreaFilled(false);
@@ -157,7 +155,6 @@ public class TrainPanel extends JPanel implements ActionListener {
         });
 		setBounds(x, y, 60, 25);
 	}
-
 	//����ö �����͸� �ҷ��´�
 	private void DataLoad(String s) {
 		String url = s;
