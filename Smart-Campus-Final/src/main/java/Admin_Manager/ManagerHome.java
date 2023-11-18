@@ -32,7 +32,6 @@ public class ManagerHome extends JFrame {
                 managerDashboard.setVisible(true);
             }
         });
-
         showMembersButton = new JButton("회원 목록 보기");
         showMembersButton.addActionListener(new ActionListener() {
             @Override
@@ -41,7 +40,6 @@ public class ManagerHome extends JFrame {
                 memberList.setVisible(true);
             }
         });
-
         academicScheduleButton = new JButton("학사일정 관리");
         academicScheduleButton.addActionListener(new ActionListener() {
             @Override
@@ -50,7 +48,6 @@ public class ManagerHome extends JFrame {
                 scheduleManager.setVisible(true);
             }
         });
-
         lostThingsButton = new JButton("분실물찾기");
         lostThingsButton.addActionListener(new ActionListener() {
             @Override
@@ -59,7 +56,6 @@ public class ManagerHome extends JFrame {
                 lostThingsManager.setVisible(true);
             }
         });
-
         staffSearchButton = new JButton("교직원검색");
         staffSearchButton.addActionListener(new ActionListener() {
             @Override
@@ -68,7 +64,6 @@ public class ManagerHome extends JFrame {
                 manager.setVisible(true);
             }
         });
-
         timeTableButton = new JButton("시간표 관리");
         timeTableButton.addActionListener(new ActionListener() {
             @Override
@@ -77,8 +72,6 @@ public class ManagerHome extends JFrame {
                 managerTimeTable.setVisible(true);
             }
         });
-
-        // 추가된 버튼
         univHopeButton = new JButton("학교에 바란다 탭");
         univHopeButton.addActionListener(new ActionListener() {
             @Override
@@ -86,8 +79,7 @@ public class ManagerHome extends JFrame {
                 ManagerUnivHope managerUnivHope = new ManagerUnivHope();
                 managerUnivHope.setVisible(true);
             }
-        });
-        
+        });  
         clubManagementButton = new JButton("동아리 관리");
         clubManagementButton.addActionListener(new ActionListener() {
             @Override
@@ -96,7 +88,6 @@ public class ManagerHome extends JFrame {
                 managerClub.setVisible(true);
             }
         });
-
         setLayout(new FlowLayout());
         add(noteButton);
         add(showMembersButton);
@@ -107,7 +98,6 @@ public class ManagerHome extends JFrame {
         add(univHopeButton);
         add(clubManagementButton);
     }
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             ManagerHome managerHome = new ManagerHome();

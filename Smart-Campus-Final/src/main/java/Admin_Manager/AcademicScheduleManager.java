@@ -85,7 +85,6 @@ public class AcademicScheduleManager extends JFrame {
 
         loadSchedules();
     }
-
     private void loadSchedules() {
         tableModel.setRowCount(0);
 
@@ -106,7 +105,6 @@ public class AcademicScheduleManager extends JFrame {
             e.printStackTrace();
         }
     }
-
     private void addSchedule() {
         try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
              PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO academic_schedule (start_date, end_date, event) VALUES (?, ?, ?)")) {
@@ -128,7 +126,6 @@ public class AcademicScheduleManager extends JFrame {
             JOptionPane.showMessageDialog(this, "오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
         }
     }
-
     private void updateSchedule() {
         int selectedRow = scheduleTable.getSelectedRow();
         if (selectedRow != -1) {
@@ -151,7 +148,6 @@ public class AcademicScheduleManager extends JFrame {
             }
         }
     }
-
     private void deleteSchedule() {
         int selectedRow = scheduleTable.getSelectedRow();
         if (selectedRow != -1) {
