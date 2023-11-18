@@ -1,6 +1,7 @@
 package Admin_Manager;
 
 import javax.swing.*;
+import services.DatabaseService;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -17,17 +18,16 @@ public class LostThingsManager extends JFrame {
     private JTable lostThingsTable;
     private DefaultTableModel lostThingsTableModel;
     private JButton refreshButton;
-    private String currentCategory = "found_items";  // 기본값 설정
+    private String currentCategory = "found_items";
+    private DatabaseService dbService = new DatabaseService();
 
     public LostThingsManager() {
         setTitle("분실물 관리");
         setSize(500, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-
         initComponents();
     }
-
     private void initComponents() {
         setLayout(new BorderLayout());
 
@@ -57,7 +57,6 @@ public class LostThingsManager extends JFrame {
                 }
             }
         });
-
         addButton = new JButton("분실물 추가");
         addButton.addActionListener(e -> {
             String title = JOptionPane.showInputDialog("분실물 제목을 입력하세요:");
@@ -69,7 +68,6 @@ public class LostThingsManager extends JFrame {
                 }
             }
         });
-
         editButton = new JButton("분실물 수정");
         editButton.addActionListener(e -> {
             int rowIndex = lostThingsTable.getSelectedRow();
@@ -86,7 +84,6 @@ public class LostThingsManager extends JFrame {
                 }
             }
         });
-
         deleteButton = new JButton("분실물 삭제");
         deleteButton.addActionListener(e -> {
             int rowIndex = lostThingsTable.getSelectedRow();
@@ -102,12 +99,10 @@ public class LostThingsManager extends JFrame {
                 loadDataFromDatabase(currentCategory);
             }
         });
-
         refreshButton = new JButton("새로고침");
         refreshButton.addActionListener(e -> {
             loadDataFromDatabase(currentCategory);
         });
-
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
@@ -115,71 +110,68 @@ public class LostThingsManager extends JFrame {
         buttonPanel.add(refreshButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-
         add(new JScrollPane(lostThingsTable), BorderLayout.CENTER);
 
         loadDataFromDatabase(currentCategory);
     }
-
     private void addLostThing(String title, String content, String author) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "INSERT INTO " + currentCategory + " (title, content, author, post_date) VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, title);
             statement.setString(2, content);
             statement.setString(3, author);
             statement.executeUpdate();
-            connection.close();
-            loadDataFromDatabase(currentCategory);  // 데이터 추가 후 데이터 갱신
+            statement.close();
+            loadDataFromDatabase(currentCategory);
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
-
     private void editLostThing(String oldTitle, String newTitle, String newContent) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "UPDATE " + currentCategory + " SET title = ?, content = ? WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, newTitle);
             statement.setString(2, newContent);
             statement.setString(3, oldTitle);
             statement.executeUpdate();
-            connection.close();
-            loadDataFromDatabase(currentCategory);  // 데이터 수정 후 데이터 갱신
+            statement.close();
+            loadDataFromDatabase(currentCategory);
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
-
     private void deleteLostThing(String title) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "DELETE FROM " + currentCategory + " WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, title);
             statement.executeUpdate();
-            connection.close();
-            loadDataFromDatabase(currentCategory);  // 데이터 삭제 후 데이터 갱신
+            statement.close();
+            loadDataFromDatabase(currentCategory);
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
-
     private void loadDataFromDatabase(String tableName) {
         currentCategory = tableName;
-        String url = "jdbc:mysql://localhost:3306/self_order_kiosk?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-        String user = "root";
-        String password = "dongyang";
-
-        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+        try {
+            dbService.connect();
             String query = "SELECT * FROM " + tableName;
-            PreparedStatement stmt = conn.prepareStatement(query);
+            PreparedStatement stmt = dbService.conn.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
 
             lostThingsTableModel.setRowCount(0);
-
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String title = rs.getString("title");
@@ -189,12 +181,15 @@ public class LostThingsManager extends JFrame {
                 int views = rs.getInt("views");
                 lostThingsTableModel.addRow(new Object[]{id, title, content, author, postDate, views});
             }
+            rs.close();
+            stmt.close();
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "데이터 로딩 중 오류가 발생했습니다.");
+        } finally {
+            dbService.disconnect();
         }
     }
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             LostThingsManager lostThingsManager = new LostThingsManager();

@@ -16,32 +16,32 @@ import javax.swing.event.ChangeListener;
 import Admin_Login_Notice.LoginNoticePanel;
 import Admin_LostThi.LostThings;
 import Admin_UnivHope.UnivHope;
+import services.DatabaseService;
 
 public class AdminFrame extends javax.swing.JFrame {
     
     private JButton profileButton;
     private String currentLoggedInUsername; 
-    private String currentLoggedInUserMajor = "전체"; // default value
-    private String currentLoggedInName; // 멤버 변수로 선언
-   
+    private String currentLoggedInUserMajor = "전체"; 
+    private String currentLoggedInName;
+    private DatabaseService dbService;
+ 
     public AdminFrame(String loggedInUsername) {
         String[] userInfo = getUserInfo(loggedInUsername);
-        this.currentLoggedInUsername = loggedInUsername; // 현재 로그인한 사용자의 username
-        this.currentLoggedInUserMajor = userInfo[0]; // 로그인한 사용자의 전공
-        this.currentLoggedInName = userInfo[1]; // 로그인한 사용자의 이름, 멤버 변수에 저장
+        this.currentLoggedInUsername = loggedInUsername; 
+        this.currentLoggedInUserMajor = userInfo[0]; 
+        this.currentLoggedInName = userInfo[1];
         initComponents();
         app.Global.setAppIcon(this);
         initProfileButton();
     }
-
     private String[] getUserInfo(String username) {
-        // DB에서 사용자의 전공과 이름을 가져옵니다.
         String major = "전체";
         String name = "";
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT major, name FROM user1 WHERE Username = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, username);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
@@ -50,38 +50,36 @@ public class AdminFrame extends javax.swing.JFrame {
             }
             rs.close();
             statement.close();
-            connection.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
         return new String[] { major, name };
     }
-
     private void initProfileButton() {
         profileButton = new JButton("@");
-        profileButton.setPreferredSize(new Dimension(50, 25)); // 버튼의 크기 설정
+        profileButton.setPreferredSize(new Dimension(50, 25));
         profileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ProfileUpdateDelete.ShowProfile(currentLoggedInUsername); // 현재 로그인한 사용자의 username을 전달
+                ProfileUpdateDelete.ShowProfile(currentLoggedInUsername); 
             }
         });
-        // JTabbedPane의 맨 오른쪽에 버튼을 추가
         JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setOpaque(false);
         buttonPanel.add(profileButton, BorderLayout.EAST);
-        tabbedPane.addTab("", null); // 빈 탭 추가
-        tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, buttonPanel); // 마지막 빈 탭에 버튼 추가
+        tabbedPane.addTab("", null);
+        tabbedPane.setTabComponentAt(tabbedPane.getTabCount() - 1, buttonPanel); 
     }
     @SuppressWarnings("unchecked")
     private void initComponents() {
         tabbedPane = new javax.swing.JTabbedPane();
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Admin");
-        setName(""); // NOI18N
+        setName("");
         setPreferredSize(new java.awt.Dimension(1080, 600));
         
-        // 탭들을 추가
         tabbedPane.addTab("시간표", new TimetablePanel(currentLoggedInUsername));
         tabbedPane.addTab("학교에 바란다", new UnivHope(currentLoggedInName));
         tabbedPane.addTab("학과 공지사항", new LoginNoticePanel(currentLoggedInUserMajor));
@@ -96,19 +94,17 @@ public class AdminFrame extends javax.swing.JFrame {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (tabbedPane.getSelectedComponent() instanceof LoginNoticePanel) {
-                    LoginNoticePanel.resetNoticeLoadedFlag(); // 플래그 초기화
+                    LoginNoticePanel.resetNoticeLoadedFlag();
                     LoginNoticePanel.showNoticeTableOnPanel((LoginNoticePanel) tabbedPane.getSelectedComponent());
                 }
             }
         });
     }
-
     public static void main(String args[]) {
         app.Global.setDefaultTheme();
         java.awt.EventQueue.invokeLater(() -> {
             new AdminFrame("defaultUser").setVisible(true); 
         });
     }
-
     private javax.swing.JTabbedPane tabbedPane;
 }

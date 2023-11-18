@@ -162,7 +162,6 @@ public class TimetablePanel extends JPanel {
         try {
             dbService.connect();
             PreparedStatement preparedStatement = dbService.conn.prepareStatement(query);
-            // 파라미터 설정
             preparedStatement.setString(1, newDay);
             preparedStatement.setString(2, newStartTime);
             preparedStatement.setString(3, newEndTime);
@@ -185,7 +184,6 @@ public class TimetablePanel extends JPanel {
             dbService.disconnect();
         }
     }
-
     private void deleteFromDatabase(String day, String startTime, String endTime) {
         String query = "DELETE FROM timetable WHERE studentId = ? AND day = ? AND startTime = ? AND endTime = ?";
         try {
@@ -195,7 +193,6 @@ public class TimetablePanel extends JPanel {
             preparedStatement.setString(2, day);
             preparedStatement.setString(3, startTime);
             preparedStatement.setString(4, endTime);
-
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows == 0) {
                 JOptionPane.showMessageDialog(null, "해당 항목을 찾을 수 없습니다.");
@@ -316,7 +313,6 @@ public class TimetablePanel extends JPanel {
                 placeField.setText(place);
                 dayCombo.setSelectedIndex(col - 1);
                 
-                // Check for the ending time of this course
                 int endRow = row;
                 while (endRow < 10 && labels[endRow + 1][col].getText().equals(text)) {
                     endRow++;

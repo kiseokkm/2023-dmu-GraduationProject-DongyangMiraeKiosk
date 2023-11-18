@@ -16,7 +16,6 @@ public class ManagerMemberList extends JFrame {
     private DefaultTableModel memberTableModel;
     private JButton refreshButton;
     
-
     public ManagerMemberList() {
         setTitle("회원 목록");
         setSize(600, 400);
@@ -27,7 +26,6 @@ public class ManagerMemberList extends JFrame {
         initComponents();
         pack(); 
     }
-
     private void initComponents() {
     	String[] columnNames = {"Username", "Password", "Major", "Student ID", "Name", "Phone Number", "Most Precious Thing"};
         memberTableModel = new DefaultTableModel(columnNames, 0);
@@ -47,19 +45,16 @@ public class ManagerMemberList extends JFrame {
                     String phoneNumber = (String) memberTableModel.getValueAt(selectedRow, 5);
                     String mostPreciousThing = (String) memberTableModel.getValueAt(selectedRow, 6);
 
-
                     MemberEditDialog dialog = new MemberEditDialog(ManagerMemberList.this, username,password, major, studentId, name, phoneNumber, mostPreciousThing);
                     dialog.setVisible(true);
                     loadMembersIntoTable();
                 }
             }
         });
-
         refreshButton = new JButton("새로고침");
         refreshButton.addActionListener(e -> {
             loadMembersIntoTable();
         });
-
         JButton editButton = new JButton("수정하기");
         editButton.addActionListener(e -> {
             try {
@@ -84,14 +79,11 @@ public class ManagerMemberList extends JFrame {
                 JOptionPane.showMessageDialog(ManagerMemberList.this, "오류가 발생했습니다.", "에러", JOptionPane.ERROR_MESSAGE);
             }
         });
-	
-
         JButton deleteButton = new JButton("탈퇴하기");
         deleteButton.addActionListener(e -> {
             int selectedRow = memberTable.getSelectedRow();
             if (selectedRow != -1) {
                 String username = (String) memberTableModel.getValueAt(selectedRow, 0);
-                // Confirm deletion
                 int response = JOptionPane.showConfirmDialog(ManagerMemberList.this, "정말로 이 회원을 삭제하시겠습니까?", "회원 삭제", JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.YES_OPTION) {
                     deleteMember(username);
@@ -99,7 +91,6 @@ public class ManagerMemberList extends JFrame {
                 }
             }
         });
-
         JPanel northPanel = new JPanel();
         northPanel.add(refreshButton);
         northPanel.add(editButton);
@@ -109,9 +100,6 @@ public class ManagerMemberList extends JFrame {
 
         loadMembersIntoTable();
     }
-
-
-
     private void deleteMember(String username) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
@@ -125,14 +113,13 @@ public class ManagerMemberList extends JFrame {
             ex.printStackTrace();
         }
     }
-
     private void loadMembersIntoTable() {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
             String sql = "SELECT username, major, studentId, name, phoneNumber, mostPreciousThing, password FROM user1";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
-            memberTableModel.setRowCount(0);  // 테이블 초기화
+            memberTableModel.setRowCount(0); 
             while (rs.next()) {
                 String username = rs.getString("username");
                 String password = rs.getString("password");
@@ -141,7 +128,6 @@ public class ManagerMemberList extends JFrame {
                 String name = rs.getString("name");
                 String phoneNumber = rs.getString("phoneNumber");
                 String mostPreciousThing = rs.getString("mostPreciousThing");
-                // 비밀번호를 테이블에 추가
                 memberTableModel.addRow(new Object[]{username, password, major, studentId, name, phoneNumber, mostPreciousThing});
                 
             }
@@ -152,8 +138,6 @@ public class ManagerMemberList extends JFrame {
             ex.printStackTrace();
         }
     }
-
-
 	public class MemberEditDialog extends JDialog {
 	    private JComboBox<String> comboMajor;
 	    private JTextField studentIdField, nameField, phoneNumberField, preciousThingField;
@@ -166,7 +150,6 @@ public class ManagerMemberList extends JFrame {
 	        super(parent, "회원 정보 수정", true);
 	        this.username = username;
 
-	        // major JComboBox 초기화
 	        comboMajor = new JComboBox<String>();
 	        String[] majors = {
 	            "기계공학과", "기계설계공학과", "로봇공학과", "자동화공학과", "전기공학과", 
@@ -178,7 +161,7 @@ public class ManagerMemberList extends JFrame {
 	        for (String m : majors) {
 	            comboMajor.addItem(m);
 	        }
-	        comboMajor.setSelectedItem(major); // 현재의 major로 선택 설정
+	        comboMajor.setSelectedItem(major); 
 	        
 	        usernameField = new JTextField(username, 15);
 	        passwordField = new JTextField(password, 15);
@@ -195,9 +178,9 @@ public class ManagerMemberList extends JFrame {
 
 	        JPanel formPanel = new JPanel();
 	        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-	        formPanel.add(createEntryPanel("Username:", usernameField));  // 여기를 추가
+	        formPanel.add(createEntryPanel("Username:", usernameField));  
 	        formPanel.add(createEntryPanel("Password:", passwordField));
-	        formPanel.add(createEntryPanel("Major:",comboMajor )); // majorField 대신 comboMajor 사용
+	        formPanel.add(createEntryPanel("Major:",comboMajor )); 
 	        formPanel.add(createEntryPanel("Student ID:", studentIdField));
 	        formPanel.add(createEntryPanel("Name:", nameField));
 	        formPanel.add(createEntryPanel("Phone Number:", phoneNumberField));
@@ -218,7 +201,7 @@ public class ManagerMemberList extends JFrame {
 	    private JPanel createEntryPanel(String labelText, JComponent component) {
 	        JPanel entryPanel = new JPanel(new BorderLayout());
 	        entryPanel.add(new JLabel(labelText), BorderLayout.WEST);
-	        entryPanel.add(component, BorderLayout.CENTER); // 여기를 수정
+	        entryPanel.add(component, BorderLayout.CENTER); 
 	        return entryPanel;
 	    }
 
@@ -226,7 +209,6 @@ public class ManagerMemberList extends JFrame {
 	        try {
 	            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
 	            
-	            // 사용자 이름 및 비밀번호도 업데이트
 	            String sql = "UPDATE user1 SET username=?, password=?, major=?, studentId=?, name=?, phoneNumber=?, mostPreciousThing=? WHERE username=?";
 	            PreparedStatement statement = connection.prepareStatement(sql);
 	            
@@ -247,12 +229,11 @@ public class ManagerMemberList extends JFrame {
 	            ex.printStackTrace();
 	        }
 	    }
-
         private void deleteMember() {
             int response = JOptionPane.showConfirmDialog(this, "정말로 이 회원을 삭제하시겠습니까?", "회원 삭제", JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.YES_OPTION) {
-                ManagerMemberList.this.deleteMember(username);  // 이 부분에서 deleteMember 메서드를 호출할 때 파라미터로 username을 전달합니다.
-                dispose();  // Close the dialog
+                ManagerMemberList.this.deleteMember(username);  
+                dispose();  
             }
         }
     }

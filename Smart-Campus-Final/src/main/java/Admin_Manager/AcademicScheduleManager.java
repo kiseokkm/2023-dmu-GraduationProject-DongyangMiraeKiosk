@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import Kiosk_AcademicSchedule.JDateChooser;
+import services.DatabaseService;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -31,6 +32,7 @@ public class AcademicScheduleManager extends JFrame {
     private JButton refreshButton;
     private JDateChooser startDateChooser;
     private JDateChooser endDateChooser;
+    private DatabaseService dbService = new DatabaseService();
 
     public AcademicScheduleManager() {
         setTitle("학사일정 관리");
@@ -87,10 +89,9 @@ public class AcademicScheduleManager extends JFrame {
     }
     private void loadSchedules() {
         tableModel.setRowCount(0);
-
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM academic_schedule ORDER BY start_date ASC")) {
-
+        try {
+            dbService.connect();
+            PreparedStatement statement = dbService.conn.prepareStatement("SELECT * FROM academic_schedule ORDER BY start_date ASC");
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -100,19 +101,21 @@ public class AcademicScheduleManager extends JFrame {
                 String event = resultSet.getString("event");
                 tableModel.addRow(new Object[]{id, startDate, endDate, event});
             }
-
+            resultSet.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
     private void addSchedule() {
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-             PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO academic_schedule (start_date, end_date, event) VALUES (?, ?, ?)")) {
-
+        try {
+            dbService.connect();
+            PreparedStatement insertStatement = dbService.conn.prepareStatement("INSERT INTO academic_schedule (start_date, end_date, event) VALUES (?, ?, ?)");
             insertStatement.setDate(1, new java.sql.Date(startDateChooser.getDate().getTime()));
             insertStatement.setDate(2, endDateChooser.getDate() != null ? new java.sql.Date(endDateChooser.getDate().getTime()) : null);
             insertStatement.setString(3, eventField.getText());
-
             int result = insertStatement.executeUpdate();
             if (result > 0) {
                 loadSchedules();
@@ -120,19 +123,21 @@ public class AcademicScheduleManager extends JFrame {
             } else {
                 JOptionPane.showMessageDialog(this, "데이터베이스에 항목을 추가하는 데 실패했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             }
-
+            insertStatement.close();
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            dbService.disconnect();
         }
     }
     private void updateSchedule() {
         int selectedRow = scheduleTable.getSelectedRow();
         if (selectedRow != -1) {
             int selectedId = (int) tableModel.getValueAt(selectedRow, 0);
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-                 PreparedStatement preparedStatement = connection.prepareStatement("UPDATE academic_schedule SET start_date = ?, end_date = ?, event = ? WHERE id = ?")) {
-
+            try {
+                dbService.connect();
+                PreparedStatement preparedStatement = dbService.conn.prepareStatement("UPDATE academic_schedule SET start_date = ?, end_date = ?, event = ? WHERE id = ?");
                 preparedStatement.setDate(1, new java.sql.Date(startDateChooser.getDate().getTime()));
                 preparedStatement.setDate(2, endDateChooser.getDate() != null ? new java.sql.Date(endDateChooser.getDate().getTime()) : null);
                 preparedStatement.setString(3, eventField.getText());
@@ -142,9 +147,11 @@ public class AcademicScheduleManager extends JFrame {
                 if (result > 0) {
                     loadSchedules();
                 }
-
+                preparedStatement.close();
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                dbService.disconnect();
             }
         }
     }
@@ -152,18 +159,20 @@ public class AcademicScheduleManager extends JFrame {
         int selectedRow = scheduleTable.getSelectedRow();
         if (selectedRow != -1) {
             int selectedId = (int) tableModel.getValueAt(selectedRow, 0);
-            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-                 PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM academic_schedule WHERE id = ?")) {
-
+            try {
+                dbService.connect();
+                PreparedStatement preparedStatement = dbService.conn.prepareStatement("DELETE FROM academic_schedule WHERE id = ?");
                 preparedStatement.setInt(1, selectedId);
 
                 int result = preparedStatement.executeUpdate();
                 if (result > 0) {
                     loadSchedules();
                 }
-
+                preparedStatement.close();
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                dbService.disconnect();
             }
         }
     }

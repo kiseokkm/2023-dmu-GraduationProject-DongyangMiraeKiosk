@@ -1,5 +1,4 @@
 package Admin_Manager;
-//공지사항
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -9,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
-
+import services.DatabaseService;
 public class ManagerDashboard extends JFrame {
     private JButton addNoticeButton;
     private JButton editNoticeButton;
@@ -17,6 +16,7 @@ public class ManagerDashboard extends JFrame {
     private JTable noticeTable; 
     private DefaultTableModel noticeTableModel;
     private JButton refreshButton;
+    private DatabaseService dbService = new DatabaseService();
     private String[] types = {
         "전체","기계공학과", "기계설계공학과", "로봇공학과", "자동화공학과", "전기공학과", "정보전자공학과",
         "반도체전자공학과", "정보통신공학과", "소방안전관리과", "컴퓨터소프트웨어공학과", "컴퓨터정보공학과",
@@ -40,12 +40,10 @@ public class ManagerDashboard extends JFrame {
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.anchor = GridBagConstraints.WEST;
 
-            // 제목 입력 필드와 레이블
             panel.add(new JLabel("공지 제목을 입력하세요:"), gbc);
             JTextField titleField = new JTextField(20);
             panel.add(titleField, gbc);
 
-            // 내용 입력 필드와 레이블
             panel.add(new JLabel("공지 내용을 입력하세요:"), gbc);
             JTextArea contentArea = new JTextArea(15, 25); 
             contentArea.setLineWrap(true);
@@ -53,12 +51,10 @@ public class ManagerDashboard extends JFrame {
             JScrollPane contentScrollPane = new JScrollPane(contentArea);
             panel.add(contentScrollPane, gbc);
 
-            // 저자 입력 필드와 레이블
             panel.add(new JLabel("작성자를 입력하세요:"), gbc);
             JTextField authorField = new JTextField(20);
             panel.add(authorField, gbc);
 
-            // 유형 선택 콤보 박스와 레이블
             panel.add(new JLabel("학과를 선택하세요:"), gbc);
             JComboBox<String> typeComboBox = new JComboBox<>(types);
             panel.add(typeComboBox, gbc);
@@ -74,10 +70,6 @@ public class ManagerDashboard extends JFrame {
                 int rowIndex = noticeTable.getSelectedRow();
                 boolean pinned = rowIndex != -1 && ((Boolean) noticeTableModel.getValueAt(rowIndex, 4)).booleanValue();
                 
-                
-
-
-                // 입력 값 검증 및 공지 추가 함수 호출
                 if (!title.isEmpty() && !content.isEmpty() && !author.isEmpty() && selectedType != null) {
                     addNotice(title, content, author, selectedType, pinned);
                 }
@@ -91,7 +83,7 @@ public class ManagerDashboard extends JFrame {
                 return;
             }
             String oldTitle = (String) noticeTableModel.getValueAt(rowIndex, 1);
-            String oldContent = fetchContentByTitle(oldTitle); // 이 부분 추가
+            String oldContent = fetchContentByTitle(oldTitle); 
             String newTitle = JOptionPane.showInputDialog("Enter new title:", oldTitle);
             String newContent = JOptionPane.showInputDialog("Enter new content:", oldContent); 
             JComboBox<String> typeComboBox = new JComboBox<>(types);
@@ -131,7 +123,7 @@ public class ManagerDashboard extends JFrame {
         noticeTableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 0 || columnIndex == 4) return Boolean.class;  // 4로 변경
+                if (columnIndex == 0 || columnIndex == 4) return Boolean.class;  
                 return String.class;
             }
             @Override
@@ -142,11 +134,11 @@ public class ManagerDashboard extends JFrame {
         noticeTable = new JTable(noticeTableModel);
         noticeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         noticeTable.getModel().addTableModelListener(e -> {
-            if (e.getColumn() == 4) {  // "pinned" 열의 인덱스는 4
+            if (e.getColumn() == 4) {  
                 int rowIndex = e.getFirstRow();
-                String title = (String) noticeTableModel.getValueAt(rowIndex, 1); // 제목은 1번 인덱스에 있습니다.
-                boolean pinned = (boolean) noticeTableModel.getValueAt(rowIndex, 4);  // "pinned" 열의 인덱스는 4
-                updatePinStatus(title, pinned);  // 핀 상태 업데이트
+                String title = (String) noticeTableModel.getValueAt(rowIndex, 1); 
+                boolean pinned = (boolean) noticeTableModel.getValueAt(rowIndex, 4); 
+                updatePinStatus(title, pinned);  
             }
         });
         JScrollPane scrollPane = new JScrollPane(noticeTable);
@@ -160,9 +152,9 @@ public class ManagerDashboard extends JFrame {
     private String fetchContentByTitle(String title) {
         String content = "";
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT content FROM notices WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, title);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
@@ -170,67 +162,65 @@ public class ManagerDashboard extends JFrame {
             }
             rs.close();
             statement.close();
-            connection.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
         return content;
     }
     private void addNotice(String title, String content, String author, String type, boolean pinned) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "INSERT INTO notices (title, content, author, type, date, pinned) VALUES (?, ?, ?, ?, CURDATE(), ?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, title);
             statement.setString(2, content);
             statement.setString(3, author);
             statement.setString(4, type);
-            statement.setInt(5, pinned ? 1 : 0);
+            statement.setBoolean(5, pinned);
             statement.executeUpdate();
-            connection.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
     private void editNotice(String oldTitle, String newTitle, String newContent, String type) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "UPDATE notices SET title = ?, content = ?, type = ? WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, newTitle);
             statement.setString(2, newContent);
             statement.setString(3, type);
             statement.setString(4, oldTitle);
             statement.executeUpdate();
-            connection.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
+            loadNoticesIntoTable();
         }
-        loadNoticesIntoTable();
     }
     private void deleteNotice(String title) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "DELETE FROM notices WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, title);
             statement.executeUpdate();
-            connection.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
-    }
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            ManagerDashboard managerDashboard = new ManagerDashboard();
-            managerDashboard.setVisible(true);
-        });
     }
     private void loadNoticesIntoTable() {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT title, type, content, pinned FROM notices ORDER BY pinned DESC, date DESC";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
             noticeTableModel.setRowCount(0);
             while (rs.next()) {
@@ -238,38 +228,38 @@ public class ManagerDashboard extends JFrame {
                 String type = rs.getString("type");
                 String content = rs.getString("content");
                 boolean pinned = rs.getBoolean("pinned");
-                if (pinned) {
-                    title = "★ " + title;
-                }
+                title = pinned ? "★ " + title : title;
                 noticeTableModel.addRow(new Object[]{false, title, type, content, pinned});  
             }
             rs.close();
             statement.close();
-            connection.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
     private void updatePinStatus(String title, boolean pinned) {
         try {
             title = title.replace("★ ", "");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "UPDATE notices SET pinned = ? WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, pinned ? 1 : 0);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
+            statement.setBoolean(1, pinned);
             statement.setString(2, title);
             statement.executeUpdate();
-            connection.close();
-            loadNoticesIntoTable();  // 데이터베이스 변경 후 테이블을 다시 로드합니다.
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
+            loadNoticesIntoTable();
         }
     }
     private void showNoticeDetails(String title) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT content FROM notices WHERE title = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, title);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
@@ -284,9 +274,10 @@ public class ManagerDashboard extends JFrame {
             }
             rs.close();
             statement.close();
-            connection.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
 }

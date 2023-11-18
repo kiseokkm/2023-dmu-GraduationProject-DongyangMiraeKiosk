@@ -8,16 +8,14 @@ import Kiosk_Club.MajorClub;
 
 import java.awt.*;
 import java.sql.*;
+import services.DatabaseService;
 
 public class ManagerClub extends JFrame {
-
     private JTabbedPane tabbedPane;
     private JPanel hobbyClubPanel;
     private JPanel majorClubPanel;
+    private DatabaseService dbService = new DatabaseService();
 
-    private final String DB_URL = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8";
-    private final String DB_USER = "root";
-    private final String DB_PASSWORD = "dongyang";
 
     public ManagerClub() {
         setTitle("Club Management");
@@ -68,8 +66,6 @@ public class ManagerClub extends JFrame {
         tabbedPane.addTab("전공동아리", majorClubPanel);
         add(tabbedPane, BorderLayout.CENTER);
     }
-    
-    
     private void addHobbyData() {
         String clubName = JOptionPane.showInputDialog(this, "동아리명을 입력하세요");
         String ciLab = JOptionPane.showInputDialog(this, "C.Ⅰ. Lab을 입력하세요");
@@ -78,7 +74,6 @@ public class ManagerClub extends JFrame {
         executeUpdateQuery(query, clubName, ciLab, intro);
         ((HobbyClub) hobbyClubPanel).refreshData();
     }
-
     private void editHobbyData() {
         JTable currentTable = ((HobbyClub) hobbyClubPanel).getTable();
         int selectedRow = currentTable.getSelectedRow();
@@ -94,7 +89,6 @@ public class ManagerClub extends JFrame {
             JOptionPane.showMessageDialog(this, "Please select a row to edit.");
         }
     }
-
     private void deleteHobbyData() {
         JTable currentTable = ((HobbyClub) hobbyClubPanel).getTable();
         int selectedRow = currentTable.getSelectedRow();
@@ -107,7 +101,6 @@ public class ManagerClub extends JFrame {
             JOptionPane.showMessageDialog(this, "Please select a row to delete.");
         }
     }
-
     private void addMajorData() {
         String faculty = JOptionPane.showInputDialog(this, "학부를 입력하세요");
         String pdLab = JOptionPane.showInputDialog(this, "PDLab을 입력하세요");
@@ -118,7 +111,6 @@ public class ManagerClub extends JFrame {
         executeUpdateQuery(query, faculty, pdLab, activity, project, professor);
         MajorClub.refreshData(MajorClub.getTableFromPanel(majorClubPanel));
     }
-
     private void editMajorData() {
         JTable currentTable = MajorClub.getTableFromPanel(majorClubPanel);
         int selectedRow = currentTable.getSelectedRow();
@@ -136,8 +128,6 @@ public class ManagerClub extends JFrame {
             JOptionPane.showMessageDialog(this, "Please select a row to edit.");
         }
     }
-
-
     private void deleteMajorData() {
         JTable currentTable = MajorClub.getTableFromPanel(majorClubPanel);
         int selectedRow = currentTable.getSelectedRow();
@@ -150,7 +140,6 @@ public class ManagerClub extends JFrame {
             JOptionPane.showMessageDialog(this, "Please select a row to delete.");
         }
     }
-
     private boolean isNumeric(String str) {
         try {
             Integer.parseInt(str);
@@ -159,14 +148,12 @@ public class ManagerClub extends JFrame {
             return false;
         }
     }
-    
     private void refreshDataForAdmin(JTable table) {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-        tableModel.setRowCount(0);  // Clear existing data
-
+        tableModel.setRowCount(0);
         try {
-            Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            Statement stmt = connection.createStatement();
+            dbService.connect();
+            Statement stmt = dbService.conn.createStatement();
 
             ResultSet rs = stmt.executeQuery("SELECT id, 학부, PDLab, 기본활동, 개발과제, 지도교수 FROM MajorClubs");
             while (rs.next()) {
@@ -178,37 +165,42 @@ public class ManagerClub extends JFrame {
                 int id = rs.getInt("id");
                 tableModel.addRow(new Object[]{ 학부, PDLab, 기본활동, 개발과제, 지도교수, id});
             }
-
             rs.close();
             stmt.close();
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
-
     private void executeUpdateQuery(String query, String... params) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try {
+            dbService.connect();
+            PreparedStatement pstmt = dbService.conn.prepareStatement(query);
             for (int i = 0; i < params.length; i++) {
                 pstmt.setString(i + 1, params[i]);
             }
             pstmt.executeUpdate();
+            pstmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
-
     private void executeDeleteQuery(String query, int id) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = connection.prepareStatement(query)) {
+        try {
+            dbService.connect();
+            PreparedStatement pstmt = dbService.conn.prepareStatement(query);
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
+            pstmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             ManagerClub managerClub = new ManagerClub();

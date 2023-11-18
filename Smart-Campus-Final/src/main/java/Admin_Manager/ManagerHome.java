@@ -17,7 +17,6 @@ public class ManagerHome extends JFrame {
     private JButton timeTableButton;
     private JButton univHopeButton; 
     private JButton clubManagementButton; 
-
     public ManagerHome() {
         setTitle("Manager Home");
         setSize(500, 400);

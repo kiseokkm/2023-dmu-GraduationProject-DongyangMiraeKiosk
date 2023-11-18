@@ -25,7 +25,6 @@ public class LoginFrame extends javax.swing.JFrame {
     private static final String MANAGER_PASSWORD = "password123";
     private DatabaseService dbService;
 
-
     public LoginFrame() {
         dbService = new DatabaseService(); 
         initComponents();
@@ -185,7 +184,6 @@ public class LoginFrame extends javax.swing.JFrame {
                 dispose();
                 return;
             }
-
             if (authenticateUser(username, password)) {
                 new AdminFrame(username).setVisible(true);
                 dispose();

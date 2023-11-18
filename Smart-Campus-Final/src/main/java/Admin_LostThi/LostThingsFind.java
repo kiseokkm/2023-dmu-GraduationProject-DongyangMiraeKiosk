@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import services.DatabaseService;
 
 public class LostThingsFind extends JPanel {
     private JTable table;
@@ -45,6 +46,7 @@ public class LostThingsFind extends JPanel {
     private JButton seButton;
     private JPanel categoryPanel;
     private JPanel searchPanel;
+    private DatabaseService dbService = new DatabaseService();
     
     public LostThingsFind() {
         mainPanel = this;
@@ -146,7 +148,6 @@ public class LostThingsFind extends JPanel {
     }
     private void startSpeechRecognition() {
         try {
-            // 1. 음성 녹음
             AudioFormat format = new AudioFormat(16000, 16, 1, true, true);
             DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
             TargetDataLine microphone = (TargetDataLine) AudioSystem.getLine(info);
@@ -173,10 +174,10 @@ public class LostThingsFind extends JPanel {
                 }
               }) 
             {{
-                setRepeats(false); // Timer가 한 번만 실행되도록 설정
-                start(); // Timer 시작
+                setRepeats(false); 
+                start(); 
             }};
-            dialog.setVisible(true); // 알림창 표시          
+            dialog.setVisible(true);       
             long end = System.currentTimeMillis() + 5000;  
             while (System.currentTimeMillis() < end) {
                 numBytesRead = microphone.read(data, 0, data.length);
@@ -187,7 +188,7 @@ public class LostThingsFind extends JPanel {
             ByteArrayInputStream bais = new ByteArrayInputStream(audioData);
             AudioInputStream ais = new AudioInputStream(bais, format, audioData.length / format.getFrameSize());
 
-            File wavFile1 = new File("recoding/recording.wav");  // 저장할 파일 경로 지정
+            File wavFile1 = new File("recoding/recording.wav"); 
             AudioSystem.write(ais, javax.sound.sampled.AudioFileFormat.Type.WAVE, wavFile);
             microphone.close();
             SpeechClient speech = SpeechClient.create();
@@ -217,21 +218,15 @@ public class LostThingsFind extends JPanel {
         loadDataFromDatabase(tableName, null, null);
     }
     private void loadDataFromDatabase(String tableName, String searchColumn, String searchText) {
-        String url = "jdbc:mysql://localhost:3306/self_order_kiosk?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-        String user = "root";
-        String password = "dongyang";
-
         currentCategory = tableName;
-
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             Statement stmt = conn.createStatement()) {
+        try {
+            dbService.connect();
+            Statement stmt = dbService.conn.createStatement();
             String query = "SELECT * FROM " + tableName;
             if (searchColumn != null && !searchColumn.isEmpty() && searchText != null && !searchText.isEmpty()) {
                 query += " WHERE " + searchColumn + " LIKE '%" + searchText + "%'";
             }
-
             ResultSet rs = stmt.executeQuery(query);
-
             tableModel.setRowCount(0);
 
             while (rs.next()) {
@@ -239,47 +234,48 @@ public class LostThingsFind extends JPanel {
                 String title = rs.getString("title");
                 String content = rs.getString("content");
                 String author = rs.getString("author");
-                boolean isAnonymous = rs.getBoolean("is_anonymous");
-                
+                boolean isAnonymous = rs.getBoolean("is_anonymous");              
                 if (isAnonymous) {
                     author = "익명";
                 }
-                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String postDate = sdf.format(rs.getTimestamp("post_date"));
-
                 int views = rs.getInt("views");
-
                 tableModel.addRow(new Object[]{id, title, content, author, postDate, views});
             }
+            rs.close();
+            stmt.close();
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "데이터 로딩 중 오류가 발생했습니다.");
+        } finally {
+            dbService.disconnect();
         }
     }
     public void incrementViewCount(int postId, String category) {
-        String url = "jdbc:mysql://localhost:3306/self_order_kiosk?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-        String user = "root";
-        String password = "dongyang";
         String sql = "UPDATE " + category + " SET views = views + 1 WHERE id = ?";
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try {
+            dbService.connect();
+            PreparedStatement pstmt = dbService.conn.prepareStatement(sql);
             pstmt.setInt(1, postId);
             int updatedRows = pstmt.executeUpdate();
-            
             if (updatedRows == 0) {
                 System.out.println("No rows updated. Check if the post with ID " + postId + " exists.");
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
     private void showContentInPanel(int postId) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang")) {
+                try{
+                	dbService.connect();
                     String sql = "SELECT * FROM " + currentCategory + " WHERE id = ?";
-                    PreparedStatement statement = connection.prepareStatement(sql);
+                    PreparedStatement statement = dbService.conn.prepareStatement(sql);
                     statement.setInt(1, postId);
                     ResultSet rs = statement.executeQuery();
 
@@ -325,7 +321,6 @@ public class LostThingsFind extends JPanel {
                             mainPanel.revalidate();
                             mainPanel.repaint();
                         });
-
                         contentPanel.add(backButton, BorderLayout.SOUTH);
                         mainPanel.removeAll();
                         mainPanel.add(contentPanel, BorderLayout.CENTER);
@@ -335,6 +330,8 @@ public class LostThingsFind extends JPanel {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "상세 정보를 가져오는 중 오류가 발생했습니다.");
+                }finally {
+                    dbService.disconnect();
                 }
             }
         });

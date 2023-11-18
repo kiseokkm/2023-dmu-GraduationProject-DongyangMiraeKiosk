@@ -8,10 +8,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import services.DatabaseService;
 public class ProfileUpdateDelete {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "dongyang";
+	private static DatabaseService dbService = new DatabaseService();
     public static void ShowProfile(String username)  {
         JFrame profileFrame = new JFrame("Profile");
         profileFrame.setSize(300, 400);
@@ -112,27 +111,31 @@ public class ProfileUpdateDelete {
     }
     private static void getUserInfo(String username, JTextField txtUsername, JComboBox<String> comboMajor, JTextField txtStudentId, JTextField txtName, JTextField txtPhoneNumber) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT * FROM user1 WHERE username = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, username);
             ResultSet result = statement.executeQuery();
             if (result.next()) {
                 txtUsername.setText(result.getString("username"));
-                comboMajor.setSelectedItem(result.getString("major")); // 학과 정보를 콤보박스에서 선택되게 함
+                comboMajor.setSelectedItem(result.getString("major"));
                 txtStudentId.setText(result.getString("studentId"));
                 txtName.setText(result.getString("name"));
                 txtPhoneNumber.setText(result.getString("phoneNumber"));
             }
+            result.close();
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
     private static void updateUserInDatabase(String username, String major, String studentId, String name, String phoneNumber) {
         try {
-            Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            dbService.connect();
             String sql = "UPDATE user1 SET major=?, studentId=?, name=?, phoneNumber=? WHERE username=?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, major);
             statement.setString(2, studentId);
             statement.setString(3, name);
@@ -144,25 +147,30 @@ public class ProfileUpdateDelete {
             } else {
                 JOptionPane.showMessageDialog(null, "사용자 정보 업데이트에 실패하였습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             }
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
     private static void deleteUserFromDatabase(String username) {
         try {
-            Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            dbService.connect();
             String sql = "DELETE FROM user1 WHERE username=?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, username);
             int rowsDeleted = statement.executeUpdate();
-
             if (rowsDeleted > 0) {
                 JOptionPane.showMessageDialog(null, "사용자 정보가 삭제되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(null, "사용자 정보 삭제에 실패하였습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             }
+            statement.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
 }

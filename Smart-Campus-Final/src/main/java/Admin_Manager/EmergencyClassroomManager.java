@@ -20,16 +20,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import kiosk.EmergencyClassroom;
+import services.DatabaseService;
 
 public class EmergencyClassroomManager extends JFrame {
     private EmergencyClassroom emergencyClassroomPanel;
     private JTable staffTable;
+    private DatabaseService dbService = new DatabaseService();
     
-    // DB 연결 정보
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8";
-    private static final String DB_USERNAME = "root";
-    private static final String DB_PASSWORD = "dongyang";
-
     public EmergencyClassroomManager() {
         setTitle("교직원 관리");
         setSize(600, 500);
@@ -125,9 +122,10 @@ public class EmergencyClassroomManager extends JFrame {
                 break;
         }
 
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+        try{
+        	dbService.connect();
             String sql = "SELECT id, department, name, task, phone FROM staff WHERE " + searchColumn + " LIKE ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, "%" + query + "%");
 
             ResultSet rs = statement.executeQuery();
@@ -147,9 +145,10 @@ public class EmergencyClassroomManager extends JFrame {
     }
 
     private void addStaff(String department, String name, String task, String phone) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+        try{
+        	dbService.connect();
             String sql = "INSERT INTO staff (department, name, task, phone) VALUES (?, ?, ?, ?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, department);
             statement.setString(2, name);
             statement.setString(3, task);
@@ -163,9 +162,10 @@ public class EmergencyClassroomManager extends JFrame {
     }
 
     private void modifyStaff(String id, String department, String name, String task, String phone) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+        try{
+        	dbService.connect();
             String sql = "UPDATE staff SET department=?, name=?, task=?, phone=? WHERE id=?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement =dbService.conn.prepareStatement(sql);
             statement.setString(1, department);
             statement.setString(2, name);
             statement.setString(3, task);
@@ -180,9 +180,10 @@ public class EmergencyClassroomManager extends JFrame {
     }
 
     private void deleteStaff(String id) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+        try{
+        	dbService.connect();
             String sql = "DELETE FROM staff WHERE id=?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setInt(1, Integer.parseInt(id));
             
             statement.executeUpdate();
