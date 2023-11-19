@@ -19,11 +19,9 @@ public class JDateChooser extends JPanel {
 
         dateSpinner.addChangeListener(e -> selectedDate = (Date) dateSpinner.getValue());
     }
-
     public Date getDate() {
         return selectedDate;
     }
-
     public void setDate(Date date) {
         this.selectedDate = date;
         dateSpinner.setValue(date);

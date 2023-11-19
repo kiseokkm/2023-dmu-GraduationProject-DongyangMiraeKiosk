@@ -20,8 +20,7 @@ import javafx.concurrent.Worker.State;
 
 public class CafeTeria {
 	public static JPanel createWebPanel() {
-	    JFXPanel jfxPanel = new JFXPanel();  // JFXPanel to embed JavaFX WebView in Swing
-	    // Starting the Flask server (app.py) in the background
+	    JFXPanel jfxPanel = new JFXPanel();
 	    String rootPath = System.getProperty("user.dir");
 	    ProcessBuilder processBuilder = new ProcessBuilder("python", rootPath +"/app/app.py");
 //	    processBuilder.directory(new File("/Smart-Campus(Register)_final16")); // Spring 프로젝트 루트 디렉토리로 설정	    
@@ -30,8 +29,7 @@ public class CafeTeria {
 	        processBuilder.start();
 	    } catch (IOException e) {
 	    	System.out.println(e);
-	    }	    
-	    // Run the JavaFX code on the JavaFX Application Thread
+	    }	 
 	    Platform.runLater(() -> {
 	        String cssPath = "file://" + rootPath + "/app/static/css/all.css";
 	        String cssLink = "<link rel='stylesheet' type='text/css' href='" + cssPath + "'>";
@@ -51,18 +49,15 @@ public class CafeTeria {
                     WebEngine.executeScript(script);
                 }
             });
-	        // Load the Flask server URL
 	        WebEngine.load("http://127.0.0.1:5000");	        
 //	        webView.getEngine().load("http://127.0.0.1:5000");        
 	        jfxPanel.setScene(new Scene(webView));
 	    });
-	    // Create a JPanel to wrap the JFXPanel and return
 	    JPanel panel = new JPanel(new BorderLayout());
 	    panel.add(jfxPanel, BorderLayout.CENTER);
 	    return panel;
 	} 
     public static void main(String[] args) {
-        // This main method is just for testing purposes
         createWebPanel();
     }
 }

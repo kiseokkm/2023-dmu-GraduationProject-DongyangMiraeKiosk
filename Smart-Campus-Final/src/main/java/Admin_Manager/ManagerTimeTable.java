@@ -1,6 +1,7 @@
 package Admin_Manager;
 
 import javax.swing.*;
+import services.DatabaseService;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -19,6 +20,7 @@ public class ManagerTimeTable extends JFrame {
     private JList<String> studentList;
     private JList<String> searchResultsList;
     private Connection connection;
+    private DatabaseService dbService;
 
     public ManagerTimeTable() {
         setTitle("시간표 관리");
@@ -81,11 +83,9 @@ public class ManagerTimeTable extends JFrame {
     }
 
     private void connectToDatabase() {
-        String url = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8";
-        String user = "root";
-        String password = "dongyang";
+        dbService = new DatabaseService();
         try {
-            connection = DriverManager.getConnection(url, user, password);
+            dbService.connect();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -16,12 +16,10 @@ public class College extends JPanel {
     public College() {
         initUI();
     }
-
     private void initUI() {
         setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        // Title "전문학사"
         addTextPaneSection(mainPanel);
         JLabel lblMajorMinimumCredits = new JLabel(" 학위종별 ");
         lblMajorMinimumCredits.setFont(new Font("SansSerif", Font.BOLD, 20));
@@ -42,17 +40,15 @@ public class College extends JPanel {
         textPane.setText("1년제 학과는 2학기 이상, 2년제 학과는 4학기 이상 재학한 학생이 졸업요건을 충족하면 졸업할 수 있습니다.");
         
         textPane.setEditable(false);
-        textPane.setBackground(new Color(100, 149, 237));  // Setting background color to RoyalBlue
-        textPane.setForeground(Color.WHITE);  // Setting text color to white for better visibility on blue background
+        textPane.setBackground(new Color(100, 149, 237));  
+        textPane.setForeground(Color.WHITE); 
         textPane.setFont(new Font("SansSerif", Font.BOLD, 18));
 
-        // Setting the text to be centered
         StyledDocument doc = textPane.getStyledDocument();
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
         doc.setParagraphAttributes(0, doc.getLength(), center, false);
 
-        // Set the JTextPane's maximum size to its preferred size
         textPane.setMaximumSize(textPane.getPreferredSize());
 
         JPanel textPanelWrapper = new JPanel();
@@ -63,7 +59,6 @@ public class College extends JPanel {
         
         container.add(textPanelWrapper);
     }
-
     private void addDegreeSection(JPanel container) {
         String[] columnNames = {"종별", "해당 학과"};
         Object[][] data = {
@@ -86,7 +81,6 @@ public class College extends JPanel {
         leftRenderer.setBackground(new Color(220, 220, 220));
         leftRenderer.setForeground(Color.BLACK);
         table.setDefaultRenderer(Object.class, leftRenderer);
-        // Custom cell renderer for wrapping text in cell
         class TextAreaRenderer extends JTextArea implements TableCellRenderer {
             public TextAreaRenderer() {
                 setWrapStyleWord(true);
@@ -107,7 +101,6 @@ public class College extends JPanel {
         scrollPane.setPreferredSize(new Dimension(1600, table.getPreferredSize().height + table.getTableHeader().getPreferredSize().height));
         container.add(scrollPane);
     }
-    
     private void addGraduationCreditSection(JPanel container) {
     	String[] columnNames = {"구분", "졸업 학점"};
     	Object[][] data = {

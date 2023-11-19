@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2020 Self-Order Kiosk
- */
 package kiosk;
 
 import java.util.ArrayList;
@@ -23,42 +20,33 @@ public class StateManager {
       return null;
     }
   }
-
   public static void setOrderedItem(OrderDetail orderDetail) {
     if (orderedItems == null) {
       orderedItems = new ArrayList<OrderDetail>();
     }
     orderedItems.add(orderDetail);
   }
-
   public static void setOrderedItem(OrderDetail orderDetail, int index) {
     orderedItems.set(index, orderDetail);
   }
-
   public static void removeOrderedItem(int index) {
     orderedItems.remove(index);
   }
-
   public static String getEatingLocation() {
     return eatingLocation;
   }
-
   public static void setEatingLocation(String location) {
     eatingLocation = location;
   }
-
   public static String getPaymentMethod() {
     return paymentMethod;
   }
-
   public static void setPaymentMethod(String method) {
     paymentMethod = method;
   }
-
   public static void reset() {
     orderedItems = null;
     eatingLocation = null;
     paymentMethod = null;
   }
-
 }

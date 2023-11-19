@@ -14,7 +14,6 @@ public class HoldOnGraduation extends JPanel {
     public HoldOnGraduation() {
         initUI();
     }
-
     private void initUI() {
         setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel();
@@ -29,23 +28,19 @@ public class HoldOnGraduation extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); 
         add(scrollPane, BorderLayout.CENTER);  
     }
-
     private void addTextPaneSection(JPanel container) {
         JTextPane textPane = new JTextPane();
         textPane.setText("졸업보류자의 등록금은 수강신청 학점에 따라 아래와 같이 등록금이 산정됩니다.");
         
         textPane.setEditable(false);
-        textPane.setBackground(new Color(100, 149, 237));  // Setting background color to RoyalBlue
-        textPane.setForeground(Color.WHITE);  // Setting text color to white for better visibility on blue background
+        textPane.setBackground(new Color(100, 149, 237));  
+        textPane.setForeground(Color.WHITE);  
         textPane.setFont(new Font("SansSerif", Font.BOLD, 18));
-
-        // Setting the text to be centered
         StyledDocument doc = textPane.getStyledDocument();
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
         doc.setParagraphAttributes(0, doc.getLength(), center, false);
 
-        // Set the JTextPane's maximum size to its preferred size
         textPane.setMaximumSize(textPane.getPreferredSize());
 
         JPanel textPanelWrapper = new JPanel();
@@ -56,9 +51,6 @@ public class HoldOnGraduation extends JPanel {
         
         container.add(textPanelWrapper);
     }
-
-
-
     private void addGraduationCreditSection(JPanel container) {
         String[] columnNames = {"1학점∼3학점", "4학점∼6학점", "7학점∼9학점", "10학점 이상"};
         Object[][] data = {

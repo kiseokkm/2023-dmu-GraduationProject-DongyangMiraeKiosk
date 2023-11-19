@@ -37,7 +37,6 @@ import java.awt.FlowLayout;
 public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 
   services.ItemService itemService;
-  OrderTable tbmOrder;
   java.util.ArrayList<models.Item> itemsNoticeFrame;
   java.util.ArrayList<models.Item> itemsClass;
   java.util.ArrayList<models.Item> itemsFood;
@@ -49,35 +48,20 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
            app.Global.setAppIcon(this);
            initModels();
            initComponents();
-           
-           // 모든 탭들을 초기화
            initAllTabs();
            initState();
        } catch (Exception e) {
-           e.printStackTrace(); // 오류 메세지 출력
+           e.printStackTrace(); 
            JOptionPane.showMessageDialog(this, "오류발생" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
        }
    }
   private void initAllTabs() {
-       // 공지사항 패널 초기화
        NoticeFrame.showNoticeTableOnPanel(pnlNotice);
-       
-       // 취미동아리 패널 초기화
        initHobbyClubPanel();
-
-       // 장학/등록 패널 초기화
        initScholarshipPanel();
-
-       // 교직원 검색 패널 초기화
-       initClassPanel();
-      
-       // 학사 일정 패널 초기화
+       initClassPanel();  
        initAcademicSchedulePanel();
-
-       // 졸업정보 패널 초기화
        initGraduationPanel();
-       
-       // 대중교통 패널 초기화
        initMetroPanel();
    }
   private void initHobbyClubPanel() {
@@ -85,7 +69,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
        pnlHobbyClub.setLayout(new BorderLayout());
        pnlHobbyClub.add(hobbyClubPanel, BorderLayout.CENTER);
    }
-  
   private void initScholarshipPanel() {
        ScholarshipMain scholarshipPanel = new ScholarshipMain();
        pnlScholarship.setLayout(new BorderLayout());
@@ -116,9 +99,9 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
        pnlGraduation.repaint();
    }
    private void initMetroPanel() {
-       Kiosk_Metro.MainMain metroMain = new Kiosk_Metro.MainMain(); // MainMain 인스턴스 생성
-       pnlMetro.setLayout(new BorderLayout()); // pnlMetro에 BorderLayout 레이아웃 설정
-       pnlMetro.add(metroMain.getMainPanel(), BorderLayout.CENTER); // MainMain의 탭 패널을 pnlMetro에 추가
+       Kiosk_Metro.MainMain metroMain = new Kiosk_Metro.MainMain(); 
+       pnlMetro.setLayout(new BorderLayout()); 
+       pnlMetro.add(metroMain.getMainPanel(), BorderLayout.CENTER); 
    }
   @SuppressWarnings("unchecked")
   private javax.swing.JPanel pnlLostThings;
@@ -141,7 +124,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlFooter = new javax.swing.JPanel();
     pnlMetro = new javax.swing.JPanel();
     
-
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Menu");
     setMinimumSize(new java.awt.Dimension(1800, 800));
@@ -158,7 +140,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
         tabbedPaneStateChanged(evt);
       }
     });
-
     pnlNotice.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlNotice.setMaximumSize(new java.awt.Dimension(0, 0));
     pnlNotice.setPreferredSize(new java.awt.Dimension(560, 500));
@@ -169,13 +150,10 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlMetro.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlMetro.setLayout(new java.awt.BorderLayout());
 
-    // MainMain 클래스의 인스턴스를 생성합니다.
     Kiosk_Metro.MainMain metroMain = new Kiosk_Metro.MainMain();
 
-    // MainMain 클래스에서 탭 패널을 가져와 pnlMetro에 추가합니다.
     pnlMetro.add(metroMain.getMainPanel(), BorderLayout.CENTER);
-
-    // 탭 패널에 "대중교통" 탭을 추가합니다.    
+    
     pnlAcademicSchedule = new javax.swing.JPanel();
     pnlAcademicSchedule.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlAcademicSchedule.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
@@ -183,7 +161,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     
     tabbedPane.addTab("대중교통", pnlMetro);
     
-    // Campus Map Tab using JavaFX WebView
     CampusMapFXFrame campusMapFXFrame = new CampusMapFXFrame();
     tabbedPane.addTab("캠퍼스 지도", campusMapFXFrame);
     
@@ -204,8 +181,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlClass.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
     pnlClass.setLayout(new java.awt.GridLayout(2, 3, 20, 20));
     tabbedPane.addTab("교직원 검색", pnlClass);
-
-
 
     pnlGraduation = new javax.swing.JPanel();
     pnlGraduation.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 20));
@@ -247,7 +222,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
     pnlFooter.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 20));
     pnlFooter.setLayout(new java.awt.GridBagLayout());
 
-
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.weightx = 1.0;
@@ -264,12 +238,10 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   private javax.swing.table.DefaultTableModel noticeTableModel;
   private javax.swing.JPanel pnlScholarship;
 
-  
   private void initModels() {
     itemService = new services.ItemService();
     itemsNoticeFrame = itemService.getAllByCategory(1);
 
-    tbmOrder = new OrderTable();
   }
   private void initState() {
     getAllOrderedItems();
@@ -288,7 +260,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
            NoticeFrame.resetNoticeLoadedFlag();
            NoticeFrame.showNoticeTableOnPanel(pnlNotice);
        }
-      
       if (tabIndex == 1) {
            ScholarshipMain scholarshipPanel = new ScholarshipMain();
            pnlScholarship.removeAll();
@@ -297,10 +268,8 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
            pnlScholarship.revalidate();
            pnlScholarship.repaint();
        }
-
-
-      if (tabIndex == 2) { // "교직원 검색" 탭이 선택되었을 때
-           if (pnlClass.getComponentCount() == 0) { // 패널에 아무 컴포넌트도 없는 경우만 추가
+      if (tabIndex == 2) {
+           if (pnlClass.getComponentCount() == 0) {
                EmergencyClassroom emergencyClassroom = new EmergencyClassroom();
                pnlClass.setLayout(new BorderLayout());
                pnlClass.add(emergencyClassroom, BorderLayout.CENTER);
@@ -308,11 +277,11 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
                pnlClass.repaint();
            }
        }
-          if (tabIndex == 4) { // "학식 정보" 탭이 선택되었을 때
-              pnlFood.removeAll(); // 기존 내용을 제거
-              JPanel webPanel = CafeTeria.createWebPanel(); // CafeTeria 웹 패널을 생성
-              pnlFood.setLayout(new BorderLayout()); // pnlFood에 BorderLayout을 설정
-              pnlFood.add(webPanel, BorderLayout.CENTER); // 생성된 웹 패널을 pnlFood에 추가
+          if (tabIndex == 4) { 
+              pnlFood.removeAll(); 
+              JPanel webPanel = CafeTeria.createWebPanel(); 
+              pnlFood.setLayout(new BorderLayout()); 
+              pnlFood.add(webPanel, BorderLayout.CENTER);
               pnlFood.revalidate();
               pnlFood.repaint();
           }
@@ -325,12 +294,9 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
   private void getAllOrderedItems() {
     java.util.ArrayList<models.OrderDetail> orderedItems = StateManager.getOrderedItems();
     if (orderedItems != null) {
-      tbmOrder.addRows(orderedItems);
-      tbmOrder.resizeColumns(tblOrder.getColumnModel());
       app.Global.setTotalPrice(orderedItems, lblTotalValue);
     }
   }
-
   @Override
   public void onStateChange() {
     getAllOrderedItems();
@@ -341,7 +307,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
       new MenuFrame().setVisible(true);
     });
   }
-
   private javax.swing.JLabel lblOrder;
   private javax.swing.JLabel lblTotal;
   private javax.swing.JLabel lblTotalValue;
@@ -373,5 +338,4 @@ class BtnItem extends javax.swing.JButton {
     setPreferredSize(new java.awt.Dimension(160, 160));
     setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
   }
-
 }

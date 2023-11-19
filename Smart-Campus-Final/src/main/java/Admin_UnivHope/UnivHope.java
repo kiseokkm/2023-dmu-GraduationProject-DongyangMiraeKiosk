@@ -53,6 +53,7 @@ import com.google.cloud.speech.v1.SpeechRecognitionAlternative;
 import com.google.cloud.speech.v1.SpeechRecognitionResult;
 import com.google.cloud.speech.v1.RecognitionConfig.AudioEncoding;
 import com.google.protobuf.ByteString;
+import services.DatabaseService;
 
 public class UnivHope extends JPanel {
     private JTable table;
@@ -68,11 +69,9 @@ public class UnivHope extends JPanel {
     private JComboBox<String> searchComboBox;
     private UnivHope univHopeInstance;
     private String loggedInUsername; 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "1234";
+    private static DatabaseService dbService = new DatabaseService();
     public UnivHope(String loggedInName) {
-    
+
         this.loggedInUsername = loggedInName; 
         mainPanel = this;
         setLayout(new BorderLayout());
@@ -87,7 +86,7 @@ public class UnivHope extends JPanel {
             }
         };
         JTableHeader tableHeader = table.getTableHeader();
-        tableHeader.setBackground(new Color(173, 216, 230));//테이블 헤더 백그라운드 색깔
+        tableHeader.setBackground(new Color(173, 216, 230));
         
         addTableMouseListener();
          
@@ -102,7 +101,6 @@ public class UnivHope extends JPanel {
         voiceButton .setBackground(new Color(135, 206, 235)); 
         voiceButton.addActionListener(e -> {
             try {
-                 // 1. 음성 녹음
                  AudioFormat format = new AudioFormat(16000, 16, 1, true, true);
                  DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
                  TargetDataLine microphone = (TargetDataLine) AudioSystem.getLine(info);
@@ -121,11 +119,9 @@ public class UnivHope extends JPanel {
                  final JOptionPane pane = new JOptionPane("음성을 입력해주세요.", JOptionPane.INFORMATION_MESSAGE);
                  final JDialog dialog = pane.createDialog(null, "알림");
 
-                 // Timer를 사용하여 JOptionPane을 자동으로 닫습니다.
                  new Timer(1000, (actionEvent) -> dialog.dispose()).start();
-                 dialog.setVisible(true); // 알림창 표시
+                 dialog.setVisible(true);
 
-                 // 녹음 시간 설정 (여기서는 5초로 설정)
                  long end = System.currentTimeMillis() + 5000;  
                  while (System.currentTimeMillis() < end) {
                      int numBytesRead = microphone.read(data, 0, data.length);
@@ -135,12 +131,11 @@ public class UnivHope extends JPanel {
                  ByteArrayInputStream bais = new ByteArrayInputStream(audioData);
                  AudioInputStream ais = new AudioInputStream(bais, format, audioData.length / format.getFrameSize());
 
-                 File wavFile1 = new File("recoding/recording.wav");  // 저장할 파일 경로 지정 오류 수정: wavFile로 바꿔야 합니다.
+                 File wavFile1 = new File("recoding/recording.wav");
                  AudioSystem.write(ais, AudioFileFormat.Type.WAVE, wavFile);
 
                  microphone.close();
 
-                 // 2. Google Cloud Speech-to-Text API 사용
                  SpeechClient speechClient = SpeechClient.create();
                  byte[] audioBytes = Files.readAllBytes(Paths.get("recoding/recoding.wav"));
                  RecognitionConfig config = RecognitionConfig.newBuilder()
@@ -158,13 +153,11 @@ public class UnivHope extends JPanel {
                      System.out.println("음성 입력 결과: " + alternative.getTranscript());
                      searchButton.doClick();
                  }
-                 speechClient.shutdown(); // 클라이언트를 닫고 모든 자원을 해제합니다.
-
+                 speechClient.shutdown();
              } catch (Exception ex) {
                  ex.printStackTrace();
              }
          });
-        
         searchField = new JTextField(25);
         searchComboBox = new JComboBox<>(new String[]{"제목", "답변", "작성자"});    
         searchComboBox.setBackground(new Color(211, 211, 211)); 
@@ -211,7 +204,6 @@ public class UnivHope extends JPanel {
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // 더블 클릭 이벤트 확인
                 if (e.getClickCount() == 1) {
                     int row = table.getSelectedRow();
                     if (row != -1) {
@@ -246,16 +238,21 @@ public class UnivHope extends JPanel {
                         fieldName = "author";
                         break;
                 }
-                try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                     PreparedStatement stmt = conn.prepareStatement("SELECT * FROM communication_board WHERE " + fieldName + " LIKE ?")) {
+                try {
+                    dbService.connect();
+                    PreparedStatement stmt = dbService.conn.prepareStatement("SELECT * FROM communication_board WHERE " + fieldName + " LIKE ?");
                     stmt.setString(1, "%" + searchQuery + "%");
                     ResultSet rs = stmt.executeQuery();
                     tableModel.setRowCount(0);
                     while (rs.next()) {
                     }
+                    rs.close();
+                    stmt.close();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(this, "검색 중 오류가 발생했습니다.");
+                } finally {
+                    dbService.disconnect();
                 }
             } else {
                 loadDataFromDatabase();
@@ -274,8 +271,6 @@ public class UnivHope extends JPanel {
         if (replyDate != null && !replyDate.isEmpty()) {
             replyText += "\n\n답변 작성일: " + replyDate;
         }
- 
-
         JTextArea postContent = new JTextArea();
         postContent.setText(postContentText);
         postContent.setWrapStyleWord(true);
@@ -290,8 +285,6 @@ public class UnivHope extends JPanel {
         adminReply.setLineWrap(true);
         adminReply.setEditable(false);
         adminReply.setBorder(BorderFactory.createTitledBorder("관리자 답변"));
-
-        // Set background color to white for the text areas
         postContent.setBackground(Color.WHITE);
         adminReply.setBackground(Color.WHITE);
 
@@ -345,12 +338,11 @@ public class UnivHope extends JPanel {
             JScrollPane tableScrollPane = new JScrollPane(table);
             mainPanel.add(tableScrollPane, BorderLayout.CENTER);
             mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-            loadDataFromDatabase(); // This should now call the static method from UnivHopeDb class
+            loadDataFromDatabase(); 
             mainPanel.revalidate();
             mainPanel.repaint();
         });
     }
-
     class PostDialog extends JDialog {
         private JTextField titleField;
         private JTextField authorField;
@@ -409,23 +401,29 @@ public class UnivHope extends JPanel {
             authorField.setEditable(!"익명".equals(displayAuthor)); 
         }
         private void savePostToDatabase(String title, String author, String content, boolean isAnonymous) {
-            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                PreparedStatement stmt = conn.prepareStatement("INSERT INTO communication_board (title, author, content, anonymous, admin_reply) VALUES (?, ?, ?, ?, ?)")) {
+            try {
+                dbService.connect();
+                PreparedStatement stmt = dbService.conn.prepareStatement("INSERT INTO communication_board (title, author, content, anonymous, admin_reply) VALUES (?, ?, ?, ?, ?)");
                 stmt.setString(1, title);
                 stmt.setString(2, author); 
                 stmt.setString(3, content);
                 stmt.setBoolean(4, isAnonymous); 
                 stmt.setString(5, ""); 
                 stmt.executeUpdate();
+                stmt.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "데이터 저장 중 오류가 발생했습니다.");
+            } finally {
+                dbService.disconnect();
             }
         }
+
         private String getDisplayName(int postId) {
             String displayName = "익명"; 
-            try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                 PreparedStatement stmt = conn.prepareStatement("SELECT author, anonymous FROM communication_board WHERE id = ?")) {
+            try {
+                dbService.connect();
+                PreparedStatement stmt = dbService.conn.prepareStatement("SELECT author, anonymous FROM communication_board WHERE id = ?");
                 stmt.setInt(1, postId);
                 ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
@@ -434,11 +432,15 @@ public class UnivHope extends JPanel {
                         displayName = rs.getString("author");
                     }
                 }
+                rs.close();
+                stmt.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "데이터 저장 중 오류가 발생했습니다.");
+            } finally {
+                dbService.disconnect();
             }
             return displayName; 
-           }
         }
+    }
 }

@@ -1,6 +1,7 @@
 package Kiosk_AcademicSchedule;
 
 import javax.swing.*;
+import services.DatabaseService;
 import javax.swing.table.DefaultTableModel;
 
 import Kiosk_AcademicSchedule.CustomTableCellRenderer.CustomTableCellRendererForEvents;
@@ -22,6 +23,7 @@ public class AcademicScheduleFrame extends JPanel {
     private JTable calendarTable;
     private JTable academicEventsTable;
     private HashSet<Integer> eventDays = new HashSet<>();
+    private static DatabaseService dbService = new DatabaseService();
     
     public AcademicScheduleFrame() {
         setLayout(new BorderLayout());
@@ -79,7 +81,6 @@ public class AcademicScheduleFrame extends JPanel {
             }
             updateCalendar();
         });
-
         nextMonth.addActionListener(e -> {
             currentMonth++;
             if (currentMonth > 11) {
@@ -88,13 +89,11 @@ public class AcademicScheduleFrame extends JPanel {
             }
             updateCalendar();
         });
-
         CustomTableCellRenderer.setHeaderRenderer(calendarTable);
         CustomTableCellRenderer.setHeaderRenderer(academicEventsTable);
 
         updateCalendar();
     }
-
     private void updateCalendar() {
         eventDays.clear();
         lblMonthYear.setText(currentYear + "." + (currentMonth + 1));
@@ -117,19 +116,17 @@ public class AcademicScheduleFrame extends JPanel {
             week = new Object[7];
             firstDayOfMonth = 0;
         }
-
         CustomTableCellRenderer renderer = new CustomTableCellRenderer(eventDays);
         for (int i = 0; i < calendarTable.getColumnCount(); i++) {
             calendarTable.getColumnModel().getColumn(i).setCellRenderer(renderer);
         }
-
         DefaultTableModel academicModel = (DefaultTableModel) academicEventsTable.getModel();
         academicModel.setRowCount(0);
 
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT * FROM academic_schedule WHERE (MONTH(start_date) = ? OR MONTH(end_date) = ?) AND YEAR(start_date) = ? ORDER BY start_date ASC";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            PreparedStatement preparedStatement = dbService.conn.prepareStatement(sql);
             preparedStatement.setInt(1, currentMonth + 1);
             preparedStatement.setInt(2, currentMonth + 1);
             preparedStatement.setInt(3, currentYear);
@@ -154,20 +151,17 @@ public class AcademicScheduleFrame extends JPanel {
                     academicModel.addRow(new Object[]{startDate, event});
                 }
             }
-
             resultSet.close();
-            preparedStatement.close();
-            connection.close();
-
-            // 학사 이벤트 테이블의 셀 렌더러 설정
+            preparedStatement.close();        
             CustomTableCellRendererForEvents eventsRenderer = new CustomTableCellRendererForEvents();
             for (int i = 0; i < academicEventsTable.getColumnCount(); i++) {
                 academicEventsTable.getColumnModel().getColumn(i).setCellRenderer(eventsRenderer);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "데이터베이스 연결 또는 쿼리 중 오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);
-        }
+            JOptionPane.showMessageDialog(null, "데이터베이스 연결 또는 쿼리 중 오류 발생: " + e.getMessage(), "오류", JOptionPane.ERROR_MESSAGE);       
+    } finally {
+        dbService.disconnect();
+    }
     }
 }

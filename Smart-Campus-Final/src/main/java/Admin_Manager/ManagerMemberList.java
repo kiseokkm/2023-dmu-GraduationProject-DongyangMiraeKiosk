@@ -10,11 +10,13 @@ import java.sql.ResultSet;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import services.DatabaseService;
 
 public class ManagerMemberList extends JFrame {
     private JTable memberTable;
     private DefaultTableModel memberTableModel;
     private JButton refreshButton;
+    private DatabaseService dbService = new DatabaseService();
     
     public ManagerMemberList() {
         setTitle("회원 목록");
@@ -102,22 +104,22 @@ public class ManagerMemberList extends JFrame {
     }
     private void deleteMember(String username) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "DELETE FROM user1 WHERE username=?";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             statement.setString(1, username);
             statement.executeUpdate();
-            statement.close();
-            connection.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
     private void loadMembersIntoTable() {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
+            dbService.connect();
             String sql = "SELECT username, major, studentId, name, phoneNumber, mostPreciousThing, password FROM user1";
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = dbService.conn.prepareStatement(sql);
             ResultSet rs = statement.executeQuery();
             memberTableModel.setRowCount(0); 
             while (rs.next()) {
@@ -129,13 +131,13 @@ public class ManagerMemberList extends JFrame {
                 String phoneNumber = rs.getString("phoneNumber");
                 String mostPreciousThing = rs.getString("mostPreciousThing");
                 memberTableModel.addRow(new Object[]{username, password, major, studentId, name, phoneNumber, mostPreciousThing});
-                
             }
             rs.close();
             statement.close();
-            connection.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            dbService.disconnect();
         }
     }
 	public class MemberEditDialog extends JDialog {
@@ -197,21 +199,18 @@ public class ManagerMemberList extends JFrame {
 	        pack();
 	        setLocationRelativeTo(parent);
 	    }
-
 	    private JPanel createEntryPanel(String labelText, JComponent component) {
 	        JPanel entryPanel = new JPanel(new BorderLayout());
 	        entryPanel.add(new JLabel(labelText), BorderLayout.WEST);
 	        entryPanel.add(component, BorderLayout.CENTER); 
 	        return entryPanel;
 	    }
-
 	    private void updateMemberInfo() {
 	        try {
-	            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-	            
+	            dbService.connect();
 	            String sql = "UPDATE user1 SET username=?, password=?, major=?, studentId=?, name=?, phoneNumber=?, mostPreciousThing=? WHERE username=?";
-	            PreparedStatement statement = connection.prepareStatement(sql);
-	            
+	            PreparedStatement statement = dbService.conn.prepareStatement(sql);
+
 	            statement.setString(1, usernameField.getText());
 	            statement.setString(2, passwordField.getText());
 	            statement.setString(3, comboMajor.getSelectedItem().toString());
@@ -219,14 +218,14 @@ public class ManagerMemberList extends JFrame {
 	            statement.setString(5, nameField.getText());
 	            statement.setString(6, phoneNumberField.getText());
 	            statement.setString(7, preciousThingField.getText());
-	            statement.setString(8, username);  // 원래의 username을 사용하여 매칭
-	            
+	            statement.setString(8, username);
+
 	            statement.executeUpdate();
-	            statement.close();
-	            connection.close();
-	            dispose();
 	        } catch (Exception ex) {
 	            ex.printStackTrace();
+	        } finally {
+	            dbService.disconnect();
+	            dispose();
 	        }
 	    }
         private void deleteMember() {

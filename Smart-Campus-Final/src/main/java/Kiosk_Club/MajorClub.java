@@ -1,6 +1,7 @@
 package Kiosk_Club;
 
 import java.awt.*;
+import services.DatabaseService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -9,9 +10,8 @@ import javax.swing.table.JTableHeader;
 import java.sql.*;
 
 public class MajorClub {
-	
+	private static DatabaseService dbService = new DatabaseService();
 	private static JTable table;
-
 	public static JPanel createMajorClubPanel() {
 	    JPanel panel = new JPanel(new BorderLayout());
 	    JPanel imagePanel = new JPanel();
@@ -24,11 +24,9 @@ public class MajorClub {
 	    headerRenderer.setHorizontalAlignment(JLabel.CENTER);
 	    header.setDefaultRenderer(headerRenderer);
 
-	    try {
-	        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-	        Statement stmt = connection.createStatement();
-
-	        // 이미지 경로 가져오기
+        try {
+        	dbService.connect();
+            Statement stmt = dbService.conn.createStatement();
 	        ResultSet rsImage = stmt.executeQuery("SELECT imagePath FROM MajorClubs WHERE imagePath IS NOT NULL");
 	        while (rsImage.next()) {
 	            String imagePath = rsImage.getString("imagePath");
@@ -55,23 +53,19 @@ public class MajorClub {
 	            String 지도교수 = rs.getString("지도교수");
 	            tableModel.addRow(new Object[]{학부, PDLab, 기본활동, 개발과제, 지도교수});
 	        }
-
 	        rs.close();
 	        stmt.close();
-	        connection.close();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
-	    }
-
+        }finally {
+            dbService.disconnect();
+        }
 	    JScrollPane scrollPane = new JScrollPane(table);
 	    int preferredHeight = table.getRowHeight() * 5 + table.getTableHeader().getPreferredSize().height;
 	    scrollPane.setPreferredSize(new Dimension(scrollPane.getPreferredSize().width, preferredHeight));
 	    panel.add(scrollPane, BorderLayout.CENTER);
-
 	    return panel;
 	}
-
-
     public static void main(String[] args) {
         JFrame frame = new JFrame("Major Club");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -79,7 +73,6 @@ public class MajorClub {
         frame.pack();
         frame.setVisible(true);
     }
-
     public static JTable getTableFromPanel(JPanel panel) {
         for (Component comp : panel.getComponents()) {
             if (comp instanceof JScrollPane) {
@@ -91,15 +84,12 @@ public class MajorClub {
         }
         return null;
     }
-
     public static void refreshData(JTable table) {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-        tableModel.setRowCount(0);  // Clear existing data
-
+        tableModel.setRowCount(0);  
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=UTC&characterEncoding=utf-8", "root", "dongyang");
-            Statement stmt = connection.createStatement();
-
+        	dbService.connect();
+            Statement stmt = dbService.conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM MajorClubs");
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -110,12 +100,12 @@ public class MajorClub {
                 String 지도교수 = rs.getString("지도교수");
                 tableModel.addRow(new Object[]{id, 학부, PDLab, 기본활동, 개발과제, 지도교수});
             }
-
             rs.close();
             stmt.close();
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally {
+            dbService.disconnect();
         }
     }
 }

@@ -22,18 +22,15 @@ public class StateScholarshipStudentLoans extends JPanel {
 
         add(contentPanel, BorderLayout.CENTER);
     }
-
     private JPanel createLeftSection() {
         JPanel panel = createItemWithStyledContent("신청기간", "<html>" +
                 "<div style='font-size: 16px; margin-bottom: 15px;'>>> 1학기 12월 ~ 3월 / 2학기 6(7)월 ~ 9월</div>" +
                 "<div style='font-size: 16px; margin-bottom: 15px;'>※ 시행기관 국가장학사업 시행계획에 따라 변동될 수 있음</div>" +
                 "<div style='font-size: 16px; margin-bottom: 15px;'>※ 학자금 대출 시행계획에 따라 변동될 수 있음</div>" +
                 "</html>");
-        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.BLACK));  // Right border
+        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.BLACK)); 
         return panel;
     }
-
-
     private JPanel createRightSection() {
         return createItemWithStyledContent("신청방법", "<html>" +
                 "<div style='font-size: 16px; margin-bottom: 15px;'>>> 한국장학재단 : 한국장학재단 홈페이지 (http://www.kosaf.go.kr) 온라인 신청</div>" +
@@ -41,7 +38,6 @@ public class StateScholarshipStudentLoans extends JPanel {
                 "<div style='font-size: 16px; margin-bottom: 15px;'>※ 한국장학재단 콜센터 : ☎ 1599-2000</div>" +
                 "</html>");
     }
-
     private JPanel createItemWithStyledContent(String title, String styledContent) {
         JPanel itemPanel = new JPanel();
         itemPanel.setLayout(new BorderLayout());
@@ -62,7 +58,6 @@ public class StateScholarshipStudentLoans extends JPanel {
 
         return itemPanel;
     }
-
     private JPanel createItem(String title, String content) {
         JPanel itemPanel = new JPanel();
         itemPanel.setLayout(new BorderLayout());

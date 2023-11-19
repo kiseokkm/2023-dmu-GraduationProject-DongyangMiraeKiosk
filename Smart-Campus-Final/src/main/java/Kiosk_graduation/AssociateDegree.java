@@ -10,13 +10,10 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 public class AssociateDegree extends JPanel {
-	
 	private JScrollPane scrollPane;
-
     public AssociateDegree() {
         initUI();
     }
-
     private void initUI() {
         setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel();
@@ -58,7 +55,6 @@ public class AssociateDegree extends JPanel {
         textPane.setOpaque(false);
         container.add(textPane);
     }
-
     private void addDegreeSection(JPanel container) {
         String[] columnNames = {"종별", "해당 학과"};
         Object[][] data = {
@@ -80,7 +76,6 @@ public class AssociateDegree extends JPanel {
         leftRenderer.setBackground(new Color(220, 220, 220));
         leftRenderer.setForeground(Color.BLACK);
         table.setDefaultRenderer(Object.class, leftRenderer);
-        // Custom cell renderer for wrapping text in cell
         class TextAreaRenderer extends JTextArea implements TableCellRenderer {
             public TextAreaRenderer() {
                 setWrapStyleWord(true);
@@ -100,7 +95,6 @@ public class AssociateDegree extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         container.add(scrollPane);
     }
-    
     private void addGraduationCreditSection(JPanel container) {
         String[] columnNames = {"구분", "2022년 2월 및 8월 졸업대상자", "2023년 2월 이후 졸업대상자"};
         Object[][] data = {
@@ -175,7 +169,6 @@ public class AssociateDegree extends JPanel {
         leftRenderer.setBackground(new Color(220, 220, 220));
         leftRenderer.setForeground(Color.BLACK);
         table.setDefaultRenderer(Object.class, leftRenderer);
-        // Custom cell renderer for wrapping text in cell
         class TextAreaRenderer extends JTextArea implements TableCellRenderer {
             public TextAreaRenderer() {
                 setWrapStyleWord(true);
@@ -195,13 +188,11 @@ public class AssociateDegree extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         container.add(scrollPane);
     }
-    
     private void addTransferStudentCreditTable(JPanel container) {
         JLabel lblTransferCreditRange = new JLabel("[별표 2] 편입학생의 전공최저이수학점 및 졸업학점 범위 지정표");
         lblTransferCreditRange.setFont(new Font("SansSerif", Font.BOLD, 20));
         lblTransferCreditRange.setHorizontalAlignment(SwingConstants.LEFT);
         container.add(lblTransferCreditRange);
-
         String[] columnNames = {
             "편입연도", "수업연한", "편입학 시기", "전공최저 이수학점", "인정학점", "졸업학점", "비고"
         };

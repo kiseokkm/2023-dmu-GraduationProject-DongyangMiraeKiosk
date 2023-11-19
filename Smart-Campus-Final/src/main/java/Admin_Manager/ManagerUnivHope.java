@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import services.DatabaseService;
 
 public class ManagerUnivHope extends JFrame {
     private JTable waitingTable;
@@ -21,11 +22,7 @@ public class ManagerUnivHope extends JFrame {
     private JButton deleteButton;
     private JButton refreshButton;
     private JButton replyButton;
-
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/self_order_kiosk?serverTimezone=Asia/Seoul&characterEncoding=utf-8";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "dongyang";
-
+    private DatabaseService dbService;
     public ManagerUnivHope() {
         setTitle("학교에 바란다 - 관리자 페이지");
         setSize(600, 500);
@@ -177,17 +174,23 @@ public class ManagerUnivHope extends JFrame {
             add(saveButton, BorderLayout.SOUTH);
         }
         private void loadPostDetails(String title) {
-            try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            dbService = new DatabaseService();
+            try {
+                dbService.connect();
                 String sql = "SELECT title, content FROM communication_board WHERE title = ?";
-                PreparedStatement statement = connection.prepareStatement(sql);
+                PreparedStatement statement = dbService.conn.prepareStatement(sql);
                 statement.setString(1, title);
                 ResultSet rs = statement.executeQuery();
                 if (rs.next()) {
                     titleField.setText(rs.getString("title"));
                     contentArea.setText(rs.getString("content"));
                 }
+                rs.close();
+                statement.close();
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                dbService.disconnect();
             }
         }
         private void addPost(String title, String content) {

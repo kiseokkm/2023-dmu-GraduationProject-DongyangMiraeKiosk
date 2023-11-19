@@ -12,13 +12,10 @@ public class ScholarshipOnAndOffCampus extends JPanel {
     public ScholarshipOnAndOffCampus() {
         setLayout(new BorderLayout());
         setBackground(Color.white);
-        
-        // 배경 Container패널 초기화
+  
         staticPanel = new JPanel();
         staticPanel.setLayout(new BoxLayout(staticPanel, BoxLayout.Y_AXIS));
         
-        
-        // StaticPanel에 나머지 추가
         initStaticPanel();
         JScrollPane mainScrollPane = new JScrollPane(staticPanel);
         mainScrollPane.getViewport().setBackground(Color.WHITE);
@@ -26,7 +23,6 @@ public class ScholarshipOnAndOffCampus extends JPanel {
     }
     
     private void initStaticPanel() {
-    	// StaticPanel에 제목 추가
     	JPanel titlePanel = new JPanel(); titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER));  titlePanel.setBackground(Color.white);
         JLabel titleLabel = new JLabel("교내외장학금");
         titleLabel.setFont(new Font("맑은 고딕", Font.BOLD, 24));
@@ -39,7 +35,6 @@ public class ScholarshipOnAndOffCampus extends JPanel {
     }
 
     private void addApplicationProcedureSection() {
-    	// 교내외장학금 타이틀
         JPanel procedurePanel = new JPanel();
         procedurePanel.setLayout(new BoxLayout(procedurePanel, BoxLayout.Y_AXIS));
         
@@ -47,11 +42,10 @@ public class ScholarshipOnAndOffCampus extends JPanel {
         JLabel procedureTitle = new JLabel("신청절차");
         procedureTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
         procedureTitle.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
-        //추가
+        
         TitlePanel.add(procedureTitle);
         procedurePanel.add(TitlePanel);
         
-        // Steps이미지 
         JPanel stepsPanel = new JPanel();
         stepsPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); stepsPanel.setBackground(Color.white);
         
@@ -65,54 +59,15 @@ public class ScholarshipOnAndOffCampus extends JPanel {
 	    procedurePanel.add(stepsPanel);
 	    
 	    staticPanel.add(procedurePanel);
-        
-//        String[] steps = {
-//            "01 학생서비스센터", "장학금 신청 안내\n(홈페이지 공지 및 친구톡 발송 등)",
-//            "02 본인", "홈페이지 e-서비스에서 신청(서류는 학부(과)에 제출)",
-//            "03 각 학부(과)", "장학금 관련 서류 수합하여 장학부서에 제출",
-//            "04 학생서비스센터", "장학부서 수합, 심사 및 지급"
-//        };
-//        for (int i = 0; i < steps.length; i += 2) {
-//            JPanel stepPanel = new JPanel();
-//            stepPanel.setLayout(new BoxLayout(stepPanel, BoxLayout.Y_AXIS));
-//            stepPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-//            stepPanel.setMaximumSize(new Dimension(280, 105));
-//            JPanel stepNumberPanel = new JPanel(new BorderLayout());
-//            stepNumberPanel.setBackground(Color.CYAN);
-//            stepNumberPanel.setMaximumSize(new Dimension(400, 50));
-//            JLabel stepNumber = new JLabel(steps[i], JLabel.CENTER);
-//            stepNumber.setFont(new Font("SansSerif", Font.BOLD, 20));
-//            stepNumber.setBorder(BorderFactory.createEmptyBorder(5, 10, 2, 10));
-//            stepNumberPanel.add(stepNumber, BorderLayout.CENTER);
-//            JPanel stepDescriptionPanel = new JPanel(new BorderLayout());
-//            JLabel stepDescription = new JLabel("<html>" + steps[i + 1].replace("\n", "<br>") + "</html>", JLabel.CENTER);
-//            stepDescription.setFont(new Font("SansSerif", Font.PLAIN, 16));
-//            stepDescription.setBorder(BorderFactory.createEmptyBorder(2, 10, 5, 10));
-//            stepDescriptionPanel.add(stepDescription, BorderLayout.CENTER);
-//            stepPanel.add(stepNumberPanel);
-//            stepPanel.add(stepDescriptionPanel);
-//            stepsPanel.add(stepPanel);
-//            if (i < steps.length - 2) {
-//                JButton arrowButton = new JButton(">");
-//                arrowButton.setFont(new Font("SansSerif", Font.BOLD, 24));
-//                arrowButton.setForeground(Color.CYAN);
-//                arrowButton.setBorderPainted(false);
-//                arrowButton.setContentAreaFilled(false);
-//                stepsPanel.add(arrowButton);
-//            }
-//        }
-//        procedurePanel.add(stepsPanel);
-//        add(procedurePanel, BorderLayout.NORTH);
-    }
-
+    }       
     private void addScholarshipTableSection() {
-        JPanel scholarshipPanel = new JPanel(new BorderLayout());  // 새로운 패널 생성
+        JPanel scholarshipPanel = new JPanel(new BorderLayout());  
 
         JLabel scholarshipTitle = new JLabel("교내 장학금");
         scholarshipTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
         scholarshipTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         scholarshipTitle.setHorizontalAlignment(JLabel.CENTER);
-        scholarshipPanel.add(scholarshipTitle, BorderLayout.NORTH);  // 여기서 NORTH 에 추가
+        scholarshipPanel.add(scholarshipTitle, BorderLayout.NORTH);  
 
         String[] columnNames = {"장학금 종류", "수혜자격", "장학금액 및 비율", "세부사항"};
         Object[][] data = {
@@ -145,16 +100,16 @@ public class ScholarshipOnAndOffCampus extends JPanel {
         JTable table = new JTable(data, columnNames);
 
         JTableHeader header = table.getTableHeader();
-        header.setBackground(new Color(96, 140, 255)); // 살색 배경
+        header.setBackground(new Color(96, 140, 255));
         header.setForeground(Color.white);
-        header.setFont(new Font("맑은 고딕", Font.BOLD, 16)); // 글씨체를 두껍게
+        header.setFont(new Font("맑은 고딕", Font.BOLD, 16));
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scholarshipPanel.add(scrollPane, BorderLayout.CENTER);  // 여기서 CENTER 에 추가 
+        scholarshipPanel.add(scrollPane, BorderLayout.CENTER);  
         scholarshipPanel.setBackground(Color.white);
         addFooterInfoSection(scholarshipPanel); 
 
-        staticPanel.add(scholarshipPanel);   // 전체 패널을 CENTER 에 추가
+        staticPanel.add(scholarshipPanel); 
     }
     private void addFooterInfoSection(JPanel scholarshipPanel) {
         JPanel footerPanel = new JPanel();
@@ -175,7 +130,7 @@ public class ScholarshipOnAndOffCampus extends JPanel {
         }
         JLabel externalScholarshipTitle = new JLabel("교외 장학금");
         externalScholarshipTitle.setFont(new Font("SansSerif", Font.BOLD, 25));
-        externalScholarshipTitle.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));  // 상단 여백을 추가하여 아래로 내림
+        externalScholarshipTitle.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));  
         footerPanel.add(externalScholarshipTitle);
 
         JLabel externalScholarshipInfo = new JLabel(">> 교외장학금 신청 및 안내는 해당 건 발생시 홈페이지 공지사항에 수시로 게시함");
@@ -184,7 +139,6 @@ public class ScholarshipOnAndOffCampus extends JPanel {
 
         scholarshipPanel.add(footerPanel, BorderLayout.SOUTH); 
 
-        scholarshipPanel.add(footerPanel, BorderLayout.SOUTH);  // 여기서 SOUTH 에 추가
+        scholarshipPanel.add(footerPanel, BorderLayout.SOUTH);  
     }
-
 }

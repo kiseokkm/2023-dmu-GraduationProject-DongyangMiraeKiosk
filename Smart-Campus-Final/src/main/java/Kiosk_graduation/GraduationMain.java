@@ -13,19 +13,15 @@ public class GraduationMain extends JPanel {
     public GraduationMain() {
         initGraduationTabs();
     }
-
     private void initGraduationTabs() {
-        graduationTabs = new JTabbedPane(JTabbedPane.TOP); // Tabs at the top
+        graduationTabs = new JTabbedPane(JTabbedPane.TOP);
 
-        // 전문학사 tab
         pnlProfessionalBachelor = new AssociateDegree();
         graduationTabs.addTab("전문학사", pnlProfessionalBachelor);
 
-        // 학사 tab
         pnlCollege = new College();
         graduationTabs.addTab("학사", pnlCollege);
         
-        // 졸업보류 tab
         pnlHoldOnGraduation = new HoldOnGraduation();
         graduationTabs.addTab("졸업보류", pnlHoldOnGraduation);
 
