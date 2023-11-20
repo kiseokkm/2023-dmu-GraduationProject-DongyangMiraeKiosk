@@ -13,7 +13,6 @@ public class DatabaseService {
 
   public DatabaseService() {
   }
-
   public void connect() {
     try {
       conn = DriverManager.getConnection(url, username, password);
@@ -21,7 +20,6 @@ public class DatabaseService {
       System.out.println(e);
     }
   }
-
   public void disconnect() {
     try {
       conn.close();
@@ -29,5 +27,4 @@ public class DatabaseService {
       System.out.println(e);
     }
   }
-
 }

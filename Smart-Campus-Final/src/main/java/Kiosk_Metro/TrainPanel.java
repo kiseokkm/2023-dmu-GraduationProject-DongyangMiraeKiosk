@@ -45,13 +45,11 @@ public class TrainPanel extends JPanel implements ActionListener {
 		if(!str_line.equals("1065")) {
 			this.i_num = Integer.parseInt(str_num);
 		}
-		//��, �ϼ� ����
 		if (updown.equals("0")) {
 			this.str_updown = "1";
 		} else {
 			this.str_updown = "2";
 		}
-		//�뼱���� ���� �¿츦 �����Ͽ� ����ö�� �̵��ϴ� �������� ���
 		btn_train = new JButton();
 		if (updown.equals("0")) {
 			if (train == 0) {
@@ -66,7 +64,6 @@ public class TrainPanel extends JPanel implements ActionListener {
 				btn_train.setIcon(new ImageIcon("images/train_left.png"));
 			}
 		}
-		//����ö�� ��Ȯ�� ��ġ�� �޾� ����, ����, ����� �����ϵ��� ������ �ణ�� �Ÿ��� ��
 		if (state.equals("0")) {
 			str_state = "진입";
 			if (updown.equals("0")) {
@@ -100,7 +97,6 @@ public class TrainPanel extends JPanel implements ActionListener {
 				}
 			}
 		}
-		//��ȯ�뼱���� Ȯ��
 		if (str_det.equals("응암(하선-종착)")) {
 			str_det = "응암순환";
 		}
@@ -118,11 +114,9 @@ public class TrainPanel extends JPanel implements ActionListener {
 		btn_train.setBounds(0, 0, 60, 25);
 
 		if(i_express == 1) {
-			// 급행
 			lbl = new JLabel(str_det, SwingConstants.CENTER);
 			lbl.setForeground(Color.RED);
 		} else {
-			// 일반
 			lbl = new JLabel(str_det, SwingConstants.CENTER);
 			lbl.setForeground(Color.BLACK);
 		}
@@ -132,8 +126,6 @@ public class TrainPanel extends JPanel implements ActionListener {
 
 		add(lbl);
 		add(btn_train);
-		//��������� �׼Ǹ����ʷ� ���
-		//btn_train.addActionListener(this);
 		btn_train.addMouseListener(new MouseAdapter()
         {
             public void mouseEntered(MouseEvent evt)
@@ -155,7 +147,6 @@ public class TrainPanel extends JPanel implements ActionListener {
         });
 		setBounds(x, y, 60, 25);
 	}
-	//����ö �����͸� �ҷ��´�
 	private void DataLoad(String s) {
 		String url = s;
 		String str_result = "";
@@ -238,8 +229,6 @@ public class TrainPanel extends JPanel implements ActionListener {
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		//����ö ��� Ŭ���� �� �ش� ������ ������ �ҷ���
 		if (e.getSource() == btn_train) {
 			Boolean bool_num = false;
 			if(bool_num) {
@@ -249,11 +238,6 @@ public class TrainPanel extends JPanel implements ActionListener {
 				lbl.setText(str_num);
 				bool_num = true;
 			}
-			/*String str_url = "http://openAPI.seoul.go.kr:8088/sample/json/SearchViaSTNArrivalTimeByTrainService/1/5/";
-			str_url += SetTrainNo(str_line) + "/1/" + str_updown;
-			DataLoad(str_url);
-			System.out.println(
-					"열차번호: " + SetTrainNo(str_line) + "\t행선지: " + str_det + "행\t열차 상태: " + str_state + "\t열차 방향: " + str_updown);*/
 		}
 	}
 }

@@ -61,7 +61,7 @@ public class CustomTableCellRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            setBackground(new Color(255, 239, 213)); // 연한 살색
+            setBackground(new Color(255, 239, 213)); 
             return this;
         }
     }

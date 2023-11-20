@@ -16,7 +16,6 @@ public class ManagerClub extends JFrame {
     private JPanel majorClubPanel;
     private DatabaseService dbService = new DatabaseService();
 
-
     public ManagerClub() {
         setTitle("Club Management");
         setSize(800, 600);

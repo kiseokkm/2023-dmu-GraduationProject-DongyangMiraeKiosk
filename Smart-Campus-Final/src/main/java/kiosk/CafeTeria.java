@@ -22,8 +22,7 @@ public class CafeTeria {
 	public static JPanel createWebPanel() {
 	    JFXPanel jfxPanel = new JFXPanel();
 	    String rootPath = System.getProperty("user.dir");
-	    ProcessBuilder processBuilder = new ProcessBuilder("python", rootPath +"/app/app.py");
-//	    processBuilder.directory(new File("/Smart-Campus(Register)_final16")); // Spring 프로젝트 루트 디렉토리로 설정	    
+	    ProcessBuilder processBuilder = new ProcessBuilder("python", rootPath +"/app/app.py");	    
 	    System.out.println(rootPath);
 	    try {
 	        processBuilder.start();
@@ -44,13 +43,12 @@ public class CafeTeria {
                 	String script = "";
                 	script += "document.head.innerHTML += '" + cssLink + "';";
                 	script = "var xhr = new XMLHttpRequest();";
-                    script += "xhr.setRequestHeader('Access-Control-Allow-Origin', '*');"; // CORS 헤더 추가
+                    script += "xhr.setRequestHeader('Access-Control-Allow-Origin', '*');";
                     script += "xhr.send();";
                     WebEngine.executeScript(script);
                 }
             });
-	        WebEngine.load("http://127.0.0.1:5000");	        
-//	        webView.getEngine().load("http://127.0.0.1:5000");        
+	        WebEngine.load("http://127.0.0.1:5000");	              
 	        jfxPanel.setScene(new Scene(webView));
 	    });
 	    JPanel panel = new JPanel(new BorderLayout());

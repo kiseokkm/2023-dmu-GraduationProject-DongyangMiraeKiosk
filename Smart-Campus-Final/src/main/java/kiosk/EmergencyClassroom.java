@@ -59,7 +59,7 @@ public class EmergencyClassroom extends JPanel {
         }
 
         DefaultTableCellRenderer bodyRenderer = new DefaultTableCellRenderer();
-        bodyRenderer.setBackground(new Color(255, 228, 196)); // 연한 살색
+        bodyRenderer.setBackground(new Color(255, 228, 196));
         bodyRenderer.setHorizontalAlignment(JLabel.CENTER);
 
         table.setDefaultRenderer(Object.class, bodyRenderer);

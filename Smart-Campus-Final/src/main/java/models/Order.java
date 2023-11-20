@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2020 Self-Order Kiosk
- */
 package models;
 
 import java.sql.Date;
@@ -8,9 +5,6 @@ import java.util.ArrayList;
 
 public class Order {
 
-  /**
-   * Constants
-   */
   public static final String EAT_IN = "EAT_IN";
   public static final String TAKE_OUT = "TAKE_OUT";
   public static final String PAY_HERE = "PAY_HERE";

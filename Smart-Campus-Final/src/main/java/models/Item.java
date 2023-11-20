@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2020 Self-Order Kiosk
- */
 package models;
 
 public class Item {
@@ -9,7 +6,6 @@ public class Item {
   private String name;
   private double price;
   private String image;
-  private Category category;
 
   public int getId() {
     return this.id;
@@ -42,13 +38,4 @@ public class Item {
   public void setImage(String image) {
     this.image = image;
   }
-
-  public Category getCategory() {
-    return this.category;
-  }
-
-  public void setCategory(Category category) {
-    this.category = category;
-  }
-
 }

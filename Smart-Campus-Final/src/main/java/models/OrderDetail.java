@@ -1,6 +1,4 @@
-/*
- * Copyright (c) 2020 Self-Order Kiosk
- */
+
 package models;
 
 public class OrderDetail extends Item {

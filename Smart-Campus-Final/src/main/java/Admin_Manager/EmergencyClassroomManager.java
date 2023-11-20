@@ -36,7 +36,6 @@ public class EmergencyClassroomManager extends JFrame {
 
         emergencyClassroomPanel = new EmergencyClassroom();
 
-        // 테이블 모델 구성 변경
         DefaultTableModel staffTableModel = new DefaultTableModel(new Object[]{"번호", "소속", "성명", "담당업무", "전화번호"}, 0);
         staffTable = new JTable(staffTableModel);
         JScrollPane scrollPane = new JScrollPane(staffTable);

@@ -32,7 +32,6 @@ public class BusInfoApp {
         mainPanel = new JPanel(new BorderLayout());
         initialize();
     }
-
     private void initialize() {
         tfSearch = new JTextField("버스 정류소 이름을 검색해주세요.", 20);
         tfSearch.setForeground(Color.GRAY);
@@ -43,7 +42,6 @@ public class BusInfoApp {
                     tfSearch.setForeground(Color.BLACK);
                 }
             }
-
             public void focusLost(FocusEvent e) {
                 if (tfSearch.getText().isEmpty()) {
                     tfSearch.setForeground(Color.GRAY);
@@ -51,14 +49,12 @@ public class BusInfoApp {
                 }
             }
         });
-
         btnSearch = new JButton("Search");
         btnSearch.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 searchBusStation();
             }
         });
-
         busStationListModel = new DefaultListModel<>();
         listBusStations = new JList<>(busStationListModel);
         listBusStations.addListSelectionListener(new ListSelectionListener() {
@@ -68,8 +64,7 @@ public class BusInfoApp {
                     displayBusInfoForStation(selectedStation);
                 }
             }
-        });
-        
+        });     
         btnNearbyStations = new JButton("근처 정류소");
         btnNearbyStations.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -77,7 +72,6 @@ public class BusInfoApp {
                 searchBusStation();
             }
         });
-
         listBusStations.setCellRenderer(new BusStationCellRenderer());
 
         JPanel searchPanel = new JPanel();
@@ -91,7 +85,6 @@ public class BusInfoApp {
         mainPanel.add(searchPanel, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
     }
-
     private void searchBusStation() {
         String searchKeyword = tfSearch.getText();
         try {
@@ -115,30 +108,23 @@ public class BusInfoApp {
             e.printStackTrace();
         }
     }
-
     private void displayBusInfoForStation(BusStation station) {
-       System.out.println("Displaying info for station: " + station.getStId()); // 이 줄
+       System.out.println("Displaying info for station: " + station.getStId()); 
         try {
-            // Construct the URL for the real-time bus info API using the station's stId
             String apiUrl = String.format("http://ws.bus.go.kr/api/rest/stationinfo/getStationByUid?serviceKey=%s&arsId=%s",
                                           SERVICE_KEY, station.getStId());
             URL url = new URL(apiUrl);
             
-            // Open a stream to the URL
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(url.openStream());
             
-            // Normalize the XML structure
             doc.getDocumentElement().normalize();
             
-            // Fetching the list of bus arrival information from the XML
             NodeList busInfoList = doc.getElementsByTagName("itemList");
             
-            // Define a ListModel to hold the bus info strings
             DefaultListModel<String> busInfoJListModel = new DefaultListModel<>();
             
-            // Loop through the list and parse the bus arrival information
             Node node;
             Element element;
             String busRouteId;
@@ -150,13 +136,11 @@ public class BusInfoApp {
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     element = (Element) node;
                     
-                    // Parse out the details of the bus arrival
                     busRouteId = getTagValue("busRouteId", element);
                     rtNm = getTagValue("rtNm", element);
                     arrmsg1 = getTagValue("arrmsg1", element);
                     arrmsg2 = getTagValue("arrmsg2", element);
                     
-                    // Create a string with the bus information and add it to the ListModel
                     String busInfo = "Bus Route ID: " + busRouteId +
                                      ", Route Name: " + rtNm +
                                      ", Arrival Message 1: " + arrmsg1 +
@@ -165,11 +149,8 @@ public class BusInfoApp {
                 }
             }
 
-            // Create a JList with the ListModel
             JList<String> busInfoJList = new JList<>(busInfoJListModel);
             
-            // Show the JList in a JOptionPane dialog
-//             JOptionPane.showMessageDialog(null, new JScrollPane(busInfoJList), "Bus Information", JOptionPane.INFORMATION_MESSAGE);
             JFrame infoFrame = new JFrame("Bus Information");
             infoFrame.setTitle("버스");
             infoFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -180,7 +161,6 @@ public class BusInfoApp {
             infoFrame.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
-            // Handle exceptions (e.g., network issues, parsing errors)
         }
     }
 
@@ -199,18 +179,16 @@ public class BusInfoApp {
         private ImageIcon busStopIcon;
 
         public BusStationCellRenderer() {
-            setPreferredSize(new Dimension(200, 50)); // Set the preferred size to double
-            setLayout(new BorderLayout(5, 0)); // 5 pixels gap between the icon and the text
+            setPreferredSize(new Dimension(200, 50)); 
+            setLayout(new BorderLayout(5, 0)); 
             label = new JLabel();
             label.setOpaque(true);
             add(label, BorderLayout.CENTER);
 
-            // Load the icon and resize it to a more appropriate size
             ImageIcon originalIcon = new ImageIcon(BusInfoApp.class.getResource("/icons/bus_StopIcon.png"));
             Image scaledImage = originalIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             busStopIcon = new ImageIcon(scaledImage);
 
-            // Set the icon to a separate JLabel
             JLabel iconLabel = new JLabel(busStopIcon);
             add(iconLabel, BorderLayout.WEST);
         }
@@ -237,7 +215,6 @@ public class BusInfoApp {
         }
     }
 }
-
 class BusStation {
     private String arsId;
     private String stNm;
@@ -266,18 +243,16 @@ class BusStationCellRenderer extends JPanel implements ListCellRenderer<BusStati
     private ImageIcon busStopIcon;
 
     public BusStationCellRenderer() {
-        setPreferredSize(new Dimension(200, 50)); // Set the preferred size to double
-        setLayout(new BorderLayout(5, 0)); // 5 pixels gap between the icon and the text
+        setPreferredSize(new Dimension(200, 50)); 
+        setLayout(new BorderLayout(5, 0)); 
         label = new JLabel();
         label.setOpaque(true);
         add(label, BorderLayout.CENTER);
 
-        // Load the icon and resize it to a more appropriate size
-        ImageIcon originalIcon = new ImageIcon(getClass().getResource("bus_stop.png")); // Relative path used
+        ImageIcon originalIcon = new ImageIcon(getClass().getResource("bus_stop.png")); 
         Image scaledImage = originalIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
         busStopIcon = new ImageIcon(scaledImage);
 
-        // Set the icon to a separate JLabel
         JLabel iconLabel = new JLabel(busStopIcon);
         add(iconLabel, BorderLayout.WEST);
     }

@@ -8,17 +8,14 @@
     flex-direction: column;
     position: absolute;
     bottom: 5px;
-    right: 5px;
-    
+    right: 5px; 
 }
-
     html, body {
         width: 100%;
         height: 100%;
         margin: 0;
         padding: 0;
     }
-
 .floor-buttons button {
     background-color: #070e0f;
     color: #c0997b;
@@ -122,30 +119,23 @@ function updateImage(building, floor) {
     kakao.maps.event.addListener(marker, 'click', function() {
         currentBuilding = placeName;
         displayModal(placeName);
-        // 여기서는 기본적으로 1층 이미지를 로드하지 않습니다.
     });
 })(place.name);
-
-
-
 var modal = document.getElementById('myModal');
     var span = document.getElementsByClassName("close")[0];
 
     span.onclick = function() {
         modal.style.display = "none";
     }
-
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = "none";
         }
     }
-
     function displayModal(text) {
         document.getElementById('modalText').textContent = text;
         modal.style.display = "block";
-    }
-  
+    } 
     var cancelButton = document.createElement("button");
     cancelButton.style.position = "fixed";
     cancelButton.style.top = "60%";
@@ -169,9 +159,7 @@ var modal = document.getElementById('myModal');
         center: new kakao.maps.LatLng(33.450701, 126.570667),
         level: 2
     };
-    
     var map = new kakao.maps.Map(container, options);
-
 var places = [
     {name: "1호관 (대학본부)", lat: 37.499867095832, lng: 126.86836642152, color: '#00274c', text: '1'},
     {name: "1호관(도서관)", lat: 37.500013361039, lng: 126.86775065329, color: '#00274c', text: '1'},
@@ -185,7 +173,6 @@ var places = [
     {name: "축구장", lat: 37.501654961744, lng: 126.86618712093, color: '#14ff76', text: 'F'},
     {name: "기숙사", lat: 37.499426488078, lng: 126.86509429163, color: '#14fff7', text: 'D'}
 ];
-
 for (var i = 0; i < places.length; i++) {
     var place = places[i];
     var markerPosition = new kakao.maps.LatLng(place.lat, place.lng);
@@ -198,7 +185,6 @@ for (var i = 0; i < places.length; i++) {
         )
     });
     marker.setMap(map);
-
 (function(placeName) {
     kakao.maps.event.addListener(marker, 'click', function() {
         displayModal(placeName);
@@ -208,137 +194,105 @@ for (var i = 0; i < places.length; i++) {
 })(place.name);
 
 }
-
-
 map.setCenter(new kakao.maps.LatLng(37.500414353106, 126.86828615849));
-
-
-// Create zoom control
 var zoomControl = new kakao.maps.ZoomControl();
 map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHTBOTTOM);
   </script>
 <script>
    // Function to set the floor image based on the building and floor number
-
-
-// Add click event listeners to all floor buttons in all modals
-
+// Add click event listeners to all floor buttons in all modal
   </script>
 <script>
    function initializeMap() {
         container: 'routingMap', 
         center: [126.86868937316, 37.500071296761], 
         zoom: 15 
-    });
-
-    
+    }); 
     // Add markers for each building
-
         color: '#00274c'
     })
     .setLngLat([126.86836642152, 37.499867095832])
-    .addTo(map);
-    
+    .addTo(map);  
         color: '#00274c'
     })
     .setLngLat([126.86775065329, 37.500013361039])
-    .addTo(map);
-    
+    .addTo(map); 
         color: '#009246'
     })
     .setLngLat([126.86868937316, 37.500071296761])
-    .addTo(map);
-    
+    .addTo(map);   
         color: '#f37735'
     })
     .setLngLat([126.86828615849, 37.500414353106])
     .addTo(map);
-    
         color: '#87ceeb'
     })
     .setLngLat([126.86706755452, 37.500670189792])
-    .addTo(map);
-    
+    .addTo(map);  
         color: '#800080'
     })
     .setLngLat([126.86775086282, 37.501010361427])
     .addTo(map);
-    
         color: '#ffcc33'
     })
     .setLngLat([126.86730521119, 37.501287699517])
-    .addTo(map);
-    
+    .addTo(map); 
         color: '#668c31'
     })
     .setLngLat([126.86683715757, 37.501992979236])
-    .addTo(map);
-    
+    .addTo(map);  
         color: '#ff1467'
     })
     .setLngLat([126.86674390514, 37.500936916629])
-    .addTo(map);
-    
+    .addTo(map);    
         color: '#14ff76'
     })
     .setLngLat([126.86618712093, 37.501654961744])
-    .addTo(map);
-    
+    .addTo(map);   
         color: '#14fff7'
     })
     .setLngLat([126.86509429163, 37.499426488078])
-    .addTo(map);
-     
+    .addTo(map);    
         color: '#00274c'
     })
     .setLngLat([126.86836642152, 37.499867095832])
     .addTo(map);
-
         color: '#00274c'
     })
     .setLngLat([126.86775065329, 37.500013361039])
     .addTo(map);
-
         color: '#009246'
     })
     .setLngLat([126.86868937316, 37.500071296761])
     .addTo(map);
-
         color: '#f37735'
     })
     .setLngLat([126.86828615849, 37.500414353106])
     .addTo(map);
-
         color: '#87ceeb'
     })
     .setLngLat([126.86706755452, 37.500670189792])
     .addTo(map);
-
         color: '#800080'
     })
     .setLngLat([126.86775086282, 37.501010361427])
     .addTo(map);
-
         color: '#ffcc33'
     })
     .setLngLat([126.86730521119, 37.501287699517])
     .addTo(map);
-
         color: '#668c31'
     })
     .setLngLat([126.86683715757, 37.501992979236])
     .addTo(map);
-
         color: '#ff1467'
     })
     .setLngLat([126.86674390514, 37.500936916629])
     .addTo(map);
-
         color: '#14ff76'
     })
     .setLngLat([126.86618712093, 37.501654961744])
     .addTo(map);
-
         color: '#14fff7'
     })
     .setLngLat([126.86509429163, 37.499426488078])
@@ -351,12 +305,10 @@ map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHTBOTTOM);
         {name: "1호관(도서관)", lat: 37.500013361039, lng: 126.86775065329},
         {name: "2호관", lat: 37.500071296761, lng: 126.86868937316},
         {name: "3호관", lat: 37.500414353106, lng: 126.86828615849},
-        // ... (other places can be added here)
     ];
-    var polyline = null; // This will hold the line between start and end locations
+    var polyline = null; 
 
     function showRoute() {
-        // Remove existing polyline if any
         if (polyline) {
             polyline.setMap(null);
         }
@@ -365,14 +317,10 @@ map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHTBOTTOM);
         
 var endLocation = document.getElementById('endLocation').value;
 
-// Check if startLocation and endLocation match the specified values
 if (startLocation === "3호관" && endLocation === "1호관(도서관)") {
-    // Display the roadview button if not already present
     var roadviewButton = document.getElementById("roadviewButton");
     if (!roadviewButton) {
-    	
-    	
-        
+    	       
 roadviewButton = document.createElement("button");
 roadviewButton.style.position = "fixed";
 roadviewButton.style.top = "50%";
@@ -384,28 +332,22 @@ roadviewButton.style.padding = "10px 20px";
         roadviewButton.id = "roadviewButton";
         roadviewButton.innerHTML = "로드뷰";
         roadviewButton.onclick = function() {
-            // Display the roadview modal
             
 var roadviewModal = document.getElementById("roadviewModal");
 var closeButton = roadviewModal.querySelector(".close");
 closeButton.onclick = function() {
     roadviewModal.style.display = "none";
-};
-    
+}; 
             roadviewModal.style.display = "block";
-        };
-        
+        };      
 var showRouteButton = document.querySelector("button[onclick='showRoute()']");
 roadviewButton.style.display = "inline-block";
 roadviewButton.style.marginLeft = "10px";
 showRouteButton.insertAdjacentElement('afterend', roadviewButton);
     
     }
-}
-    
+}   
         var startPosition, endPosition;
-
-        // Find the positions of the start and end locations from the places array
         for (var i = 0; i < places.length; i++) {
             if (places[i].name === startLocation) {
                 startPosition = new kakao.maps.LatLng(places[i].lat, places[i].lng);
@@ -414,11 +356,9 @@ showRouteButton.insertAdjacentElement('afterend', roadviewButton);
                 endPosition = new kakao.maps.LatLng(places[i].lat, places[i].lng);
             }
         }
-
-        // Draw a line between start and end locations
         var path = [startPosition, endPosition];
         polyline = new kakao.maps.Polyline({
-            map: map, // assuming the map variable is named 'map'
+            map: map,
             path: path,
             strokeWeight: 5,
             strokeColor: '#FF4500',
@@ -444,7 +384,6 @@ width: 80%;
         </video>
 </div>
 </div>
-
 // Close the roadview modal if clicked outside of the modal content
 window.onclick = function(event) {
     var roadviewModal = document.getElementById("roadviewModal");
@@ -459,30 +398,25 @@ window.addEventListener('click', function(event) {
         roadviewModal.style.display = "none";
     }
 });
-
 var showRouteButton = document.querySelector("button[onclick='showRoute()']");
 showRouteButton.insertAdjacentElement('afterend', roadviewButton);
 </script><script>
 var showRouteButton = document.querySelector("button[onclick='showRoute()']");
 var roadviewButton = document.getElementById("roadviewButton");
 
-// Adjusting the style to be inline
 roadviewButton.style.display = "inline-block";
 roadviewButton.style.marginLeft = "10px";
 
-// Placing it next to the showRouteButton
 showRouteButton.parentNode.insertBefore(roadviewButton, showRouteButton.nextSibling);
 </script></body></html>
 <script>
    function initializeMap() {
-    if (window.mapInitialized) return; // Ensure the map is initialized only once
+    if (window.mapInitialized) return; 
     
         container: 'routingMap', 
         center: [126.86868937316, 37.500071296761], 
         zoom: 15 
     });
-
-    // Placeholder marker based on Smart_Campus_Map.html
         color: '#00274c'
     })
     .setLngLat([126.86836642152, 37.499867095832])
@@ -550,7 +484,6 @@ showRouteButton.parentNode.insertBefore(roadviewButton, showRouteButton.nextSibl
             dropdown.style.display = 'none';
         }
     }
-
     function toggleMapStyle(styleType) {
         if (styleType === map.getMapTypeId()) {
             map.setMapTypeId(kakao.maps.MapTypeId.NORMAL);
@@ -562,7 +495,6 @@ showRouteButton.parentNode.insertBefore(roadviewButton, showRouteButton.nextSibl
             }
         }
     }
-
     function toggleOverlayMapTypeId(maptype) {
         var changeMaptype;
         if (maptype === 'traffic') {
@@ -572,7 +504,6 @@ showRouteButton.parentNode.insertBefore(roadviewButton, showRouteButton.nextSibl
         } else if (maptype === 'terrain') {
             changeMaptype = kakao.maps.MapTypeId.TERRAIN;
         }
-
         if (currentTypeId === changeMaptype) {
             map.removeOverlayMapTypeId(changeMaptype);
             currentTypeId = null;
@@ -595,7 +526,6 @@ showRouteButton.parentNode.insertBefore(roadviewButton, showRouteButton.nextSibl
     top: 50%;
     transform: translateY(-50%);
 }
-
     .modal {
         display: none;
         position: fixed;
@@ -607,7 +537,6 @@ showRouteButton.parentNode.insertBefore(roadviewButton, showRouteButton.nextSibl
         overflow: auto;
         background-color: rgba(0,0,0,0.4);
     }
-
     .modal-content {
     top: 30%; transform: translateY(-30%);
     top: 0vh;
@@ -618,14 +547,12 @@ showRouteButton.parentNode.insertBefore(roadviewButton, showRouteButton.nextSibl
         border: 1px solid #888;
         width: 80%;
     }
-
     .close {
         color: #aaaaaa;
         float: right;
         font-size: 28px;
         font-weight: bold;
     }
-
     .close:hover,
     .close:focus {
         color: #000;
@@ -661,32 +588,24 @@ showRouteButton.parentNode.insertBefore(roadviewButton, showRouteButton.nextSibl
 </div>
 </div>
 <script>
-
-
-
 var modal = document.getElementById('myModal');
     var span = document.getElementsByClassName("close")[0];
-
     span.onclick = function() {
         modal.style.display = "none";
     }
-
     window.onclick = function(event) {
         if (event.target == modal) {
             modal.style.display = "none";
         }
     }
-
     function displayModal(text) {
         document.getElementById('modalText').textContent = text;
         modal.style.display = "block";
     }
 </script>
 <script>
-
 closeBtn.onclick = function() {
 }
-
 window.onclick = function(event) {
     }
 }

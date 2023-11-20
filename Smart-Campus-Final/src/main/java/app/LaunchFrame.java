@@ -81,10 +81,9 @@ public class LaunchFrame extends JFrame {
        pnlContainer.setPreferredSize(new java.awt.Dimension(640, 480));
        pnlContainer.setLayout(new java.awt.GridBagLayout());
 
-       
        java.awt.Image originalImage = new javax.swing.ImageIcon(getClass().getResource("/app/customer-logo-2.png")).getImage();
-       int newWidth = 70; // 원하는 너비 설정
-       int newHeight = 70; // 원하는 높이 설정
+       int newWidth = 70; 
+       int newHeight = 70; 
        java.awt.Image resizedImage = originalImage.getScaledInstance(newWidth, newHeight, java.awt.Image.SCALE_SMOOTH);
        lblAppLogo.setIcon(new javax.swing.ImageIcon(resizedImage));// NOI18N;
        gridBagConstraints = new java.awt.GridBagConstraints();

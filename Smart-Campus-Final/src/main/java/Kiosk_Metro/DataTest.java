@@ -15,9 +15,7 @@ public class DataTest {
     public DataTest(String str) {
         this.str_line_table = str;
         String url = "https://raw.githubusercontent.com/LDK511/mydata/main/";
-
-        BufferedReader in = null;
-        
+        BufferedReader in = null;  
         try {
             String url_encode = URLEncoder.encode(str, "UTF-8");
             try {

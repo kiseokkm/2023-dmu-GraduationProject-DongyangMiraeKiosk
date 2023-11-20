@@ -40,8 +40,7 @@ public class Main extends JPanel implements ActionListener, Runnable {
             SwingUtilities.updateComponentTreeUI(this);
         } catch (Exception exc) {
             System.err.println("Theme error");
-        }
-        
+        }    
         setLayout(null);
         setPreferredSize(new Dimension(969, 621));
 
@@ -188,153 +187,23 @@ public class Main extends JPanel implements ActionListener, Runnable {
             JSONObject jo = (JSONObject) js.parse(response.toString());
             JSONArray jsonArr = (JSONArray) jo.get("realtimePositionList");
 
-            //System.out.println(response.toString());
-
             for (int i = 0; i < jsonArr.size(); i++) {
                String hobby = jsonArr.get(i).toString();
                JSONObject jj = (JSONObject) js.parse(hobby);
                arr_train.add(new TrainArray(jj.get("statnId").toString(), jj.get("updnLine").toString(),
                      jj.get("trainNo").toString(), jj.get("statnTnm").toString(),
                      jj.get("trainSttus").toString(), jj.get("directAt").toString()));
-               /*System.out.println("[" + i + "]" + "\t코드: " + arr_train.get(i).sta_no + "\t\t열차방향: "
-                     + arr_train.get(i).train_updown + "\t열차번호: " + arr_train.get(i).train_no + "\t도착지: "
-                     + arr_train.get(i).train_det + "\t열차상태: " + arr_train.get(i).train_state + "\t급행: " + arr_train.get(i).train_express);
-            */
             }
          } catch (Exception e) {
             e.printStackTrace();
          }
       } catch (UnsupportedEncodingException e1) {
-         // TODO Auto-generated catch block
          e1.printStackTrace();
       }
    }
 
    @Override
-   public void actionPerformed(ActionEvent e) {
-      // TODO Auto-generated method stub
-      //  ư            ߻  ϴ   ̺ Ʈ   ó   Ѵ .
-      /*if (e.getSource() == btn[0]) {
-         str_img = "images/bg_line1.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1001";
-         i_arr = 0;
-         loadData(arr_line[i_arr]);
-         System.out.println("1호선");
-      }
-      if (e.getSource() == btn[1]) {
-         str_img = "images/bg_line2.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1002";
-         i_arr = 1;
-         loadData(arr_line[i_arr]);
-         System.out.println("2호선");
-      }
-      if (e.getSource() == btn[2]) {
-         str_img = "images/bg_line3.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1003";
-         i_arr = 2;
-         loadData(arr_line[i_arr]);
-         System.out.println("3호선");
-      }
-      if (e.getSource() == btn[3]) {
-         str_img = "images/bg_line4.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1004";
-         i_arr = 3;
-         loadData(arr_line[i_arr]);
-         System.out.println("4호선");
-      }
-      if (e.getSource() == btn[4]) {
-         str_img = "images/bg_line5.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1005";
-         i_arr = 4;
-         loadData(arr_line[i_arr]);
-         System.out.println("5호선");
-      }
-      if (e.getSource() == btn[5]) {
-         str_img = "images/bg_line6.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1006";
-         i_arr = 5;
-         loadData(arr_line[i_arr]);
-         System.out.println("6호선");
-      }
-      if (e.getSource() == btn[6]) {
-         str_img = "images/bg_line7.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1007";
-         i_arr = 6;
-         loadData(arr_line[i_arr]);
-         System.out.println("7호선");
-      }
-      if (e.getSource() == btn[7]) {
-         str_img = "images/bg_line8.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1008";
-         i_arr = 7;
-         loadData(arr_line[i_arr]);
-         System.out.println("8호선");
-      }
-      if (e.getSource() == btn[8]) {
-         str_img = "images/bg_line9.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1009";
-         i_arr = 8;
-         loadData(arr_line[i_arr]);
-         System.out.println("9호선");
-      }
-      if (e.getSource() == btn[9]) {
-         str_img = "images/bg_linekj.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1063";
-         i_arr = 9;
-         loadData(arr_line[i_arr]);
-         System.out.println("경의중앙선");
-      }
-      if (e.getSource() == btn[10]) {
-         str_img = "images/bg_linebd.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1075";
-         i_arr = 10;
-         loadData(arr_line[i_arr]);
-         System.out.println("분당선");
-      }
-      if (e.getSource() == btn[11]) {
-         str_img = "images/bg_linesi.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1071";
-         i_arr = 11;
-         loadData(arr_line[i_arr]);
-         System.out.println("수인선");
-      }
-      if (e.getSource() == btn[12]) {
-         str_img = "images/bg_linesb.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1077";
-         i_arr = 12;
-         loadData(arr_line[i_arr]);
-         System.out.println("신분당선");
-      }
-      if (e.getSource() == btn[13]) {
-         str_img = "images/bg_linekc.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1067";
-         i_arr = 13;
-         loadData(arr_line[i_arr]);
-         System.out.println("경춘선");
-      }
-      if (e.getSource() == btn[14]) {
-         str_img = "images/bg_linegc.png";
-         icon = new ImageIcon(str_img);
-         str_line = "1065";
-         i_arr = 14;
-         loadData(arr_line[i_arr]);
-         System.out.println("공항철도");
-      }*/
-      
+   public void actionPerformed(ActionEvent e) {     
       if(e.getSource() == jcb) {
          switch(jcb.getSelectedIndex()) {
          case 0:
@@ -491,23 +360,20 @@ public class Main extends JPanel implements ActionListener, Runnable {
          try {
             Thread.sleep(10000);
          } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
          }
       }
    }
     public static void main(String[] args) {
         JFrame frame = new JFrame("실시간 지하철");
-        Main panel = new Main(); // Main은 이제 JPanel을 상속받음
-        frame.setContentPane(panel); // frame에 panel을 컨텐트 팬으로 설정
-        frame.setSize(969, 621); // 또는 panel.setPreferredSize(new Dimension(969, 621)); 사용
-        frame.setLocationRelativeTo(null); // 화면 중앙에 위치
+        Main panel = new Main(); 
+        frame.setContentPane(panel); 
+        frame.setSize(969, 621); 
+        frame.setLocationRelativeTo(null); 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setVisible(true);
-        Thread t1 = new Thread(panel); // panel은 Runnable을 구현하므로 Thread에 직접 전달할 수 있음
+        Thread t1 = new Thread(panel); 
         t1.start();
     }   
-    
 }
-

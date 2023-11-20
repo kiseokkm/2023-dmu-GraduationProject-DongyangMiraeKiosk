@@ -35,14 +35,12 @@ import Kiosk_Metro.*;
 import java.awt.FlowLayout;
 
 public class MenuFrame extends javax.swing.JFrame implements StateObserver {
-
   services.ItemService itemService;
   java.util.ArrayList<models.Item> itemsNoticeFrame;
   java.util.ArrayList<models.Item> itemsClass;
   java.util.ArrayList<models.Item> itemsFood;
   java.util.ArrayList<models.Item> itemsMap;
   private javax.swing.JPanel pnlMetro;
-  
   public MenuFrame() {
        try {
            app.Global.setAppIcon(this);
@@ -240,8 +238,6 @@ public class MenuFrame extends javax.swing.JFrame implements StateObserver {
 
   private void initModels() {
     itemService = new services.ItemService();
-    itemsNoticeFrame = itemService.getAllByCategory(1);
-
   }
   private void initState() {
     getAllOrderedItems();
