@@ -22,3 +22,6 @@
 ## 기본 시스템 구성도
 ![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/aaaee407-51e9-4e7c-be1e-f45779c19c97)
 
+## 세부 시스템 구성도
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/3e8af5f5-7a3f-4e34-9185-64bb0ee9afef)
+
