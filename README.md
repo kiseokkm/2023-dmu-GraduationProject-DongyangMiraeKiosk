@@ -20,3 +20,5 @@
 이처럼 Google cloud Speech-To-Text, Google cloud Text-to-Speech, 액추에이터를 활용한 학교 키오스크 개발은 기존 키오스크의 한계를 극복하고, 사용자 경험을 향상시킬 수 있는 기회이다. 따라서 이러한 기능을 통합한 학교 키오스크의 개발은 학교생활의 효율성과 접근성을 높일 수 있는 중요한 프로젝트로써, 위와 같은 필요성을 확보한다.
 
 ## 기본 시스템 구성도
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/aaaee407-51e9-4e7c-be1e-f45779c19c97)
+
