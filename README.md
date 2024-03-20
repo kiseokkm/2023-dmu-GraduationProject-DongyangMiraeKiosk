@@ -5,23 +5,24 @@
 #### - The November-
 -------------------------------------------------------------------
 ## 개발배경
-현대 사회에서는 기술의 발전과 함께 다양한 분야에서 키오스크를 활용한다. 이를 바탕으로 학교에 대해 잘 모르는 신입생들과 코로나로 인한 비대면 수업 방식 때문에 학교에서 수업을 받는 데에 익숙하지 않은 재학생들, 그리고 학교의 변화에 둔감한 복학생들, 이 외에도 처음 방문하시거나 새롭게 부임하신 교수님들 등 다양한 부류의 계층에게 특별한 도움을 줄 수 있는 키오스크가 있다면 학생들의 적극성과 참여도를 높이며, 학교 내부 구조와 교육 프로그램 등에 대한 정보를 제공받아 학교생활에 더욱 능동적으로 참여할 수 있으며, 학교의 전반적인 이미지 향상까지도 기대할 수 있다. 
- 그러나 기존의 키오스크는 터치스크린 기반의 인터페이스를 사용하고 있어서 공용시설로서의 위생 문제와 편의성 측면에서 개선의 여지가 있다. 또한, 장애를 가진 사람들이나 키오스크 사용에 익숙하지 않은 연령대의 사람들에게는 사용하는 데에 많은 어려움을 겪는 경우도 심심치 않게 목격된다. 그 밖에도 기술에 익숙한 사람들일지라도, 기기 오류나 복잡한 조작에 따라 난감한 경우가 생기기도 한다. 
-키오스크의 이러한 단점을 개선한다면 ‘키오스크’는 이용자의 편리성과 접근성을 더 높일 수 있다. 이를 위해 음성 인식, 높이 조절 기능을 갖춘 학교 키오스크를 개발할 필요가 있다. 
-이렇게 개선된 키오스크는 학교생활에 대한 정보를 제공함으로써, 다양한 학생들에게 도움이 되며, 더 나아가 학교 생활의 만족도를 향상시킨다.
+기존 키오스크의 위생 및 사용상 문제를 해결하고, 모든 사용자의 접근성을 높이기 위해 음성 인식과 높이 조절 기능을 갖춘 새로운 학교 키오스크의 개발이 필요하다. 이는 신입생부터 교수님까지 학교 구성원 모두에게 학교 정보 접근을 용이하게 하여 적극적 참여를 증진시키고, 학교의 전반적인 이미지를 향상시킬 수 있다.
 
-## 개발필요성
-1. 액추에이터를 이용한 높이 조절 기능:
-높이 조절 기능을 통해 키가 작은 학생들이나 휠체어를 이용하는 장애인들도 편리하게 키오스크를 사용할 수 있다. 이를 통해 학교 키오스크의 접근성을 높이고 사용자 만족도를 향상시킨다. 
-2. Google cloud Speech-To-Text를 활용한 음성 검색 기능:
- Google cloud Speech-To-Text를 통해 사용자가 음성으로 검색할 수 있는 기능을 제공함으로써, 장애인이나 손이 불편한 학생들도 쉽게 정보를 찾을 수 있다. 또한 음성 인식 기능을 통해 사용자 경험(UX)을 향상시킨다.
-3. Google cloud Text-to-Speech를 활용한 음성 안내 기능:
- Google cloud Text-to-Speech를 통해 사용자에게 직관적이고 편리한 인터랙션을 제공하여, 각 기능에 대한 활용 정보를 얻을 수 있으며, 다양한 언어를 지원하여 언어 장벽을 줄이며, 이는 모든 사용자에 대한 개발 필요성을 확보한다.
-이처럼 Google cloud Speech-To-Text, Google cloud Text-to-Speech, 액추에이터를 활용한 학교 키오스크 개발은 기존 키오스크의 한계를 극복하고, 사용자 경험을 향상시킬 수 있는 기회이다. 따라서 이러한 기능을 통합한 학교 키오스크의 개발은 학교생활의 효율성과 접근성을 높일 수 있는 중요한 프로젝트로써, 위와 같은 필요성을 확보한다.
+## 시스템 설계
+---
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/0aa36a10-1d2e-41b1-9b56-353c1be3d568)
+## 기능 설계
+---
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/c101f54e-56c0-4eba-9bad-b01a6ff26af8)
 
-## 기본 시스템 구성도
-![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/aaaee407-51e9-4e7c-be1e-f45779c19c97)
-
-## 세부 시스템 구성도
-![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/3e8af5f5-7a3f-4e34-9185-64bb0ee9afef)
-
+# 구현
+---
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/7fdcddb5-0d49-4ca4-9e5f-57ec21bdfc6b)
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/2db688c7-fa80-4a2e-a2a0-93629759037c)
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/20e82573-8b9f-48fc-8802-5f211e082d79)
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/59655703-b95d-4add-b1a7-e807aee566ca)
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/445003c7-785a-4b26-bbc2-b7ed965453f0)
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/7ebdb348-5c93-4aef-a83d-1b3323e2f1b0)
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/8bd2c615-8828-4f8f-8581-a3a50a08b497)
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/475b0c0f-6086-4300-ad3c-af0823e4b0cd)
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/1186e2c0-bdb7-497d-bc85-b0670029438e)
+![image](https://github.com/kiseokkm/2023-dmu-GraduationProject-DongyangMiraeKiosk/assets/132454778/5966ca94-3e2d-4a3a-b3d1-9f16e4cfb586)
